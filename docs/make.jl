@@ -15,7 +15,7 @@ function rendernotebook(name)
     session = Pluto.ServerSession()
     notebook = Pluto.SessionActions.open(session, input; run_async = false)
     html_contents = Pluto.generate_html(notebook)
-    write(output, html_contents)
+    return write(output, html_contents)
 end
 
 include("makeplots.jl")
@@ -30,18 +30,20 @@ function mkdocs()
         makeplots(example_md_dir; Plotter = CairoMakie, extension = "svg")
     end
     generated_examples = joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(example_md_dir)))
-    makedocs(; sitename = "GridVisualize.jl",
-             modules = [GridVisualize],
-             doctest = false,
-             clean = false,
-             authors = "J. Fuhrmann",
-             repo = "https://github.com/WIAS-PDELib/GridVisualize.jl",
-             pages = [
-                 "Home" => "index.md",
-                 "Public API" => "api.md",
-                 "Private API" => "privapi.md",
-                 "Examples" => generated_examples,
-             ])
+    return makedocs(;
+        sitename = "GridVisualize.jl",
+        modules = [GridVisualize],
+        doctest = false,
+        clean = false,
+        authors = "J. Fuhrmann",
+        repo = "https://github.com/WIAS-PDELib/GridVisualize.jl",
+        pages = [
+            "Home" => "index.md",
+            "Public API" => "api.md",
+            "Private API" => "privapi.md",
+            "Examples" => generated_examples,
+        ]
+    )
 end
 
 mkdocs()

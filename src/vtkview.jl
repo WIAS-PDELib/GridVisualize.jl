@@ -14,7 +14,7 @@ function initialize!(p::GridVisualizer, ::Type{VTKViewType})
     end
     VTKView.layout!(frame, tlayout...)
     VTKView.size!(frame, pctx[:size]...)
-    pctx
+    return pctx
 end
 
 function save(fname, p, ::Type{VTKViewType})
@@ -23,7 +23,7 @@ function save(fname, p, ::Type{VTKViewType})
     if ext != ".png"
         error("VTKView can only save png files")
     end
-    VTKView.writepng(p.context[:frame], fname)
+    return VTKView.writepng(p.context[:frame], fname)
 end
 
 function save(fname, scene, VTKView, ::Type{VTKViewType})
@@ -31,17 +31,17 @@ function save(fname, scene, VTKView, ::Type{VTKViewType})
     if ext != ".png"
         error("VTKView can only save png files")
     end
-    VTKView.writepng(scene, fname)
+    return VTKView.writepng(scene, fname)
 end
 
 function reveal(p::GridVisualizer, ::Type{VTKViewType})
     VTKView = p.Plotter
     VTKView.display(p.context[:frame])
-    p.context[:frame]
+    return p.context[:frame]
 end
 
 function reveal(ctx::SubVisualizer, TP::Type{VTKViewType})
-    if ctx[:show] || ctx[:reveal]
+    return if ctx[:show] || ctx[:reveal]
         reveal(ctx[:GridVisualizer], TP)
     end
 end
@@ -62,7 +62,7 @@ function gridplot!(ctx, TP::Type{VTKViewType}, grid)
         VTKView.data!(ctx[:gridview], ctx[:dataset])
         VTKView.addview!(frame, ctx[:gridview], ctx[:iplot]...)
     end
-    reveal(ctx, TP)
+    return reveal(ctx, TP)
 end
 
 gridplot!(ctx, T::Type{VTKViewType}, ::Type{Val{2}}, grid) = gridplot!(ctx, T, grid)
@@ -93,14 +93,14 @@ function scalarplot!(ctx, TP::Type{VTKViewType}, grids, parentgrid, funcs)
         VTKView.isolevels!(ctx[:scalarview], [ctx[:flevel]])
         VTKView.show_isosurfaces!(ctx[:scalarview], true)
     end
-    reveal(ctx, TP)
+    return reveal(ctx, TP)
 end
 
 function scalarplot!(ctx, T::Type{VTKViewType}, ::Type{Val{2}}, grids, parentgrid, funcs)
-    scalarplot!(ctx, T, grids, parentgrid, funcs)
+    return scalarplot!(ctx, T, grids, parentgrid, funcs)
 end
 function scalarplot!(ctx, T::Type{VTKViewType}, ::Type{Val{3}}, grids, parentgrid, funcs)
-    scalarplot!(ctx, T, grids, parentgrid, funcs)
+    return scalarplot!(ctx, T, grids, parentgrid, funcs)
 end
 gridplot!(ctx, T::Type{VTKViewType}, ::Type{Val{1}}, grid) = nothing
 
@@ -129,7 +129,7 @@ function scalarplot!(ctx, TP::Type{VTKViewType}, ::Type{Val{1}}, grids, parentgr
     end
 
     VTKView.addplot!(plot, collect(grid[Coordinates][1, :]), collect(func))
-    reveal(ctx, TP)
+    return reveal(ctx, TP)
 end
 
 vectorplot!(ctx, TP::Type{VTKViewType}, ::Type{Val{1}}, grid, func) = nothing

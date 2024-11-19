@@ -83,5 +83,5 @@ function makeplots(picdir; Plotter = GLMakie, extension = "png")
     @test isfile(fname)
     println("custom")
 
-    true
+    return true
 end

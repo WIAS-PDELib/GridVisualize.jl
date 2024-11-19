@@ -6,8 +6,12 @@ using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
-    quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+    return quote
+        local iv = try
+            Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value
+        catch
+            b -> missing
+        end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
@@ -51,8 +55,10 @@ md"""
 # ╔═╡ a20d74c9-16da-408a-b247-0c17321888f9
 function testplot1()
     grid = simplexgrid(0:0.01:10)
-    scalarplot(grid, map(sin, grid); resolution = (600, 200), markershape = :star5,
-               markevery = 20, xlabel = "x", ylabel = "z", legend = :rt, label = "sin")
+    return scalarplot(
+        grid, map(sin, grid); resolution = (600, 200), markershape = :star5,
+        markevery = 20, xlabel = "x", ylabel = "z", legend = :rt, label = "sin"
+    )
 end
 
 # ╔═╡ 33482af8-3542-4723-ae43-770a789b69b3
@@ -62,11 +68,15 @@ testplot1()
 function testplot2(; t = 0)
     p = GridVisualizer(; resolution = (500, 200), legend = :rt, xlabel = "x")
     grid = simplexgrid(0:0.01:10)
-    scalarplot!(p, grid, map(x -> sin(x - t), grid); color = :red, label = "sin(x-$(t))",
-                linestyle = :dash)
-    scalarplot!(p, grid, map(cos, grid); color = :green, clear = false, label = "cos",
-                linestyle = :dashdot, linewidth = 3)
-    reveal(p)
+    scalarplot!(
+        p, grid, map(x -> sin(x - t), grid); color = :red, label = "sin(x-$(t))",
+        linestyle = :dash
+    )
+    scalarplot!(
+        p, grid, map(cos, grid); color = :green, clear = false, label = "cos",
+        linestyle = :dashdot, linewidth = 3
+    )
+    return reveal(p)
 end
 
 # ╔═╡ 84192945-d4b6-4949-8f06-d94e04a7a56d
@@ -125,19 +135,23 @@ let
     func1 = map((x) -> x, g1)
     func2 = map((x) -> -x, g2)
     func = map(x -> x^2 / 100, g)
-    scalarplot!(vis,
-                [g1, g2],
-                g,
-                [func1, func2];
-                elevation = 0.1,
-                clear = true,
-                color = :red,)
-    scalarplot!(vis,
-                g,
-                func;
-                elevation = 0.1,
-                clear = false,
-                color = :green,)
+    scalarplot!(
+        vis,
+        [g1, g2],
+        g,
+        [func1, func2];
+        elevation = 0.1,
+        clear = true,
+        color = :red,
+    )
+    scalarplot!(
+        vis,
+        g,
+        func;
+        elevation = 0.1,
+        clear = false,
+        color = :green,
+    )
     reveal(vis)
 end
 
@@ -151,7 +165,7 @@ function testgridplot()
     grid = simplexgrid(0:1:10)
     cellmask!(grid, [0.0], [5], 2)
     bfacemask!(grid, [5], [5], 3)
-    gridplot(grid; resolution = (600, 200), legend = :rt)
+    return gridplot(grid; resolution = (600, 200), legend = :rt)
 end
 
 # ╔═╡ d503ee1e-1e1f-4235-b286-dc3137a2c96a
@@ -167,8 +181,10 @@ function testplot3()
     X = 0:0.1:10
     grid = simplexgrid(X, X)
     f = map((x, y) -> sin(x) * atan(y), grid)
-    scalarplot(grid, f;
-               resolution = (300, 300), limits = (-π / 2, π / 2))
+    return scalarplot(
+        grid, f;
+        resolution = (300, 300), limits = (-π / 2, π / 2)
+    )
 end
 
 # ╔═╡ 0998a9a7-d57a-476e-aacd-bee9396e9b8f
@@ -226,7 +242,7 @@ md"""
 function testgridplot2d()
     X = -1:0.2:1
     grid = simplexgrid(X, X)
-    gridplot(grid; resolution = (300, 300))
+    return gridplot(grid; resolution = (300, 300))
 end
 
 # ╔═╡ 1388c246-be49-4757-a2cc-a685642b6b37
@@ -242,13 +258,13 @@ Here we use the possibility to update plots to allow moving isosurfaces and plan
 # ╔═╡ 0c99daca-f9a8-4116-867b-e13461c3e754
 function grid3d(; n = 15)
     X = collect(0:(1 / n):1)
-    g = simplexgrid(X, X, X)
+    return g = simplexgrid(X, X, X)
 end
 
 # ╔═╡ 82ccfd24-0053-4399-9bc8-b2e4010bbc92
 function func3d(; n = 15)
     g = grid3d(; n = n)
-    g, map((x, y, z) -> sinpi(2 * x) * sinpi(3.5 * y) * sinpi(1.5 * z), g)
+    return g, map((x, y, z) -> sinpi(2 * x) * sinpi(3.5 * y) * sinpi(1.5 * z), g)
 end
 
 # ╔═╡ 8b20f720-5470-4da7-bbb6-b746e887046e
@@ -267,9 +283,11 @@ z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
 """
 
 # ╔═╡ ecd941a0-85b7-4bb7-a903-b19a500198e1
-scalarplot!(p3d, g3, f3; levels = [flevel], xplanes = [xplane], yplanes = [yplane],
-            zplanes = [zplane], colormap = :hot, outlinealpha = 0.05, show = true,
-            levelalpha = 0.5)
+scalarplot!(
+    p3d, g3, f3; levels = [flevel], xplanes = [xplane], yplanes = [yplane],
+    zplanes = [zplane], colormap = :hot, outlinealpha = 0.05, show = true,
+    levelalpha = 0.5
+)
 
 # ╔═╡ d924d90d-4102-4ae8-b8de-254a17a5d4df
 begin
@@ -294,15 +312,17 @@ let
     g2 = subgrid(g, [2])
     func1 = map((x, y, z) -> (x + y + z), g1)
     func2 = map((x, y, z) -> (3 - x - y - z), g2)
-    scalarplot([g1, g2],
-               g,
-               [func1, func2];
-               levels = 0,
-               yplane = 0.25,
-               xplane = 0.25,
-               zplane = 0.25,
-               levelalpha = 1,
-               colormap = :hot,)
+    scalarplot(
+        [g1, g2],
+        g,
+        [func1, func2];
+        levels = 0,
+        yplane = 0.25,
+        xplane = 0.25,
+        zplane = 0.25,
+        levelalpha = 1,
+        colormap = :hot,
+    )
 end
 
 # ╔═╡ 4b9113d2-10bd-4f7a-a2b8-22092656c6b3
@@ -344,11 +364,11 @@ function qv2d(; n = 20, stream = false, kwargs...)
     gvis = GridVisualizer(; resolution = (400, 400))
     scalarplot!(gvis, grid, v; colormap = :summer, levels = 7)
     vectorplot!(gvis, grid, ∇v; clear = false, show = true, kwargs...)
-    reveal(gvis)
+    return reveal(gvis)
 end
 
 # ╔═╡ 812af347-7606-4c54-b155-88322d20d921
-qv2d(; n = 50, rasterpoints=16)
+qv2d(; n = 50, rasterpoints = 16)
 
 # ╔═╡ 09998521-68b6-45b4-8c1d-ae73bbd431ad
 md"""
@@ -362,8 +382,10 @@ let vis = GridVisualizer(; resolution = (600, 600), layout = (2, 2))
     scalarplot!(vis[1, 1], X, sin.(2 * X))
     scalarplot!(vis[1, 2], g2, (x, y) -> sin(x) * cos(y))
     scalarplot!(vis[2, 1], g2, (x, y) -> sin(x) * cos(y); colormap = :hot)
-    scalarplot!(vis[2, 2], g2, (x, y) -> sin(x) * cos(y); colormap = :hot,
-                backend = :plotly)
+    scalarplot!(
+        vis[2, 2], g2, (x, y) -> sin(x) * cos(y); colormap = :hot,
+        backend = :plotly
+    )
     reveal(vis)
 end
 
@@ -418,12 +440,16 @@ begin
 end
 
 # ╔═╡ 608a5704-a84c-4c55-8642-ecddb275dc1b
-scalarplot(XX, YY, (x, y) -> sin(4x) * 10 * y; aspect = 0.1, xlabel = "aaa",
-           size = (300, 300))
+scalarplot(
+    XX, YY, (x, y) -> sin(4x) * 10 * y; aspect = 0.1, xlabel = "aaa",
+    size = (300, 300)
+)
 
 # ╔═╡ 3efbeb11-eaa4-4fc5-bd5f-b3bdb63e7772
-scalarplot(XX, YY, (x, y) -> sin(4x) * 10 * y; aspect = 0.1, xlabel = "aaa",
-           size = (300, 300), backend = :plotly)
+scalarplot(
+    XX, YY, (x, y) -> sin(4x) * 10 * y; aspect = 0.1, xlabel = "aaa",
+    size = (300, 300), backend = :plotly
+)
 
 # ╔═╡ ccd274d2-68c0-40e0-8ba7-b8421f5ec9d3
 gridplot(simplexgrid(XX, YY); aspect = 0.1)

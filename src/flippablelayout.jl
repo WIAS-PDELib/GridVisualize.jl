@@ -53,16 +53,18 @@ mutable struct FLayout
     condition::Condition
 
     function FLayout(visible; blocked = false)
-        new(visible,
+        return new(
+            visible,
             Makie.GridLayout(; bbox = Makie.BBox(-500, -400, -500, -400)),
             blocked,
             Dict{Tuple{Int64, Int64}, Any}(),
-            Condition())
+            Condition()
+        )
     end
 end
 
 function Base.setindex!(flayout::FLayout, layoutable, i, j)
-    if isnothing(layoutable)
+    return if isnothing(layoutable)
         flayout.offscreen[1, 1] = flayout.layoutables[(i, j)]
         delete!(flayout.layoutables, (i, j))
     elseif !isa(layoutable, Union{Makie.Block, Makie.GridLayout})
@@ -80,21 +82,21 @@ function _showall(flayout::FLayout)
     for (pos, layoutable) in flayout.layoutables
         flayout.visible[pos...] = layoutable
     end
-    Makie.trim!(flayout.visible)
+    return Makie.trim!(flayout.visible)
 end
 
 #
 # Check if mouse position is  within pixel area of scene
 #
 function _inarea(area, pos)
-    pos[1] > area.origin[1] &&
+    return pos[1] > area.origin[1] &&
         pos[1] < area.origin[1] + area.widths[1] &&
         pos[2] > area.origin[2] &&
         pos[2] < area.origin[2] + area.widths[2]
 end
 
 function _inscene(l, pos)
-    if isa(l, Makie.Block)
+    return if isa(l, Makie.Block)
         _inarea(l.scene.viewport[], pos)
     elseif isa(l, Makie.GridLayout)
         _inarea(l.layoutobservables.computedbbox[], pos)
@@ -121,10 +123,12 @@ The `kwargs...` are the same as of `AbstractPlotting.layoutscene`.
 The idea is that this can work in some cases as a drop-in replacement
 of `layoutscene`.     
 """
-function flayoutscene(; blocked = false,
-                      focuskey = Makie.Keyboard.comma,
-                      blockingkey = Makie.Keyboard.space,
-                      kwargs...)
+function flayoutscene(;
+        blocked = false,
+        focuskey = Makie.Keyboard.comma,
+        blockingkey = Makie.Keyboard.space,
+        kwargs...
+    )
     parent = Makie.Scene(; camera = Makie.campixel!, kwargs...)
     layout = Makie.GridLayout(parent; alignmode = Makie.Outside(5))
 
@@ -152,7 +156,7 @@ function flayoutscene(; blocked = false,
                 flayout.offscreen[1, 1] = layoutable
             end
         end
-        Makie.trim!(flayout.visible)
+        return Makie.trim!(flayout.visible)
     end
 
     # Figure out to which subscene the mouse position
@@ -167,7 +171,7 @@ function flayoutscene(; blocked = false,
     end
 
     function _toggle_block(flayout::FLayout)
-        if flayout.blocked
+        return if flayout.blocked
             flayout.blocked = false
             notify(flayout.condition)
         else
@@ -197,7 +201,7 @@ function flayoutscene(; blocked = false,
         end
         return false
     end
-    parent, flayout
+    return parent, flayout
 end
 
 """
@@ -207,7 +211,7 @@ Yield and wait in case of scene being blocked via space key toggle
 """
 function yieldwait(flayout::FLayout)
     yield()
-    if flayout.blocked
+    return if flayout.blocked
         wait(flayout.condition)
     end
 end

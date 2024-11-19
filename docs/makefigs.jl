@@ -20,5 +20,5 @@ function makefigs()
 
     Plotter = VTKView
     scene = plotting_multiscene(; Plotter = Plotter)
-    save("multiscene_vtkview.png", scene; Plotter = Plotter)
+    return save("multiscene_vtkview.png", scene; Plotter = Plotter)
 end

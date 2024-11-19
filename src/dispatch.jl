@@ -8,7 +8,7 @@ if one of these packages is imported.
 """
 function default_plotter()
     global default_backend
-    default_backend
+    return default_backend
 end
 
 """
@@ -17,7 +17,7 @@ end
 Set plotter module or `nothing` as the default plotter backend.
 """
 function default_plotter!(Plotter)
-    global default_backend = Plotter
+    return global default_backend = Plotter
 end
 
 """
@@ -130,7 +130,7 @@ function plottertype(Plotter::Union{Module, Nothing})
     elseif isplutovista(Plotter)
         return PlutoVistaType
     end
-    Nothing
+    return Nothing
 end
 
 plottername(::Type{MakieType}) = "Makie"
@@ -151,7 +151,7 @@ including the type of the plotter and its position in the plot.
 const SubVisualizer = Union{Dict{Symbol, Any}, Nothing}
 
 #
-# Update subplot context from dict 
+# Update subplot context from dict
 # and provide some backward compatibilitiy switches.
 function _update_context!(ctx::SubVisualizer, kwargs)
     for (k, v) in kwargs
@@ -166,7 +166,7 @@ function _update_context!(ctx::SubVisualizer, kwargs)
     haskey(ctx, :zplane) ? ctx[:zplanes] = [ctx[:zplane]] : nothing
     haskey(ctx, :alpha) ? ctx[:outlinealpha] = ctx[:alpha] : nothing
 
-    ctx
+    return ctx
 end
 
 """
@@ -178,10 +178,12 @@ struct GridVisualizer
     Plotter::Union{Module, Nothing}
     subplots::Array{SubVisualizer, 2}
     context::SubVisualizer
-    function GridVisualizer(Plotter::Union{Module, Nothing},
-                            layout::Tuple,
-                            default::SubVisualizer)
-        new(Plotter, [copy(default) for I in CartesianIndices(layout)], copy(default))
+    function GridVisualizer(
+            Plotter::Union{Module, Nothing},
+            layout::Tuple,
+            default::SubVisualizer
+        )
+        return new(Plotter, [copy(default) for I in CartesianIndices(layout)], copy(default))
     end
 end
 
@@ -245,11 +247,11 @@ function GridVisualizer(; Plotter::Union{Module, Nothing} = default_plotter(), k
         end
         initialize!(p, plottertype(Plotter))
     end
-    p
+    return p
 end
 
 function Base.show(io::IO, mime::MIME"text/html", p::GridVisualizer)
-    if isplutovista(p.Plotter)
+    return if isplutovista(p.Plotter)
         show(io, mime, p.subplots[1][:figure])
     else
         output = """<code>GridVisualizer(Plotter=$(p.Plotter))</code>"""
@@ -282,76 +284,98 @@ plottertype(p::GridVisualizer) = plottertype(p.Plotter)
 # Default context information with help info.
 #
 function default_plot_kwargs()
-    OrderedDict{Symbol, Pair{Any, String}}(:show => Pair(false, "Show plot immediately"),
-                                           :reveal => Pair(false, "Show plot immediately (same as :show)"),
-                                           :clear => Pair(true, "Clear plot before adding new content"),
-                                           :layout => Pair((1, 1), "Layout of plots in window"),
-                                           :size => Pair((500, 500), "Plot window resolution"),
-                                           :legend => Pair(:none,
-                                                           "Legend (position): one of [:none, :best, :lt, :ct, :rt, :lc, :rc, :lb, :cb, :rb]"),
-                                           :title => Pair("", "Plot title"),
-                                           :xlabel => Pair("x", "x axis label"),
-                                           :ylabel => Pair("y", "y axis label"),
-                                           :zlabel => Pair("z", "z axis label"),
-                                           :xlimits => Pair((1, -1), "x axis limits"),
-                                           :ylimits => Pair((1, -1), "y axis limits"),
-                                           :zlimits => Pair((1, -1), "z axis limits"),
-                                           :limits => Pair((1, -1), "function limits"),
-                                           :xscale => Pair(:identity, "x axis  scale: one of [:log, :identity]"),
-                                           :yscale => Pair(:identity, "y axis  scale: one of [:log, :identity]"),
-                                           :aspect => Pair(1.0, "XY Aspect ratio modification"),
-                                           :fontsize => Pair(20, "Fontsize of titles. All others are relative to it"),
-                                           :linewidth => Pair(2, "linewidth for isolines or 1D plots"),
-                                           :linestyle => Pair(:solid,
-                                                              "1D Plot linestyle: one of [:solid, :dash, :dot, :dashdot, :dashdotdot]"),
-                                           :markevery => Pair(5, "1D plot marker stride"),
-                                           :markersize => Pair(5, "1D plot marker size"),
-                                           :markershape => Pair(:none,
-                                                                "1D plot marker shape: one of [:none, :circle, :star5, :diamond, :hexagon, :cross, :xcross, :utriangle, :dtriangle, :rtriangle, :ltriangle, :pentagon, :+, :x]"),
-                                           :color => Pair((0.0, 0.0, 0.0), "1D plot line color"),
-                                           :cellwise => Pair(false, "1D plots cellwise; unmaintained and can be slow)"),
-                                           :label => Pair("", "1D plot label"),
-                                           :levels => Pair(7, "array of isolevels or number of isolevels for contour plots"),
-                                           :elevation => Pair(0.0, "2D plot height factor for elevation"),
-                                           :colorlevels => Pair(51, "2D/3D contour plot: number of color levels"),
-                                           :colormap => Pair(:viridis,
-                                                             "2D/3D contour plot color map (any from [ColorSchemes.jl](https://juliagraphics.github.io/ColorSchemes.jl/stable/basics/#Pre-defined-schemes))"),
-                                           :colorbar => Pair(:vertical,
-                                                             "2D/3D plot colorbar. One of [:none, :vertical, :horizontal]"),
-                                           :colorbarticks => Pair(:default,
-                                                                  "number of ticks in colorbar (:default sets it equal to levels)"),
-                                           :outlinealpha => Pair(0.05, "3D outline surface alpha value"),
-                                           :levelalpha => Pair(0.25, "3D isolevel alpha"),
-                                           :planealpha => Pair(0.25, "3D plane section alpha"),
-                                           :tetxplane_tol => Pair(0.0, "tolerance for tet-plane intersection in 3D"),
-                                           :rasterpoints => Pair(16,
-                                                                 "Number of quiver points resp. half number of streamplot interpolation points in the maximum extent direction. "),
-                                           :offset => Pair(:default, "Offset of quiver grid"),
-                                           :vscale => Pair(1.0, "Vector field scale for quiver grid"),
-                                           :vconstant => Pair(false, "Set all arrow length constant in vector plot"),
-                                           :vnormalize => Pair(true, "Normalize vector field before scaling"),
-                                           :interior => Pair(true, "3D plot interior of grid"),
-                                           :xplanes => Pair([prevfloat(Inf)], "3D x plane positions or number thereof"),
-                                           :yplanes => Pair([prevfloat(Inf)], "3D y plane positions or number thereof"),
-                                           :zplanes => Pair([prevfloat(Inf)], "3D z plane positions or number thereof"),
-                                           :zoom => Pair(1.0, "Zoom level"),
-                                           :gridscale => Pair(1, "Grid scale factor. Will be applied also to planes, spacing"),
-                                           :cellcoloring => Pair(:cellregions,
-                                                                 "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"),
-                                           :azim => Pair(-60, "3D azimuth angle  (in degrees)"),
-                                           :elev => Pair(30, "3D elevation angle  (in degrees)"),
-                                           :perspectiveness => Pair(0.25,
-                                                                    "3D perspective A number between 0 and 1, where 0 is orthographic, and 1 full perspective"),
-                                           :scene3d => Pair(:Axis3,
-                                                            "3D plot type of Makie scene. Alternaitve to `:Axis3` is `:LScene`"),
-                                           :fignumber => Pair(1, "Figure number (PyPlot)"),
-                                           :framepos => Pair(1, "Subplot position in frame (VTKView)"),
-                                           :subplot => Pair((1, 1), "Private: Actual subplot"),
-                                           :backend => Pair(:default, "Backend for PlutoVista plot"),
-                                           :dim => Pair(1, "Data dimension for PlutoVista plot"),
-                                           :regions => Pair(:all, "List of regions to plot"),
-                                           :species => Pair(1, "Number of species to plot or number of species in regions"),
-                                           :spacing => Pair(nothing, "Removed from API"))
+    return OrderedDict{Symbol, Pair{Any, String}}(
+        :show => Pair(false, "Show plot immediately"),
+        :reveal => Pair(false, "Show plot immediately (same as :show)"),
+        :clear => Pair(true, "Clear plot before adding new content"),
+        :layout => Pair((1, 1), "Layout of plots in window"),
+        :size => Pair((500, 500), "Plot window resolution"),
+        :legend => Pair(
+            :none,
+            "Legend (position): one of [:none, :best, :lt, :ct, :rt, :lc, :rc, :lb, :cb, :rb]"
+        ),
+        :title => Pair("", "Plot title"),
+        :xlabel => Pair("x", "x axis label"),
+        :ylabel => Pair("y", "y axis label"),
+        :zlabel => Pair("z", "z axis label"),
+        :xlimits => Pair((1, -1), "x axis limits"),
+        :ylimits => Pair((1, -1), "y axis limits"),
+        :zlimits => Pair((1, -1), "z axis limits"),
+        :limits => Pair((1, -1), "function limits"),
+        :xscale => Pair(:identity, "x axis  scale: one of [:log, :identity]"),
+        :yscale => Pair(:identity, "y axis  scale: one of [:log, :identity]"),
+        :aspect => Pair(1.0, "XY Aspect ratio modification"),
+        :fontsize => Pair(20, "Fontsize of titles. All others are relative to it"),
+        :linewidth => Pair(2, "linewidth for isolines or 1D plots"),
+        :linestyle => Pair(
+            :solid,
+            "1D Plot linestyle: one of [:solid, :dash, :dot, :dashdot, :dashdotdot]"
+        ),
+        :markevery => Pair(5, "1D plot marker stride"),
+        :markersize => Pair(5, "1D plot marker size"),
+        :markershape => Pair(
+            :none,
+            "1D plot marker shape: one of [:none, :circle, :star5, :diamond, :hexagon, :cross, :xcross, :utriangle, :dtriangle, :rtriangle, :ltriangle, :pentagon, :+, :x]"
+        ),
+        :color => Pair((0.0, 0.0, 0.0), "1D plot line color"),
+        :cellwise => Pair(false, "1D plots cellwise; unmaintained and can be slow)"),
+        :label => Pair("", "1D plot label"),
+        :levels => Pair(7, "array of isolevels or number of isolevels for contour plots"),
+        :elevation => Pair(0.0, "2D plot height factor for elevation"),
+        :colorlevels => Pair(51, "2D/3D contour plot: number of color levels"),
+        :colormap => Pair(
+            :viridis,
+            "2D/3D contour plot color map (any from [ColorSchemes.jl](https://juliagraphics.github.io/ColorSchemes.jl/stable/basics/#Pre-defined-schemes))"
+        ),
+        :colorbar => Pair(
+            :vertical,
+            "2D/3D plot colorbar. One of [:none, :vertical, :horizontal]"
+        ),
+        :colorbarticks => Pair(
+            :default,
+            "number of ticks in colorbar (:default sets it equal to levels)"
+        ),
+        :outlinealpha => Pair(0.05, "3D outline surface alpha value"),
+        :levelalpha => Pair(0.25, "3D isolevel alpha"),
+        :planealpha => Pair(0.25, "3D plane section alpha"),
+        :tetxplane_tol => Pair(0.0, "tolerance for tet-plane intersection in 3D"),
+        :rasterpoints => Pair(
+            16,
+            "Number of quiver points resp. half number of streamplot interpolation points in the maximum extent direction. "
+        ),
+        :offset => Pair(:default, "Offset of quiver grid"),
+        :vscale => Pair(1.0, "Vector field scale for quiver grid"),
+        :vconstant => Pair(false, "Set all arrow length constant in vector plot"),
+        :vnormalize => Pair(true, "Normalize vector field before scaling"),
+        :interior => Pair(true, "3D plot interior of grid"),
+        :xplanes => Pair([prevfloat(Inf)], "3D x plane positions or number thereof"),
+        :yplanes => Pair([prevfloat(Inf)], "3D y plane positions or number thereof"),
+        :zplanes => Pair([prevfloat(Inf)], "3D z plane positions or number thereof"),
+        :zoom => Pair(1.0, "Zoom level"),
+        :gridscale => Pair(1, "Grid scale factor. Will be applied also to planes, spacing"),
+        :cellcoloring => Pair(
+            :cellregions,
+            "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"
+        ),
+        :azim => Pair(-60, "3D azimuth angle  (in degrees)"),
+        :elev => Pair(30, "3D elevation angle  (in degrees)"),
+        :perspectiveness => Pair(
+            0.25,
+            "3D perspective A number between 0 and 1, where 0 is orthographic, and 1 full perspective"
+        ),
+        :scene3d => Pair(
+            :Axis3,
+            "3D plot type of Makie scene. Alternaitve to `:Axis3` is `:LScene`"
+        ),
+        :fignumber => Pair(1, "Figure number (PyPlot)"),
+        :framepos => Pair(1, "Subplot position in frame (VTKView)"),
+        :subplot => Pair((1, 1), "Private: Actual subplot"),
+        :backend => Pair(:default, "Backend for PlutoVista plot"),
+        :dim => Pair(1, "Data dimension for PlutoVista plot"),
+        :regions => Pair(:all, "List of regions to plot"),
+        :species => Pair(1, "Number of species to plot or number of species in regions"),
+        :spacing => Pair(nothing, "Removed from API")
+    )
 end
 
 #
@@ -362,7 +386,7 @@ function _myprint(dict)
     for (k, v) in dict
         println(lines_out, "  - `$(k)`: $(v[2]). Default: `$(v[1])`\n")
     end
-    String(take!(lines_out))
+    return String(take!(lines_out))
 end
 
 """
@@ -384,42 +408,48 @@ Keyword arguments: see [`available_kwargs`](@ref)
 """
 function gridplot!(ctx::SubVisualizer, grid::ExtendableGrid; kwargs...)
     _update_context!(ctx, kwargs)
-    gridplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid)
+    return gridplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid)
 end
 
 "$(TYPEDSIGNATURES)"
 function gridplot!(p::GridVisualizer, grid::ExtendableGrid; kwargs...)
-    gridplot!(p[1, 1], grid; kwargs...)
+    return gridplot!(p[1, 1], grid; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function gridplot!(vis::Union{SubVisualizer,GridVisualizer}, X::AbstractVector; kwargs...)
-    gridplot!(vis,simplexgrid(X); kwargs...)
+function gridplot!(vis::Union{SubVisualizer, GridVisualizer}, X::AbstractVector; kwargs...)
+    return gridplot!(vis, simplexgrid(X); kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function gridplot!(vis::Union{SubVisualizer,GridVisualizer},
-                   X::AbstractVector,
-                   Y::AbstractVector; kwargs...)
+function gridplot!(
+        vis::Union{SubVisualizer, GridVisualizer},
+        X::AbstractVector,
+        Y::AbstractVector; kwargs...
+    )
 
-    gridplot!(vis,simplexgrid(X,Y); kwargs...)
+    return gridplot!(vis, simplexgrid(X, Y); kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function gridplot!(vis::Union{SubVisualizer,GridVisualizer},
-                   X::AbstractVector,
-                   Y::AbstractVector,
-                   Z::AbstractVector; kwargs...)
+function gridplot!(
+        vis::Union{SubVisualizer, GridVisualizer},
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector; kwargs...
+    )
 
-    gridplot!(vis,simplexgrid(X,Y,Z); kwargs...)
+    return gridplot!(vis, simplexgrid(X, Y, Z); kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function gridplot!(vis::Union{SubVisualizer,GridVisualizer},
-                   coord::AbstractMatrix,
-                   cellnodes::AbstractMatrix,
-                   kwargs...)
-    gridplot!(vis,simplexgrid(coord,cellnodes); kwargs...)
+function gridplot!(
+        vis::Union{SubVisualizer, GridVisualizer},
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        kwargs...
+    )
+    return gridplot!(vis, simplexgrid(coord, cellnodes); kwargs...)
 end
 
 
@@ -431,34 +461,40 @@ Create grid visualizer and plot grid
 Keyword arguments: see [`available_kwargs`](@ref)
 """
 function gridplot(grid::ExtendableGrid; Plotter = default_plotter(), kwargs...)
-    gridplot!(GridVisualizer(; Plotter = Plotter, show = true, kwargs...), grid)
+    return gridplot!(GridVisualizer(; Plotter = Plotter, show = true, kwargs...), grid)
 end
 
 
 "$(TYPEDSIGNATURES)"
 function gridplot(X::AbstractVector; kwargs...)
-    gridplot(simplexgrid(X); kwargs...)
+    return gridplot(simplexgrid(X); kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function gridplot( X::AbstractVector,
-                   Y::AbstractVector; kwargs...)
-    gridplot(simplexgrid(X,Y); kwargs...)
+function gridplot(
+        X::AbstractVector,
+        Y::AbstractVector; kwargs...
+    )
+    return gridplot(simplexgrid(X, Y); kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function gridplot(X::AbstractVector,
-                   Y::AbstractVector,
-                   Z::AbstractVector; kwargs...)
+function gridplot(
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector; kwargs...
+    )
 
-    gridplot(simplexgrid(X,Y,Z); kwargs...)
+    return gridplot(simplexgrid(X, Y, Z); kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function gridplot(coord::AbstractMatrix,
-                  cellnodes::AbstractMatrix;
-                  kwargs...)
-    gridplot(simplexgrid(coord,cellnodes); kwargs...)
+function gridplot(
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix;
+        kwargs...
+    )
+    return gridplot(simplexgrid(coord, cellnodes); kwargs...)
 end
 
 ###################################################################################
@@ -476,7 +512,7 @@ Keyword arguments: see [`available_kwargs`](@ref)
 function scalarplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
     _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
-    scalarplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, [grid], grid, [func])
+    return scalarplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, [grid], grid, [func])
 end
 
 """
@@ -486,93 +522,107 @@ Plot node vectors on subgrids of parent grid as P1 FEM function on the triangula
 If `[i,j]` is omitted, `[1,1]` is assumed.
 eyword arguments: see [`available_kwargs`](@ref)
 """
-function scalarplot!(ctx::SubVisualizer,
-                     grids::Vector{ExtendableGrid{Tv, Ti}},
-                     parentgrid::ExtendableGrid{Tv, Ti},
-                     funcs::AbstractVector;
-                     kwargs...,) where {Tv, Ti}
+function scalarplot!(
+        ctx::SubVisualizer,
+        grids::Vector{ExtendableGrid{Tv, Ti}},
+        parentgrid::ExtendableGrid{Tv, Ti},
+        funcs::AbstractVector;
+        kwargs...,
+    ) where {Tv, Ti}
     _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
     if length(grids) != length(funcs)
         error("number of subgrids: $(length(grids)) and number of functions: $(length(funcs)) not equal")
     end
-    scalarplot!(ctx,
-                plottertype(ctx[:Plotter]),
-                Val{dim_space(parentgrid)},
-                grids,
-                parentgrid,
-                funcs)
+    return scalarplot!(
+        ctx,
+        plottertype(ctx[:Plotter]),
+        Val{dim_space(parentgrid)},
+        grids,
+        parentgrid,
+        funcs
+    )
 end
 
 "$(TYPEDSIGNATURES)"
 function scalarplot!(p::GridVisualizer, grid::ExtendableGrid, func; kwargs...)
-    scalarplot!(p[1, 1], grid, func; kwargs...)
+    return scalarplot!(p[1, 1], grid, func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
 function scalarplot!(ctx::SubVisualizer, grid::ExtendableGrid, func::Function; kwargs...)
-    scalarplot!(ctx, grid, map(func, grid); kwargs...)
+    return scalarplot!(ctx, grid, map(func, grid); kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function scalarplot!(p::GridVisualizer,
-                     grids::Vector{ExtendableGrid{Tv, Ti}},
-                     parentgrid::ExtendableGrid{Tv, Ti},
-                     funcs::AbstractVector;
-                     kwargs...,) where {Tv, Ti}
-    scalarplot!(p[1, 1], grids, parentgrid, funcs; kwargs...)
+function scalarplot!(
+        p::GridVisualizer,
+        grids::Vector{ExtendableGrid{Tv, Ti}},
+        parentgrid::ExtendableGrid{Tv, Ti},
+        funcs::AbstractVector;
+        kwargs...,
+    ) where {Tv, Ti}
+    return scalarplot!(p[1, 1], grids, parentgrid, funcs; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
 function scalarplot!(ctx::SubVisualizer, func::AbstractVector; kwargs...)
-    scalarplot!(ctx, simplexgrid(1:length(func)), func; kwargs...)
+    return scalarplot!(ctx, simplexgrid(1:length(func)), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
 function scalarplot!(ctx::SubVisualizer, X::AbstractVector, func; kwargs...)
-    scalarplot!(ctx, simplexgrid(X), func; kwargs...)
+    return scalarplot!(ctx, simplexgrid(X), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function scalarplot!(ctx::SubVisualizer,
-                    coord::AbstractMatrix,
-                    cellnodes::AbstractMatrix,
-                    func;
-                    kwargs...,)
-    scalarplot!(ctx,simplexgrid(coord,cellnodes), func; kwargs...)
+function scalarplot!(
+        ctx::SubVisualizer,
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        func;
+        kwargs...,
+    )
+    return scalarplot!(ctx, simplexgrid(coord, cellnodes), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
 function scalarplot!(ctx::GridVisualizer, X::AbstractVector, func; kwargs...)
-    scalarplot!(ctx, simplexgrid(X), func; kwargs...)
+    return scalarplot!(ctx, simplexgrid(X), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function scalarplot!(ctx::GridVisualizer,
-                     X::AbstractVector,
-                     Y::AbstractVector,
-                     func;
-                     kwargs...,)
-    scalarplot!(ctx, simplexgrid(X, Y), func; kwargs...)
+function scalarplot!(
+        ctx::GridVisualizer,
+        X::AbstractVector,
+        Y::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return scalarplot!(ctx, simplexgrid(X, Y), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function scalarplot!(ctx::GridVisualizer,
-                     X::AbstractVector,
-                     Y::AbstractVector,
-                     Z::AbstractVector,
-                     func;
-                     kwargs...,)
-    scalarplot!(ctx, simplexgrid(X, Y, Z), func; kwargs...)
+function scalarplot!(
+        ctx::GridVisualizer,
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return scalarplot!(ctx, simplexgrid(X, Y, Z), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function scalarplot!(ctx::GridVisualizer,
-                    coord::AbstractMatrix,
-                    cellnodes::AbstractMatrix,
-                    func;
-                    kwargs...,)
-    scalarplot!(ctx,simplexgrid(coord,cellnodes), func; kwargs...)
+function scalarplot!(
+        ctx::GridVisualizer,
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        func;
+        kwargs...,
+    )
+    return scalarplot!(ctx, simplexgrid(coord, cellnodes), func; kwargs...)
 end
 
 
@@ -588,19 +638,23 @@ If instead of the grid,  vectors for coordinates are given, a grid is created au
 For keyword arguments, see [`available_kwargs`](@ref)
 """
 function scalarplot(grid::ExtendableGrid, func; Plotter = default_plotter(), kwargs...)
-    scalarplot!(GridVisualizer(; Plotter = Plotter, kwargs...), grid, func; show = true)
+    return scalarplot!(GridVisualizer(; Plotter = Plotter, kwargs...), grid, func; show = true)
 end
 
-function scalarplot(grids::Vector{ExtendableGrid{Tv, Ti}},
-                    parentgrid::ExtendableGrid{Tv, Ti},
-                    funcs::AbstractVector;
-                    Plotter = default_plotter(),
-                    kwargs...,) where {Tv, Ti}
-    scalarplot!(GridVisualizer(; Plotter = Plotter, kwargs...),
-                grids,
-                parentgrid,
-                funcs;
-                show = true,)
+function scalarplot(
+        grids::Vector{ExtendableGrid{Tv, Ti}},
+        parentgrid::ExtendableGrid{Tv, Ti},
+        funcs::AbstractVector;
+        Plotter = default_plotter(),
+        kwargs...,
+    ) where {Tv, Ti}
+    return scalarplot!(
+        GridVisualizer(; Plotter = Plotter, kwargs...),
+        grids,
+        parentgrid,
+        funcs;
+        show = true,
+    )
 end
 
 "$(TYPEDSIGNATURES)"
@@ -611,24 +665,28 @@ scalarplot(X::AbstractVector{T}, func; kwargs...) where {T <: Number} = scalarpl
 
 "$(TYPEDSIGNATURES)"
 function scalarplot(X::AbstractVector, Y::AbstractVector, func; kwargs...)
-    scalarplot(simplexgrid(X, Y), func; kwargs...)
+    return scalarplot(simplexgrid(X, Y), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function scalarplot(X::AbstractVector,
-                    Y::AbstractVector,
-                    Z::AbstractVector,
-                    func;
-                    kwargs...,)
-    scalarplot(simplexgrid(X, Y, Z), func; kwargs...)
+function scalarplot(
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return scalarplot(simplexgrid(X, Y, Z), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function scalarplot(coord::AbstractMatrix,
-                    cellnodes::AbstractMatrix,
-                    func;
-                    kwargs...,)
-    scalarplot(simplexgrid(coord,cellnodes), func; kwargs...)
+function scalarplot(
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        func;
+        kwargs...,
+    )
+    return scalarplot(simplexgrid(coord, cellnodes), func; kwargs...)
 end
 
 ###################################################################################
@@ -644,44 +702,50 @@ function vectorplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
     if ctx[:spacing] != nothing
         @warn "`spacing` has been removed from keyword arguments, use `rasterpoints` to control spacing"
     end
-    vectorplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid, func)
+    return vectorplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid, func)
 end
 
 function vectorplot!(ctx, ptype, ::Type{Val{1}}, grid, func::Matrix)
-    scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func[1, :]])
+    return scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func[1, :]])
 end
 function vectorplot!(ctx, ptype, ::Type{Val{1}}, grid, func::Vector)
-    scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func])
+    return scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func])
 end
 
 "$(TYPEDSIGNATURES)"
 function vectorplot!(p::GridVisualizer, grid::ExtendableGrid, func; kwargs...)
-    vectorplot!(p[1, 1], grid, func; kwargs...)
+    return vectorplot!(p[1, 1], grid, func; kwargs...)
 end
 "$(TYPEDSIGNATURES)"
-function vectorplot!(ctx::GridVisualizer,
-                     X::AbstractVector,
-                     Y::AbstractVector,
-                     func;
-                     kwargs...,)
-    vectorplot!(ctx, simplexgrid(X, Y), func; kwargs...)
+function vectorplot!(
+        ctx::GridVisualizer,
+        X::AbstractVector,
+        Y::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return vectorplot!(ctx, simplexgrid(X, Y), func; kwargs...)
 end
 "$(TYPEDSIGNATURES)"
-function vectorplot!(ctx::GridVisualizer,
-                     X::AbstractVector,
-                     Y::AbstractVector,
-                     Z::AbstractVector,
-                     func;
-                     kwargs...,)
-    vectorplot!(ctx, simplexgrid(X, Y, Z), func; kwargs...)
+function vectorplot!(
+        ctx::GridVisualizer,
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return vectorplot!(ctx, simplexgrid(X, Y, Z), func; kwargs...)
 end
 "$(TYPEDSIGNATURES)"
-function vectorplot!(ctx::GridVisualizer,
-                     coord::AbstractMatrix,
-                     cellnodes::AbstractMatrix,
-                     func;
-                     kwargs...,)
-    vectorplot!(ctx, simplexgrid(coord,cellnodes), func; kwargs...)
+function vectorplot!(
+        ctx::GridVisualizer,
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        func;
+        kwargs...,
+    )
+    return vectorplot!(ctx, simplexgrid(coord, cellnodes), func; kwargs...)
 end
 
 
@@ -691,26 +755,30 @@ $(TYPEDSIGNATURES)
 Plot piecewise linear vector field  as quiver plot.
 """
 function vectorplot(grid::ExtendableGrid, func; Plotter = default_plotter(), kwargs...)
-    vectorplot!(GridVisualizer(; Plotter = Plotter, kwargs...), grid, func; show = true)
+    return vectorplot!(GridVisualizer(; Plotter = Plotter, kwargs...), grid, func; show = true)
 end
 "$(TYPEDSIGNATURES)"
 function vectorplot(X::AbstractVector, Y::AbstractVector, func; kwargs...)
-    vectorplot(simplexgrid(X, Y), func; kwargs...)
+    return vectorplot(simplexgrid(X, Y), func; kwargs...)
 end
 "$(TYPEDSIGNATURES)"
-function vectorplot(X::AbstractVector,
-                    Y::AbstractVector,
-                    Z::AbstractVector,
-                    func;
-                    kwargs...,)
-    vectorplot(simplexgrid(X, Y, Z), func; kwargs...)
+function vectorplot(
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return vectorplot(simplexgrid(X, Y, Z), func; kwargs...)
 end
 "$(TYPEDSIGNATURES)"
-function vectorplot(coord::AbstractMatrix,
-                    cellnodes::AbstractMatrix,
-                    func;
-                    kwargs...,)
-    vectorplot(simplexgrid(coord,cellnodes), func; kwargs...)
+function vectorplot(
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        func;
+        kwargs...,
+    )
+    return vectorplot(simplexgrid(coord, cellnodes), func; kwargs...)
 end
 
 ###################################################################################
@@ -727,41 +795,46 @@ function streamplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
     if ctx[:spacing] != nothing
         @warn "`spacing` has been removed from keyword arguments, use `rasterpoints` to control spacing"
     end
-    streamplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid, func)
+    return streamplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid, func)
 end
 
 "$(TYPEDSIGNATURES)"
 function streamplot!(p::GridVisualizer, grid::ExtendableGrid, func; kwargs...)
-    streamplot!(p[1, 1], grid, func; kwargs...)
+    return streamplot!(p[1, 1], grid, func; kwargs...)
 end
 "$(TYPEDSIGNATURES)"
-function streamplot!(ctx::GridVisualizer,
-                     X::AbstractVector,
-                     Y::AbstractVector,
-                     func;
-                     kwargs...,)
-    streamplot!(ctx, simplexgrid(X, Y), func; kwargs...)
+function streamplot!(
+        ctx::GridVisualizer,
+        X::AbstractVector,
+        Y::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return streamplot!(ctx, simplexgrid(X, Y), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function streamplot!(ctx::GridVisualizer,
-                     X::AbstractVector,
-                     Y::AbstractVector,
-                     Z::AbstractVector,
-                     func;
-                     kwargs...,)
-    streamplot!(ctx, simplexgrid(X, Y, Z), func; kwargs...)
+function streamplot!(
+        ctx::GridVisualizer,
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return streamplot!(ctx, simplexgrid(X, Y, Z), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function streamplot!(ctx::GridVisualizer,
-                     coord::AbstractMatrix,
-                     cellnodes::AbstractMatrix,
-                     func;
-                     kwargs...,)
-    streamplot!(ctx, simplexgrid(coord,cellnodes), func; kwargs...)
+function streamplot!(
+        ctx::GridVisualizer,
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        func;
+        kwargs...,
+    )
+    return streamplot!(ctx, simplexgrid(coord, cellnodes), func; kwargs...)
 end
-
 
 
 """
@@ -771,28 +844,32 @@ Plot piecewise linear vector field  as stream plot.
 (2D pyplot only)
 """
 function streamplot(grid::ExtendableGrid, func; Plotter = default_plotter(), kwargs...)
-    streamplot!(GridVisualizer(; Plotter = Plotter, kwargs...), grid, func; show = true)
+    return streamplot!(GridVisualizer(; Plotter = Plotter, kwargs...), grid, func; show = true)
 end
 "$(TYPEDSIGNATURES)"
 function streamplot(X::AbstractVector, Y::AbstractVector, func; kwargs...)
-    streamplot(simplexgrid(X, Y), func; kwargs...)
+    return streamplot(simplexgrid(X, Y), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function streamplot(X::AbstractVector,
-                    Y::AbstractVector,
-                    Z::AbstractVector,
-                    func;
-                    kwargs...,)
-    streamplot(simplexgrid(X, Y, Z), func; kwargs...)
+function streamplot(
+        X::AbstractVector,
+        Y::AbstractVector,
+        Z::AbstractVector,
+        func;
+        kwargs...,
+    )
+    return streamplot(simplexgrid(X, Y, Z), func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function streamplot( coord::AbstractMatrix,
-                     cellnodes::AbstractMatrix,
-                     func;
-                     kwargs...,)
-    streamplot(simplexgrid(coord,cellnodes), func; kwargs...)
+function streamplot(
+        coord::AbstractMatrix,
+        cellnodes::AbstractMatrix,
+        func;
+        kwargs...,
+    )
+    return streamplot(simplexgrid(coord, cellnodes), func; kwargs...)
 end
 
 ###################################################################################
@@ -803,7 +880,7 @@ function customplot!(ctx::SubVisualizer, func; kwargs...)
     if ctx[:spacing] != nothing
         @warn "`spacing` has been removed from keyword arguments, use `rasterpoints` to control spacing"
     end
-    customplot!(ctx, plottertype(ctx[:Plotter]), func)
+    return customplot!(ctx, plottertype(ctx[:Plotter]), func)
 end
 
 """
@@ -812,12 +889,12 @@ $(TYPEDSIGNATURES)
 Variant for do block syntax.
 """
 function customplot!(func, ctx::SubVisualizer; kwargs...)
-    customplot!(ctx, func; kwargs...)
+    return customplot!(ctx, func; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
 function customplot!(p::GridVisualizer, func; kwargs...)
-    customplot!(p[1, 1], func; kwargs...)
+    return customplot!(p[1, 1], func; kwargs...)
 end
 
 """
@@ -826,7 +903,7 @@ $(TYPEDSIGNATURES)
 Variant for do block syntax.
 """
 function customplot!(func, p::GridVisualizer; kwargs...)
-    customplot!(p[1, 1], func; kwargs...)
+    return customplot!(p[1, 1], func; kwargs...)
 end
 
 """
@@ -835,7 +912,7 @@ $(TYPEDSIGNATURES)
 Custom user plot.
 """
 function customplot(func; Plotter = default_plotter(), kwargs...)
-    customplot!(GridVisualizer(; Plotter = Plotter, kwargs...), func; show = true)
+    return customplot!(GridVisualizer(; Plotter = Plotter, kwargs...), func; show = true)
 end
 
 ###################################################################################
@@ -858,7 +935,7 @@ $(TYPEDSIGNATURES)
 Save last plotted figure from visualizer to disk.
 """
 function save(fname::String, visualizer::GridVisualizer)
-    save(fname, visualizer, plottertype(visualizer.Plotter))
+    return save(fname, visualizer, plottertype(visualizer.Plotter))
 end
 
 """
@@ -867,7 +944,7 @@ $(TYPEDSIGNATURES)
 Save scene returned from [`reveal`](@ref), [`scalarplot`](@ref) or [`gridplot`](@ref)  to disk.
 """
 function save(fname::String, scene; Plotter = default_plotter())
-    save(fname, scene, Plotter, plottertype(Plotter))
+    return save(fname, scene, Plotter, plottertype(Plotter))
 end
 
 #
