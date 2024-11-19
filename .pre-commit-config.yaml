@@ -4,3 +4,4 @@ repos:
   hooks:
   - id: check-added-large-files
     args: [--maxkb=8192]
+  - id: check-merge-conflict
