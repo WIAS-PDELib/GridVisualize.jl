@@ -9,3 +9,5 @@ repos:
   - id: check-yaml
     args: [--allow-multiple-documents]
   - id: end-of-file-fixer
+  - id: no-commit-to-branch
+    args: [--branch, main]
