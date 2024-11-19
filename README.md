@@ -186,4 +186,3 @@ See the example notebook: [pluto](https://raw.githubusercontent.com/WIAS-PDELib/
 ### Jupyter
 Chances are that things work with Jupyter as well.  Please ping me if you would like to volunteer with testing and
 possibly fixing this.
-

@@ -8,4 +8,3 @@ include("../docs/makeplots.jl")
 @testset "makeplots - CairoMakie" begin
     makeplots(mktempdir(); Plotter = CairoMakie, extension = ".svg")
 end
-

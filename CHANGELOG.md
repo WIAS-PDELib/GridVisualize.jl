@@ -139,5 +139,3 @@ fix colorbarticks
 - Subgridplots (#16)
 
 Handle plots of discontinuous functions in Makie,Pyplot, PlutoVista
-
-

@@ -7,4 +7,3 @@ Instead of PlutoVista, Plots, PyPlot and GLMakie can be used from Pluto notebook
 ```@raw html
 <iframe style="height:15000px" width="100%" src="../../plutovista.html"> </iframe>
 ```
-
