@@ -179,7 +179,7 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{1}}, grid)
         ax.plot([x2, x2], [-h, h]; linewidth = ctx[:linewidth], color = "k", label = "")
     end
 
-    cmap = bregion_cmap(max(nbfaceregions,2))
+    cmap = bregion_cmap(max(nbfaceregions, 2))
     for ibface in 1:num_bfaces(grid)
         ireg = bfaceregions[ibface]
         if ireg > 0
