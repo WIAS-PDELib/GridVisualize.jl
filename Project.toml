@@ -17,8 +17,16 @@ IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Observables = "510215fc-4207-5dde-b226-833fc4488ee2"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+PlutoVista = "646e1f28-b900-46d7-9d87-d554eb38a413"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[weakdeps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+PlutoVista = "646e1f28-b900-46d7-9d87-d554eb38a413"
+PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 
 [compat]
 CairoMakie = "0.11.3, 0.12"
@@ -42,11 +50,3 @@ Printf = "1.6"
 PyPlot = "2"
 StaticArrays = "1"
 julia = "1.9"
-
-
-[weakdeps]
-CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
-GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
-Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoVista = "646e1f28-b900-46d7-9d87-d554eb38a413"
-PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
