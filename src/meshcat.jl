@@ -13,7 +13,7 @@ function initialize!(p::GridVisualizer, ::Type{MeshCatType})
         ctx = p.subplots[I]
         ctx[:figure] = p.context[:scene]
     end
-    return
+    return nothing
 end
 
 function reveal(p::GridVisualizer, ::Type{MeshCatType})
@@ -22,9 +22,10 @@ function reveal(p::GridVisualizer, ::Type{MeshCatType})
 end
 
 function reveal(ctx::SubVisualizer, TP::Type{MeshCatType})
-    return if ctx[:show] || ctx[:reveal]
-        reveal(ctx[:GridVisualizer], TP)
+    if ctx[:show] || ctx[:reveal]
+        return reveal(ctx[:GridVisualizer], TP)
     end
+    return nothing
 end
 
 gridplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{1}}, grid) = nothing

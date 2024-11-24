@@ -64,7 +64,7 @@ mutable struct FLayout
 end
 
 function Base.setindex!(flayout::FLayout, layoutable, i, j)
-    return if isnothing(layoutable)
+    if isnothing(layoutable)
         flayout.offscreen[1, 1] = flayout.layoutables[(i, j)]
         delete!(flayout.layoutables, (i, j))
     elseif !isa(layoutable, Union{Makie.Block, Makie.GridLayout})
@@ -74,6 +74,7 @@ function Base.setindex!(flayout::FLayout, layoutable, i, j)
         _showall(flayout)
         yield()
     end
+    return flayout
 end
 
 Base.getindex(flayout::FLayout, i, j) = flayout.layoutables[(i, j)]
@@ -96,10 +97,10 @@ function _inarea(area, pos)
 end
 
 function _inscene(l, pos)
-    return if isa(l, Makie.Block)
-        _inarea(l.scene.viewport[], pos)
+    if isa(l, Makie.Block)
+        return _inarea(l.scene.viewport[], pos)
     elseif isa(l, Makie.GridLayout)
-        _inarea(l.layoutobservables.computedbbox[], pos)
+        return _inarea(l.layoutobservables.computedbbox[], pos)
     end
 end
 
@@ -171,12 +172,13 @@ function flayoutscene(;
     end
 
     function _toggle_block(flayout::FLayout)
-        return if flayout.blocked
+        if flayout.blocked
             flayout.blocked = false
             notify(flayout.condition)
         else
             flayout.blocked = true
         end
+        return nothing
     end
 
     # Handle global key events for `,` (focus/gallery view)
@@ -211,9 +213,10 @@ Yield and wait in case of scene being blocked via space key toggle
 """
 function yieldwait(flayout::FLayout)
     yield()
-    return if flayout.blocked
+    if flayout.blocked
         wait(flayout.condition)
     end
+    return nothing
 end
 
 """

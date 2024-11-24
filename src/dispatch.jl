@@ -17,7 +17,8 @@ end
 Set plotter module or `nothing` as the default plotter backend.
 """
 function default_plotter!(Plotter)
-    return global default_backend = Plotter
+    global default_backend = Plotter
+    return default_backend
 end
 
 """
@@ -251,12 +252,13 @@ function GridVisualizer(; Plotter::Union{Module, Nothing} = default_plotter(), k
 end
 
 function Base.show(io::IO, mime::MIME"text/html", p::GridVisualizer)
-    return if isplutovista(p.Plotter)
+    if isplutovista(p.Plotter)
         show(io, mime, p.subplots[1][:figure])
     else
         output = """<code>GridVisualizer(Plotter=$(p.Plotter))</code>"""
         write(io, output)
     end
+    return nothing
 end
 
 """

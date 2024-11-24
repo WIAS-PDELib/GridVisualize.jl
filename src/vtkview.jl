@@ -41,9 +41,10 @@ function reveal(p::GridVisualizer, ::Type{VTKViewType})
 end
 
 function reveal(ctx::SubVisualizer, TP::Type{VTKViewType})
-    return if ctx[:show] || ctx[:reveal]
-        reveal(ctx[:GridVisualizer], TP)
+    if ctx[:show] || ctx[:reveal]
+        return reveal(ctx[:GridVisualizer], TP)
     end
+    return nothing
 end
 
 function gridplot!(ctx, TP::Type{VTKViewType}, grid)

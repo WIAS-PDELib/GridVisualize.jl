@@ -457,7 +457,8 @@ function bary!(λ, invA, L2G, x)
             λ[k] += invA[j, k] * dj
         end
     end
-    return ExtendableGrids.postprocess_xreftest!(λ, Triangle2D)
+    ExtendableGrids.postprocess_xreftest!(λ, Triangle2D)
+    return nothing
 end
 
 function cellcolors(grid, coloring)
@@ -485,11 +486,11 @@ function cellcolors(grid, coloring)
 end
 
 function num_cellcolors(grid, coloring)
-    return if coloring == :partitions
-        num_partitions(grid)
+    if coloring == :partitions
+        return num_partitions(grid)
     elseif coloring == :pcolors
-        num_pcolors(grid)
+        return num_pcolors(grid)
     else
-        num_cellregions(grid)
+        return num_cellregions(grid)
     end
 end

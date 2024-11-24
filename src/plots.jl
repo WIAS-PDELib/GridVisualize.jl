@@ -27,18 +27,19 @@ function reveal(p::GridVisualizer, ::Type{PlotsType})
         end
     end
     plt = Plots.plot(subplots...; layout = p.context[:layout], size = p.context[:size])
-    return if haskey(p.context, :videostream)
-        Plots.frame(p.context[:videostream], plt)
+    if haskey(p.context, :videostream)
+        return Plots.frame(p.context[:videostream], plt)
     else
         Plots.gui(plt)
-        plt
+        return plt
     end
 end
 
 function reveal(ctx::SubVisualizer, TP::Type{PlotsType})
-    return if ctx[:show] || ctx[:reveal]
-        reveal(ctx[:GridVisualizer], TP)
+    if ctx[:show] || ctx[:reveal]
+        return reveal(ctx[:GridVisualizer], TP)
     end
+    return nothing
 end
 
 function save(fname, scene, Plots, ::Type{PlotsType})
@@ -65,15 +66,15 @@ function movie(
 
     return if !isnothing(file)
         if format == "mp4"
-            Plotter.mp4(vis.context[:videostream], file)
+            return Plotter.mp4(vis.context[:videostream], file)
         else
-            Plotter.gif(vis.context[:videostream], file)
+            return Plotter.gif(vis.context[:videostream], file)
         end
     elseif isdefined(Main, :PlutoRunner)
         if format == "mp4"
-            Plotter.mp4(vis.context[:videostream])
+            return Plotter.mp4(vis.context[:videostream])
         else
-            Plotter.gif(vis.context[:videostream])
+            return Plotter.gif(vis.context[:videostream])
         end
     end
 end

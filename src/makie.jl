@@ -55,18 +55,19 @@ function reveal(p::GridVisualizer, ::Type{MakieType})
         end
     end
 
-    return if haskey(p.context, :videostream)
-        XMakie.recordframe!(p.context[:videostream])
+    if haskey(p.context, :videostream)
+        return XMakie.recordframe!(p.context[:videostream])
     else
-        p.context[:figure]
+        return p.context[:figure]
     end
 end
 
 function reveal(ctx::SubVisualizer, TP::Type{MakieType})
     FlippableLayout.yieldwait(ctx[:flayout])
-    return if ctx[:show] || ctx[:reveal]
-        reveal(ctx[:GridVisualizer], TP)
+    if ctx[:show] || ctx[:reveal]
+        return reveal(ctx[:GridVisualizer], TP)
     end
+    return nothing
 end
 
 function save(fname, p::GridVisualizer, ::Type{MakieType})
@@ -95,12 +96,12 @@ function movie(
 
     func(vis)
 
-    return if !isnothing(file)
-        Plotter.save(file, vis.context[:videostream])
+    if !isnothing(file)
+        return Plotter.save(file, vis.context[:videostream])
     elseif isdefined(Main, :PlutoRunner)
-        vis.context[:videostream]
+        return vis.context[:videostream]
     else
-        nothing
+        return nothing
     end
 end
 
@@ -927,12 +928,12 @@ support LScene in addition.
 """
 function makeaxis3d(ctx)
     XMakie = ctx[:Plotter]
-    return if ctx[:scene3d] == :LScene
+    if ctx[:scene3d] == :LScene
         # "Old" LScene with zoom-in functionality
-        XMakie.LScene(ctx[:figure])
+        return XMakie.LScene(ctx[:figure])
     else
         # "New" Axis3 with prospective new stuff by Julius.
-        XMakie.Axis3(
+        return XMakie.Axis3(
             ctx[:figure];
             aspect = :data,
             viewmode = :fit,
@@ -1204,7 +1205,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
     make_mesh(pts, fcs) = Mesh(pts, fcs)
 
     function make_mesh(pts, fcs, vals, alpha)
-        return if length(fcs) > 0
+        if length(fcs) > 0
             colors = XMakie.Makie.interpolated_getindex.((cmap,), vals, (crange,))
             if alpha < 1
                 colors = [
@@ -1212,9 +1213,9 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
                         i in 1:length(colors)
                 ]
             end
-            GeometryBasics.Mesh(meta(pts; color = colors, normals = normals(pts, fcs)), fcs)
+            return GeometryBasics.Mesh(meta(pts; color = colors, normals = normals(pts, fcs)), fcs)
         else
-            GeometryBasics.Mesh(pts, fcs)
+            return GeometryBasics.Mesh(pts, fcs)
         end
     end
 

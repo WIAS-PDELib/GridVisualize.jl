@@ -13,7 +13,7 @@ function initialize!(p::GridVisualizer, ::Type{PlutoVistaType})
             datadim = p.context[:dim],
         )
     end
-    return
+    return nothing
 end
 
 function reveal(p::GridVisualizer, ::Type{PlutoVistaType})
@@ -26,17 +26,17 @@ function reveal(p::GridVisualizer, ::Type{PlutoVistaType})
             push!(subplots, p.subplots[i, j])
         end
     end
-    return if l == 1
-        subplots[1][:figure]
+    if l == 1
+        return subplots[1][:figure]
     elseif l == 2
-        @htl(
+        return @htl(
             """<div><div style=" display: inline-block;">
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[1][:figure])</div>
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[2][:figure])</div>
             </div>"""
         )
     elseif l == 3
-        @htl(
+        return @htl(
             """<div><div style=" display: inline-block;">
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[1][:figure])</div>
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[2][:figure])</div>
@@ -44,7 +44,7 @@ function reveal(p::GridVisualizer, ::Type{PlutoVistaType})
             </div>"""
         )
     elseif l == 4
-        @htl(
+        return @htl(
             """<div><div style=" display: inline-block;">
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[1][:figure])</div>
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[2][:figure])</div>
@@ -53,7 +53,7 @@ function reveal(p::GridVisualizer, ::Type{PlutoVistaType})
             </div>"""
         )
     elseif l == 5
-        @htl(
+        return @htl(
             """<div><div style=" display: inline-block;">
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[1][:figure])</div>
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[2][:figure])</div>
@@ -63,7 +63,7 @@ function reveal(p::GridVisualizer, ::Type{PlutoVistaType})
             </div>"""
         )
     elseif l == 6
-        @htl(
+        return @htl(
             """<div><div style=" display: inline-block;">
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[1][:figure])</div>
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[2][:figure])</div>
@@ -74,7 +74,7 @@ function reveal(p::GridVisualizer, ::Type{PlutoVistaType})
             </div>"""
         )
     elseif l == 7
-        @htl(
+        return @htl(
             """<div><div style=" display: inline-block;">
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[1][:figure])</div>
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[2][:figure])</div>
@@ -86,7 +86,7 @@ function reveal(p::GridVisualizer, ::Type{PlutoVistaType})
             </div>"""
         )
     elseif l == 8
-        @htl(
+        return @htl(
             """<div><div style=" display: inline-block;">
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[1][:figure])</div>
             <div style= "width: $(figwidth)px;  display: inline-block;">$(subplots[2][:figure])</div>
