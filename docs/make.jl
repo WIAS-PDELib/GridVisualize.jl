@@ -40,8 +40,9 @@ function mkdocs()
         pages = [
             "Home" => "index.md",
             "Public API" => "api.md",
-            "Private API" => "privapi.md",
             "Examples" => generated_examples,
+            "Private API" => "privapi.md",
+            "Contributing" => "contributing.md",
         ]
     )
 end

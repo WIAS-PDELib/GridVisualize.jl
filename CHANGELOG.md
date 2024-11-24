@@ -1,10 +1,14 @@
 # Changelog
 
-## [unreleased]
+## [1.9.0] - 2024-11-25
 
 ### Added
 
 - new key word argument `show_colorbar` (default=true) to toggle the color bar next to grid plots
+
+### Fixed
+
+- removed dependency on type piracy of Colors.RGB
 
 ## [1.8.2] - 2024-11-08
 
