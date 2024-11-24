@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Added
+
+- new key word argument `show_colorbar` (default=true) to toggle the color bar next to grid plots
+
 ## [1.8.2] - 2024-11-08
 
 ### Fixed

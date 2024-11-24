@@ -256,7 +256,6 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
         label = "",
     )
 
-    color = ctx[:color]
     if ctx[:cellwise] ## not checked
         cellnodes = grid[CellNodes]
         for icell in 1:num_cells(grid)
@@ -269,7 +268,7 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
                     p,
                     [x1, x2],
                     [func[i1], func[i2]];
-                    linecolor = Plots.RGB(color...),
+                    linecolor = rgbcolor(ctx[:color]),
                     label = ctx[:label],
                 )
             else
@@ -277,7 +276,7 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
                     p,
                     [x1, x2],
                     [func[i1], func[i2]];
-                    linecolor = Plots.RGB(color...),
+                    linecolor = rgbcolor(ctx[:color]),
                     label = "",
                 )
             end
@@ -291,7 +290,7 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
                 p,
                 X,
                 func;
-                linecolor = Plots.RGB(color),
+                linecolor = rgbcolor(ctx[:color]),
                 linewidth = ctx[:linewidth],
                 linestyle = ctx[:linestyle],
                 legend = legpos[ctx[:legend]],
@@ -305,7 +304,7 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
                 p,
                 X,
                 func;
-                linecolor = Plots.RGB(color),
+                linecolor = rgbcolor(ctx[:color]),
                 linewidth = ctx[:linewidth],
                 linestyle = ctx[:linestyle],
                 xscale = ctx[:xscale],
@@ -319,19 +318,19 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
                 markershape = markershape,
                 label = ctx[:label],
                 markersize = ctx[:markersize],
-                linecolor = Plots.RGB(color),
+                linecolor = rgbcolor(ctx[:color]),
                 linewidth = ctx[:linewidth],
                 xscale = ctx[:xscale],
                 yscale = ctx[:yscale],
                 legend = legpos[ctx[:legend]],
                 linestyle = ctx[:linestyle],
-                markercolor = Plots.RGB(color),
+                markercolor = rgbcolor(ctx[:color]),
             )
             @views Plots.plot!(
                 p,
                 X[1:markevery:end],
                 func[1:markevery:end],
-                markercolor = Plots.RGB(color),
+                markercolor = rgbcolor(ctx[:color]),
                 label = "",
                 linecolor = :white,
                 xscale = ctx[:xscale],

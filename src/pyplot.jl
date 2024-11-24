@@ -179,7 +179,7 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{1}}, grid)
         ax.plot([x2, x2], [-h, h]; linewidth = ctx[:linewidth], color = "k", label = "")
     end
 
-    cmap = bregion_cmap(nbfaceregions)
+    cmap = bregion_cmap(max(nbfaceregions,2))
     for ibface in 1:num_bfaces(grid)
         ireg = bfaceregions[ibface]
         if ireg > 0
@@ -235,7 +235,7 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{2}}, grid)
     brflag = ones(Bool, nbfaceregions)
     ax.set_aspect(ctx[:aspect])
     tridat = tridata(grid, ctx[:gridscale])
-    cmap = region_cmap(ncellregions)
+    cmap = region_cmap(max(ncellregions, 2))
     cdata = ax.tripcolor(
         tridat...;
         facecolors = cellcolors(grid, ctx[:cellcoloring]),
@@ -243,22 +243,24 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{2}}, grid)
         vmin = 1.0,
         vmax = length(cmap),
     )
-    if ctx[:colorbar] == :horizontal
-        cbar = fig.colorbar(
-            cdata;
-            ax = ax,
-            ticks = collect(1:length(cmap)),
-            orientation = "horizontal",
-        )
-    end
+    if ctx[:show_colorbar]
+        if ctx[:colorbar] == :horizontal
+            cbar = fig.colorbar(
+                cdata;
+                ax = ax,
+                ticks = collect(1:length(cmap)),
+                orientation = "horizontal",
+            )
+        end
 
-    if ctx[:colorbar] == :vertical
-        cbar = fig.colorbar(
-            cdata;
-            ax = ax,
-            ticks = collect(1:length(cmap)),
-            orientation = "vertical",
-        )
+        if ctx[:colorbar] == :vertical
+            cbar = fig.colorbar(
+                cdata;
+                ax = ax,
+                ticks = collect(1:length(cmap)),
+                orientation = "vertical",
+            )
+        end
     end
 
     ax.triplot(tridat...; color = "k", linewidth = ctx[:linewidth])
@@ -266,7 +268,7 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{2}}, grid)
     if nbfaceregions > 0
         gridscale = ctx[:gridscale]
         coord = grid[Coordinates]
-        cmap = bregion_cmap(nbfaceregions)
+        cmap = bregion_cmap(max(nbfaceregions, 2))
         # see https://gist.github.com/gizmaa/7214002
         c1 = [coord[:, bfacenodes[1, i]] for i in 1:num_sources(bfacenodes)] * gridscale
         c2 = [coord[:, bfacenodes[2, i]] for i in 1:num_sources(bfacenodes)] * gridscale
@@ -302,7 +304,6 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{3}}, grid)
     if ctx[:clear]
         ctx[:ax].cla()
     end
-
     fig = ctx[:figure]
 
     nregions = num_cellregions(grid)
@@ -321,8 +322,8 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{3}}, grid)
     ax.set_zlim3d(xyzmin[3], xyzmax[3])
     ax.view_init(ctx[:elev], ctx[:azim])
 
-    cmap = region_cmap(nregions)
-    bcmap = bregion_cmap(nbregions)
+    cmap = region_cmap(max(nregions, 2))
+    bcmap = bregion_cmap(max(nbregions, 2))
 
     xyzcut = [ctx[:xplanes][1], ctx[:yplanes][1], ctx[:zplanes][1]]
 
@@ -731,7 +732,7 @@ function vectorplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{2}}, grid, func)
     # For the kwargs, see
     # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.quiver.html
     # Without them, PyPlot itself normalizes
-    ax.quiver(qc[1, :], qc[2, :], qv[1, :], qv[2, :]; color = ctx[:color], scale = 1, angles = "xy", scale_units = "xy")
+    ax.quiver(qc[1, :], qc[2, :], qv[1, :], qv[2, :]; color = rgbtuple(ctx[:color]), scale = 1, angles = "xy", scale_units = "xy")
     ax.set_xlabel(ctx[:xlabel])
     ax.set_ylabel(ctx[:ylabel])
 
@@ -788,7 +789,7 @@ function streamplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{2}}, grid, func)
 
     X, Y = meshgrid(rc)
 
-    ax.streamplot(X, Y, rv[1, :, :, 1]', rv[2, :, :, 1]'; color = ctx[:color], density = 1)
+    ax.streamplot(X, Y, rv[1, :, :, 1]', rv[2, :, :, 1]'; color = rgbtuple(ctx[:color]), density = 1)
     ax.set_xlabel(ctx[:xlabel])
     ax.set_ylabel(ctx[:ylabel])
 

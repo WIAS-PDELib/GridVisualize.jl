@@ -390,7 +390,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
                     map(a -> a, ctx[:lines][l]);
                     linestyle = ctx[:linestyle],
                     linewidth = ctx[:linewidth],
-                    color = RGB(ctx[:color]),
+                    color = rgbcolor(ctx[:color])
                 )
             end
             if ctx[:label] != ""
@@ -400,7 +400,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
                     linestyle = ctx[:linestyle],
                     linewidth = ctx[:linewidth],
                     markersize = 0.1,
-                    color = RGB(ctx[:color]),
+                    color = rgbcolor(ctx[:color]),
                     label = ctx[:label],
                 )
             end
@@ -413,14 +413,14 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
                     ctx[:scene],
                     map(a -> a, ctx[:lines][l]);
                     linestyle = ctx[:linestyle],
-                    color = RGB(ctx[:color]),
+                    color = rgbcolor(ctx[:color]),
                     linewidth = ctx[:linewidth],
                 )
                 # draw markers without label
                 XMakie.scatter!(
                     ctx[:scene],
                     map(a -> a[1:ctx[:markevery]:end], ctx[:lines][l]);
-                    color = RGB(ctx[:color]),
+                    color = rgbcolor(ctx[:color]),
                     marker = ctx[:markershape],
                     markersize = ctx[:markersize],
                 )
@@ -437,8 +437,8 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
                     linewidth = ctx[:linewidth],
                     marker = ctx[:markershape],
                     markersize = ctx[:markersize],
-                    markercolor = RGB(ctx[:color]),
-                    color = RGB(ctx[:color]),
+                    markercolor = rgbcolor(ctx[:color]),
+                    color = rgbcolor(ctx[:color]),
                     label = ctx[:label],
                 )
             end
@@ -469,7 +469,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
         XMakie.scatter!(
             ctx[:scene],
             [Point2f(xmin, ymin), Point2f(xmax, ymax)];
-            color = :white,
+            color = parse(RGB{Float64}, :white),
             markersize = 0.0,
             strokewidth = 0,
         )
@@ -529,36 +529,38 @@ function makescene_grid(ctx)
     ncol = length(ctx[:cmap])
     nbcol = length(ctx[:bcmap])
     # fontsize=0.5*ctx[:fontsize],ticklabelsize=0.5*ctx[:fontsize]
-    if ctx[:colorbar] == :vertical
-        GL[1, 2] = XMakie.Colorbar(
-            ctx[:figure];
-            colormap = XMakie.cgrad(ctx[:cmap]; categorical = true),
-            limits = (0.5, ncol + 0.5),
-            ticks = 1:ncol,
-            width = 15,
-        )
-        GL[1, 3] = XMakie.Colorbar(
-            ctx[:figure];
-            colormap = XMakie.cgrad(ctx[:bcmap]; categorical = true),
-            limits = (0.5, nbcol + 0.5),
-            ticks = 1:nbcol,
-            width = 15,
-        )
-    elseif ctx[:colorbar] == :horizontal
-        GL[2, 1] = XMakie.Colorbar(
-            ctx[:figure];
-            colormap = XMakie.cgrad(ctx[:cmap]; categorical = true),
-            limits = (1, ncol),
-            height = 15,
-            vertical = false,
-        )
-        GL[3, 1] = XMakie.Colorbar(
-            ctx[:figure];
-            colormap = XMakie.cgrad(ctx[:bcmap]; categorical = true),
-            limits = (1, nbcol),
-            height = 15,
-            vertical = false,
-        )
+    if ctx[:show_colorbar]
+        if ctx[:colorbar] == :vertical
+            GL[1, 2] = XMakie.Colorbar(
+                ctx[:figure];
+                colormap = XMakie.cgrad(ctx[:cmap]; categorical = true),
+                limits = (0.5, ncol + 0.5),
+                ticks = 1:ncol,
+                width = 15,
+            )
+            GL[1, 3] = XMakie.Colorbar(
+                ctx[:figure];
+                colormap = XMakie.cgrad(ctx[:bcmap]; categorical = true),
+                limits = (0.5, nbcol + 0.5),
+                ticks = 1:nbcol,
+                width = 15,
+            )
+        elseif ctx[:colorbar] == :horizontal
+            GL[2, 1] = XMakie.Colorbar(
+                ctx[:figure];
+                colormap = XMakie.cgrad(ctx[:cmap]; categorical = true),
+                limits = (1, ncol),
+                height = 15,
+                vertical = false,
+            )
+            GL[3, 1] = XMakie.Colorbar(
+                ctx[:figure];
+                colormap = XMakie.cgrad(ctx[:bcmap]; categorical = true),
+                limits = (1, nbcol),
+                height = 15,
+                vertical = false,
+            )
+        end
     end
     return GL
 end

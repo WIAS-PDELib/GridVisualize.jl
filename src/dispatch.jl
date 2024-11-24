@@ -317,7 +317,7 @@ function default_plot_kwargs()
             :none,
             "1D plot marker shape: one of [:none, :circle, :star5, :diamond, :hexagon, :cross, :xcross, :utriangle, :dtriangle, :rtriangle, :ltriangle, :pentagon, :+, :x]"
         ),
-        :color => Pair((0.0, 0.0, 0.0), "1D plot line color"),
+        :color => Pair(RGB(0.0, 0.0, 0.0), "1D plot line color"),
         :cellwise => Pair(false, "1D plots cellwise; unmaintained and can be slow)"),
         :label => Pair("", "1D plot label"),
         :levels => Pair(7, "array of isolevels or number of isolevels for contour plots"),
@@ -374,7 +374,8 @@ function default_plot_kwargs()
         :dim => Pair(1, "Data dimension for PlutoVista plot"),
         :regions => Pair(:all, "List of regions to plot"),
         :species => Pair(1, "Number of species to plot or number of species in regions"),
-        :spacing => Pair(nothing, "Removed from API")
+        :spacing => Pair(nothing, "Removed from API"),
+        :show_colorbar => Pair(true, "Show color bar next to grid plots")
     )
 end
 
