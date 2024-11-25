@@ -23,4 +23,3 @@ julia> ENV["PLUTO_PROJECT"]=Base.active_project()
 julia> Pluto.run(notebook="examples/plutovista.jl")
 
 ```
-
