@@ -242,10 +242,17 @@ function gridplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{2}}, grid)
 
     cell_colors = cellcolors(grid, ctx[:cellcoloring])
 
+    # the first triangle for dummy plot below
+    dummy_triangle = @views tridat[3][1, :]
+
+    # the corresponding coordinates (add +1 for Python → Julia)
+    dummy_coords_x = [ tridat[1][i + 1] for i in dummy_triangle ]
+    dummy_coords_y = [ tridat[2][i + 1] for i in dummy_triangle ]
+
     # dummy plot to get a correct color bar for the boundary data
     bcdata = ax.tripcolor(
-        tridat[1][1:3], tridat[2][1:3]; # extract a single point from the original triangulation
-        facecolors = cell_colors[1:1],  # only one triangle!
+        dummy_coords_x, dummy_coords_y, dummy_triangle; # use the dummy triangle
+        facecolors = cell_colors[1:1],                  # only one triangle!
         cmap = PyPlot.ColorMap(bcmap, length(bcmap)),
         vmin = 0.5,
         vmax = length(bcmap) + 0.5,
