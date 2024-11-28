@@ -1,12 +1,28 @@
 using Test, ExtendableGrids, GridVisualize, Pkg
-import CairoMakie
+
+import CairoMakie, PyPlot, PlutoVista
+
 CairoMakie.activate!(; type = "svg", visible = false)
 
 plotting = joinpath(@__DIR__, "..", "examples", "plotting.jl")
 include(plotting)
 include("../docs/makeplots.jl")
-@testset "makeplots - CairoMakie" begin
-    makeplots(mktempdir(); Plotter = CairoMakie, extension = ".svg")
+
+for Plotter in [CairoMakie]
+    @eval begin
+        @testset "makeplots - $(nameof($Plotter))" begin
+            makeplots(mktempdir(); Plotter = $Plotter, extension = ".svg")
+        end
+    end
+end
+
+# Some Plotters cannot perform the `makeplots` run, only try a `multiscene`
+for Plotter in [PyPlot, PlutoVista]
+    @eval begin
+        @testset "plotting_multiscene - $(nameof($Plotter))" begin
+            @test plotting_multiscene(Plotter = $Plotter) !== nothing
+        end
+    end
 end
 
 
