@@ -6,6 +6,12 @@
 
 - `gridplot` with `GLMakie` and `PyPlot` now annotates the color bars with `boundary regions` and `cell regions`
 
+- unit test for undocumented names
+
+### Removed
+
+- dangling exported function `backend!`
+
 ## [1.9.0] - 2024-11-25
 
 ### Added

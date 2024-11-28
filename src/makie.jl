@@ -77,6 +77,12 @@ function save(fname, scene, XMakie, ::Type{MakieType})
     return isnothing(scene) ? nothing : XMakie.save(fname, scene)
 end
 
+
+"""
+    movie( func, vis::GridVisualizer, ::Type{MakieType}; file = nothing, format = "gif", kwargs... )
+
+Record a movie with GLMakie backend. MP4 files and gifs can be created.
+"""
 function movie(
         func,
         vis::GridVisualizer,

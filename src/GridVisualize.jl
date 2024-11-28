@@ -1,3 +1,8 @@
+"""
+    GridVisualize
+
+$(read(joinpath(@__DIR__, "..", "README.md"), String))
+"""
 module GridVisualize
 
 using Printf
@@ -31,7 +36,7 @@ export gridplot, gridplot!
 export vectorplot, vectorplot!
 export streamplot, streamplot!
 export customplot, customplot!
-export save, reveal, backend!
+export save, reveal
 export isplots, isvtkview, ispyplot, ismakie, isplutovista
 export GridVisualizer, SubVisualizer
 export plottertype, available_kwargs
