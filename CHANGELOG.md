@@ -8,6 +8,8 @@
 
 - unit test for undocumented names
 
+- Unit test for `PyPlot` and `PlutoVista`
+
 ### Removed
 
 - dangling exported function `backend!`
