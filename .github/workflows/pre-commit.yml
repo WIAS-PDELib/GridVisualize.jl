@@ -1,10 +1,11 @@
-name: pre-commit
+name: code quality checks
 
 on:
   pull_request:
   
 jobs:
   pre-commit:
+    name: run pre-commit
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
