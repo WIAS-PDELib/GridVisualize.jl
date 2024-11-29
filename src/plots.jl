@@ -46,6 +46,11 @@ function save(fname, scene, Plots, ::Type{PlotsType})
     return isnothing(scene) ? nothing : Plots.savefig(scene, fname)
 end
 
+"""
+    movie( func, vis::GridVisualizer, ::Type{PlotsType}; file = nothing, format = "gif", kwargs... )
+
+Record a movie with Plots backend. MP4 files and gifs can be created.
+"""
 function movie(
         func,
         vis::GridVisualizer,

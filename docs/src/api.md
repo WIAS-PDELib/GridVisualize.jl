@@ -61,3 +61,8 @@ available_kwargs
 vectorsample
 quiverdata
 ```
+
+## Creating movies
+```@docs
+movie
+```

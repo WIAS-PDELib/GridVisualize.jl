@@ -8,3 +8,10 @@ include("../docs/makeplots.jl")
 @testset "makeplots - CairoMakie" begin
     makeplots(mktempdir(); Plotter = CairoMakie, extension = ".svg")
 end
+
+
+if isdefined(Docs, :undocumented_names) # >=1.11
+    @testset "UndocumentedNames" begin
+        @test isempty(Docs.undocumented_names(GridVisualize))
+    end
+end
