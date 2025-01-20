@@ -600,12 +600,12 @@ function scalarplot!(ctx, TP::Type{PyPlotType}, ::Type{Val{2}}, grids, parentgri
         cmap = PyPlot.ColorMap(plaincolormap(ctx)),
     )
 
-    if hasproperty(cnt,:collections)
+    if hasproperty(cnt, :collections)
         for c in cnt.collections
             c.set_edgecolor("face")
         end
     end
-    
+
     ax.tricontour(tdat..., func; colors = "k", levels = levels)
 
     if ctx[:colorbar] == :horizontal
