@@ -1025,8 +1025,13 @@ pgup/pgdown: coarse control control value
 """
 
 function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grid)
-    make_mesh(pts, fcs) = Mesh(meta(pts; normals = normals(pts, fcs)), fcs)
-
+    function make_mesh(pts, fcs)
+        if pkgversion(GeometryBasics) < v"0.5"
+            return GeometryBasics.Mesh(meta(pts; normals = normals(pts, fcs)), fcs)
+        else
+            return GeometryBasics.Mesh(pts, fcs; normal = normals(pts, fcs))
+        end
+    end
     nregions = num_cellregions(grid)
     nbregions = num_bfaceregions(grid)
 
@@ -1223,7 +1228,11 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
                         i in 1:length(colors)
                 ]
             end
-            return GeometryBasics.Mesh(meta(pts; color = colors, normals = normals(pts, fcs)), fcs)
+            if pkgversion(GeometryBasics) < v"0.5"
+                return GeometryBasics.Mesh(meta(pts; color = colors, normals = normals(pts, fcs)), fcs)
+            else
+                return GeometryBasics.Mesh(pts, fcs; color = colors, normal = normals(pts, fcs))
+            end
         else
             return GeometryBasics.Mesh(pts, fcs)
         end
