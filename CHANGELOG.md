@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [1.10.0]
 
 ### Added
 
@@ -9,6 +9,8 @@
 - unit test for undocumented names
 
 - Unit test for `PyPlot` and `PlutoVista`
+
+- Allow to use breaking releases GeometryBasics v0.5 and Makie v0.22
 
 ### Removed
 
