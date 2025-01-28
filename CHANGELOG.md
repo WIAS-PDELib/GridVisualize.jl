@@ -1,5 +1,12 @@
 # Changelog
 
+## [unreleased]
+
+### Added
+
+ - new high level extraction plot method `sliceplot` to extract a 2D plot from a 3D plot across a given plane
+ - new high level extraction plot method `lineplot` to extract a 1D plot from a 2D plot along a given line
+
 ## [1.10.0] - 2025-01-20
 
 ### Added

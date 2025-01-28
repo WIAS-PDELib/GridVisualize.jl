@@ -30,6 +30,8 @@ include("vtkview.jl")
 include("meshcat.jl")
 include("plots.jl")
 include("plutovista.jl")
+include("extraction_plots.jl")
+export sliceplot, lineplot
 
 export scalarplot, scalarplot!
 export gridplot, gridplot!
