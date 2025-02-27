@@ -1,3 +1,37 @@
+@testset "eval_expr! test" begin
+
+    function test_slice_expr(result, expr)
+        vec = zero(result)
+        GridVisualize.eval_slice_expr!(vec, expr)
+        @test vec == result
+        return nothing
+    end
+
+    function test_fail_slice_plot(expr)
+        try
+            GridVisualize.eval_slice_expr!(zeros(4), expr)
+        catch
+            @show "fail with $expr"
+            @test true
+        else
+            @show expr
+            @test false
+        end
+        return nothing
+    end
+
+    test_slice_expr([1, 0, 0, 0], :(x))
+    test_slice_expr([0, 2, 0, 0], :(2y))
+    test_slice_expr([0, 0, -3, 0], :(-3z))
+    test_slice_expr([1, 2, 3, 4], :(3z + x + 2y + 4))
+    test_slice_expr([-4, 3, -2, 1], :(1 - 2z + 3y - 4x))
+
+    test_fail_slice_plot(:(y^2)) # wrong operation
+    test_fail_slice_plot(:(z * z - 4)) # wrong operation
+    test_fail_slice_plot(:(x * y)) # wrong operation
+end
+
+
 @testset "z-rotation matrix" begin
 
     # t is already the z-vector ⇒ R = id
