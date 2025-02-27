@@ -55,11 +55,8 @@ module ImplEvalSlice
     end
 
     function _eval_slice_expr!(vec, expr::Expr, factor)
-        @show "#####" vec expr factor
-
         # only calls are allowed: no assignments etc.
         @assert expr.head == :call "slice expression syntax is :(αx ± βy [± γz] ± δ) for numbers α, β, [γ,] δ."
-
 
         if expr.args[1] == :+
             handle_plus!(vec, expr, factor)
@@ -87,6 +84,11 @@ module ImplEvalSlice
         return nothing
     end
 
+    function _eval_slice_expr!(vec, pair::Pair{Symbol, <:Number}, factor)
+        set_symbol!(first)
+        return nothing
+    end
+
 end # module ImplEvalSlice
 
 """
@@ -108,14 +110,14 @@ eval_slice_expr!(vec, expr::Union{Symbol, Expr}) = ImplEvalSlice._eval_slice_exp
 """
     $(SIGNATURES)
 
-    Convert a Symbol-Number pair to a slice expression.
+    Provide a Symbol-Number pair as a slice expression.
     Allowed symbols are :x, :y and :z.
 
     Example:
-      -  :x => 4 becomes :(x - 4)
+      -  :x = 4 becomes :(x - 4)
       -  :y = -3 becomes :(y + 3)
 """
-pair_to_slice_expr(pair::Pair{Symbol, <:Number}) = :($(first(pair)) - $(second(pair)))
+eval_slice_expr!(vec, pair::Pair{Symbol, <:Number}) = eval_slice_expr!(vec, :($(first(pair)) - $(last(pair))))
 
 
 """
@@ -174,10 +176,11 @@ function compute_2d_rotation_matrix(target_vector)
     return R(α)
 end
 
+
 """
     $(SIGNATURES)
 
-    Extract a 2D slice plot of a 3D plot
+    Extract a 2D plane plot of a 3D plot
 
     The intersection of the given 3D grid with a given plane is computed and rotated into a 2D
     coordinate system.
@@ -190,16 +193,23 @@ end
 
     Else, for a generic plane, the new coordinate system has non-negative values and start at [0,0].
 
-    vis:     GridVisualizer
+    ctx:     Plotting context
     grid:    3D ExtendableGrid
     values:  value vector corresponding to the grid nodes
     plane:   Vector [a,b,c,d], s.t., ax + by + cz + d = 0 defines the plane that slices the 3D grid
     xlabel:  new first transformed coordinate
     ylabel:  new second transformed coordinate
 """
-function sliceplot!(vis, grid, values, plane; xlabel = "ξ", ylabel = "η", kwargs...)
+function slice_plot!(ctx, ::Type{Val{3}}, grid, values; xlabel = "ξ", ylabel = "η", kwargs...)
 
-    @assert length(plane) == 4 "a plane equation requires exactly 4 parameters"
+    _update_context!(ctx, Dict(:xlabel => xlabel, :ylabel => ylabel))
+    _update_context!(ctx, kwargs)
+
+    plane = zeros(4)
+    eval_slice_expr!(plane, ctx[:slice])
+
+    # reset :slice in kwargs to avoid infinite loops into slice_plot
+    ctx[:slice] = nothing
 
     # get new data from marching_tetrahedra
     new_coords, new_triangles, new_values = GridVisualize.marching_tetrahedra(grid, values, [plane], [])
@@ -249,18 +259,10 @@ function sliceplot!(vis, grid, values, plane; xlabel = "ξ", ylabel = "η", kwar
         @views grid_2d[CellNodes][:, it] .= t
     end
 
-    scalarplot!(vis, grid_2d, new_values; xlabel, ylabel, kwargs...)
+    # kwargs are merged into ctx
+    scalarplot!(ctx, grid_2d, new_values; xlabel, ylabel)
 
-    return vis
-end
-
-"""
-    ($SIGNATURES)
-
-    Handy in-place variant of [`sliceplot!`](@ref)
-"""
-function sliceplot(grid, values, line; Plotter = default_plotter(), kwargs...)
-    return sliceplot!(GridVisualizer(; Plotter = Plotter, show = true, kwargs...), grid, values, line; kwargs...)
+    return ctx
 end
 
 
@@ -277,16 +279,23 @@ end
 
     Else, for a generic line, the new axis has non-negative values and starts at [0,0].
 
-    vis:     GridVisualizer
+    ctx:     plotting context
     grid:    2D ExtendableGrid
     values:  value vector corresponding to the grid nodes
     line:    Vector [a,b,c], s.t., ax + by + d = 0 defines the line that slices the 2D grid
     xlabel:  new coordinate of the resulting line
     ylabel:  label for the data
 """
-function lineplot!(vis, grid, values, line; xlabel = "line", ylabel = "value", kwargs...)
+function slice_plot!(ctx, ::Type{Val{2}}, grid, values; xlabel = "line", ylabel = "value", kwargs...)
 
-    @assert length(line) == 3 "a line equation requires exactly 3 parameters"
+    _update_context!(ctx, Dict(:xlabel => xlabel, :ylabel => ylabel))
+    _update_context!(ctx, kwargs)
+
+    line = zeros(3)
+    eval_slice_expr!(line, ctx[:slice])
+
+    # reset :slice in kwargs to avoid infinite loops into slice_plot
+    ctx[:slice] = nothing
 
     # get new data from marching_triangles
     new_coords, new_adjecencies, new_values = GridVisualize.marching_triangles(grid, values, [line], [])
@@ -334,17 +343,9 @@ function lineplot!(vis, grid, values, line; xlabel = "line", ylabel = "value", k
     grid_1d[Coordinates] = @views grid_1d[Coordinates][:, p]
     new_values = new_values[p]
 
-    scalarplot!(vis, grid_1d, new_values; xlabel, ylabel, kwargs...)
+    # kwargs are merged into ctx
+    scalarplot!(ctx, grid_1d, new_values; xlabel, ylabel)
 
-    return vis
+    return ctx
 
-end
-
-"""
-    ($SIGNATURES)
-
-    Handy in-place variant of [`lineplot!`](@ref)
-"""
-function lineplot(grid, values, line; Plotter = default_plotter(), kwargs...)
-    return lineplot!(GridVisualizer(; Plotter = Plotter, show = true, kwargs...), grid, values, line; kwargs...)
 end

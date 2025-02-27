@@ -7,11 +7,10 @@
         return nothing
     end
 
-    function test_fail_slice_plot(expr)
+    function test_fail_slice_plot(n, expr)
         try
-            GridVisualize.eval_slice_expr!(zeros(4), expr)
-        catch
-            @show "fail with $expr"
+            GridVisualize.eval_slice_expr!(zeros(n), expr)
+        catch e
             @test true
         else
             @show expr
@@ -26,9 +25,19 @@
     test_slice_expr([1, 2, 3, 4], :(3z + x + 2y + 4))
     test_slice_expr([-4, 3, -2, 1], :(1 - 2z + 3y - 4x))
 
-    test_fail_slice_plot(:(y^2)) # wrong operation
-    test_fail_slice_plot(:(z * z - 4)) # wrong operation
-    test_fail_slice_plot(:(x * y)) # wrong operation
+    test_slice_expr([1, 0, 0, -3], :x => 3)
+    test_slice_expr([0, 1, 0, 5.5], :y => -5.5)
+    test_slice_expr([0, 0, 1, -1 // 2], :z => 1 // 2)
+
+    test_fail_slice_plot(3, :(y^2)) # wrong operation
+    test_fail_slice_plot(4, :(z * z - 4)) # wrong operation
+    test_fail_slice_plot(3, :(x * y)) # wrong operation
+    test_fail_slice_plot(3, :(w + x - 5)) # wrong symbol
+    test_fail_slice_plot(3, :(z + x - 5)) # :z not allowed in 2D
+
+    test_fail_slice_plot(4, :w => 3) # wrong symbol
+    test_fail_slice_plot(4, :x => "wtf") # wrong type
+    test_fail_slice_plot(3, :z => 1) # :z not allowed in 2D
 end
 
 
@@ -79,27 +88,21 @@ end
 end
 
 
-@testset "lineplot" begin
+@testset "slice_plot!" begin
 
-    grid = simplexgrid(0.0:10.0, 0.0:10.0)
+    let
+        grid = simplexgrid(0.0:10.0, 0.0:10.0)
+        f = map(x -> x[1] * x[2], grid)
 
-    f = map(x -> x[1] * x[2], grid)
+        @test scalarplot(grid, f, Plotter = CairoMakie, slice = :(3x - y + 5)) !== nothing
+        @test scalarplot(grid, f, Plotter = CairoMakie, slice = :y => 4) !== nothing
+    end
 
-    # x = 5 line
-    line = [1, 0, -5]
+    let
+        grid = simplexgrid(0.0:10.0, 0.0:10.0, 0.0:10.0)
+        f = map(x -> x[1] * x[2] + x[3], grid)
 
-    @test lineplot(grid, f, line, Plotter = CairoMakie) !== nothing
-end
-
-
-@testset "sliceplot" begin
-
-    grid = simplexgrid(0.0:10.0, 0.0:10.0, 0.0:10.0)
-
-    f = map(x -> x[1] * x[2] + x[3], grid)
-
-    # x = 5 line
-    plane = [1, 0, 0, -5]
-
-    @test sliceplot(grid, f, plane, Plotter = CairoMakie) !== nothing
+        @test scalarplot(grid, f, Plotter = CairoMakie, slice = :(3x - y - 5.5z + 5)) !== nothing
+        @test scalarplot(grid, f, Plotter = CairoMakie, slice = :z => 4) !== nothing
+    end
 end

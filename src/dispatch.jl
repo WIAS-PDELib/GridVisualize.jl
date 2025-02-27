@@ -515,8 +515,15 @@ Keyword arguments: see [`available_kwargs`](@ref)
 """
 function scalarplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
     _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
-    _update_context!(ctx, kwargs)
-    return scalarplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, [grid], grid, [func])
+
+    # call a specialized function if the user want to plot only a dim-1 slice of the data
+    if (haskey(kwargs, :slice) && kwargs[:slice] !== nothing) || (haskey(ctx, :slice) && ctx[:slice] !== nothing)
+        # we update the context in the method since we set some custom defaults
+        return slice_plot!(ctx, Val{dim_space(grid)}, grid, func; kwargs...)
+    else
+        _update_context!(ctx, kwargs)
+        return scalarplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, [grid], grid, [func])
+    end
 end
 
 """
