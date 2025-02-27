@@ -4,10 +4,9 @@
 
 ### Added
 
- - new high level extraction plot method `sliceplot` to extract a 2D plot from a 3D plot across a given plane
- - new high level extraction plot method `lineplot` to extract a 1D plot from a 2D plot along a given line
-
-## [1.10.0] - 2025-01-20
+ - New key word argument `slice` for `scalarplot` to extract a `dim-1` scalar plot along a slice definition.
+   The slice can be provided as an expression `slice = :(x + 2y - 4)` constrained by zero, or as a pair `slice = :x => 3`
+   to fix a certain value of one axis.
 
 ### Added
 
