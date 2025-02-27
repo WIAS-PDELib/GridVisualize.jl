@@ -20,7 +20,7 @@ end
 for Plotter in [PyPlot, PlutoVista]
     @eval begin
         @testset "plotting_multiscene - $(nameof($Plotter))" begin
-            @test plotting_multiscene(Plotter = $Plotter) !== nothing broken = true # PlutoVista needs a downstream change for marching_triangles
+            @test plotting_multiscene(Plotter = $Plotter) !== nothing skip = true # PlutoVista needs a downstream change for marching_triangles
         end
     end
 end
