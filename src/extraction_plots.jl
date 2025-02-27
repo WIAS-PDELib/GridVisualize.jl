@@ -1,4 +1,124 @@
 """
+Implementation details for slice evaluation. Do not use directly.
+"""
+module ImplEvalSlice
+
+    function set_symbol!(vec, symbol::Symbol, value::Number)
+        index = Dict(
+            :x => 1,
+            :y => 2,
+            :z => 3
+        )
+
+        if symbol == :z
+            @assert length(vec) == 4
+        end
+
+        vec[index[symbol]] = value
+        return nothing
+    end
+
+    function handle_plus!(vec, expr::Expr, factor)
+        # simply eval all other arguments
+        @views for arg in expr.args[2:end]
+            _eval_slice_expr!(vec, arg, factor)
+        end
+
+        return nothing
+    end
+
+    function handle_minus!(vec, expr::Expr, factor)
+        if length(expr.args) == 2
+            # unary minus
+            set_symbol!(vec, expr.args[2], -factor)
+        else
+            # binary minus
+            _eval_slice_expr!(vec, expr.args[2], factor)
+            _eval_slice_expr!(vec, expr.args[3], -factor)
+        end
+
+        return nothing
+    end
+
+    function handle_mul!(vec, expr::Expr, factor)
+        @assert length(expr.args) == 3 "multiplication only with 2 arguments, please"
+
+        if expr.args[2] isa Number && expr.args[3] isa Symbol
+            _eval_slice_expr!(vec, expr.args[3], factor * expr.args[2])
+        elseif expr.args[3] isa Number && expr.args[2] isa Symbol
+            _eval_slice_expr!(vec, expr.args[2], factor * expr.args[3])
+        else
+            error("multiplication only between a number and a symbol")
+        end
+
+        return nothing
+    end
+
+    function _eval_slice_expr!(vec, expr::Expr, factor)
+        @show "#####" vec expr factor
+
+        # only calls are allowed: no assignments etc.
+        @assert expr.head == :call "slice expression syntax is :(αx ± βy [± γz] ± δ) for numbers α, β, [γ,] δ."
+
+
+        if expr.args[1] == :+
+            handle_plus!(vec, expr, factor)
+        elseif expr.args[1] == :-
+            handle_minus!(vec, expr, factor)
+        elseif expr.args[1] == :*
+            handle_mul!(vec, expr, factor)
+        elseif expr.args[1] isa Symbol
+            set_symbol!(vec, expr.args[1], factor)
+        elseif expr.args[1] isa Number
+            vec[end] = expr.args[1]
+            error("cannot handle $expr")
+        end
+
+        return nothing
+    end
+
+    function _eval_slice_expr!(vec, expr::Symbol, factor)
+        set_symbol!(vec, expr, factor)
+        return nothing
+    end
+
+    function _eval_slice_expr!(vec, numb::Number, factor)
+        vec[end] = numb * factor
+        return nothing
+    end
+
+end # module ImplEvalSlice
+
+"""
+    $(SIGNATURES)
+
+    Evaluate an expression of the form :(αx ± βy ± γz ± δ)
+    and compute the vector vec = [ α, β, γ, δ ].
+
+    At least one nonzero symbol :x, :y or :z needs to be present.
+    Providing a :z symbol assumes that length(vec) == 4.
+
+    Examples:
+      -  :(x-3) => [ 1, 0, 0, -3 ]
+      -  :(2x - z + 3)  => [2, 0, 1, 3]
+"""
+eval_slice_expr!(vec, expr::Union{Symbol, Expr}) = ImplEvalSlice._eval_slice_expr!(vec, expr, 1.0)
+
+
+"""
+    $(SIGNATURES)
+
+    Convert a Symbol-Number pair to a slice expression.
+    Allowed symbols are :x, :y and :z.
+
+    Example:
+      -  :x => 4 becomes :(x - 4)
+      -  :y = -3 becomes :(y + 3)
+"""
+pair_to_slice_expr(pair::Pair{Symbol, <:Number}) = :($(first(pair)) - $(second(pair)))
+
+
+"""
     $(SIGNATURES)
 
     Compute and return a rotation matrix 𝐑³ˣ³

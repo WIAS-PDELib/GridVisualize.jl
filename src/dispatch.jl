@@ -377,7 +377,8 @@ function default_plot_kwargs()
         :regions => Pair(:all, "List of regions to plot"),
         :species => Pair(1, "Number of species to plot or number of species in regions"),
         :spacing => Pair(nothing, "Removed from API"),
-        :show_colorbar => Pair(true, "Show color bar next to grid plots")
+        :show_colorbar => Pair(true, "Show color bar next to grid plots"),
+        :slice => Pair(nothing, "Plot a dim-1 slice along a hyperplane expression :(αx ± βy [± γz] ± δ)) or a fixed axis pair, e.g., :x => 3")
     )
 end
 
