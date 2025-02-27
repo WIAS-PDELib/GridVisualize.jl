@@ -817,7 +817,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grids, parentgrid
         if ctx[:elevation] ≈ 0
             XMakie.linesegments!(
                 ctx[:scene],
-                map(data -> marching_triangles(data.g, data.f, data.l; gridscale), ctx[:contourdata]);
+                map(data -> first(marching_triangles(data.g, data.f, [], data.l; gridscale)), ctx[:contourdata]);
                 color = :black,
                 linewidth = ctx[:linewidth],
             )
