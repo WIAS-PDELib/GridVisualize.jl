@@ -255,9 +255,7 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
     end
 
     # kwargs are merged into ctx
-    scalarplot!(ctx, grid_2d, new_values)
-
-    return ctx
+    return scalarplot!(ctx, grid_2d, new_values; show = ctx[:show])
 end
 
 
@@ -334,8 +332,5 @@ function slice_plot!(ctx, ::Type{Val{2}}, grid, values)
     new_values = new_values[p]
 
     # kwargs are merged into ctx
-    scalarplot!(ctx, grid_1d, new_values)
-
-    return ctx
-
+    return scalarplot!(ctx, grid_1d, new_values; show = ctx[:show])
 end
