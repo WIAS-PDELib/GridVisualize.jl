@@ -110,6 +110,7 @@ function plotting_func3d(;
 end
 # ![](plotting_func3d.svg)
 
+# ## d-1 dim slice in d-dim data
 # ### 2D slice of a 3D grid
 #
 # You can plot a 2D slice of a function defined on a
