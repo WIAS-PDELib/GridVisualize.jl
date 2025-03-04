@@ -24,6 +24,18 @@ function makeplots(picdir; Plotter = GLMakie, extension = "png")
     @test isfile(fname)
     println("func3d")
 
+    p = plotting_slice3d(; Plotter = Plotter)
+    fname = joinpath(picdir, "plotting_slice3d." * extension)
+    save(fname, p; Plotter = Plotter)
+    @test isfile(fname)
+    println("slice3d")
+
+    p = plotting_line2d(; Plotter = Plotter)
+    fname = joinpath(picdir, "plotting_line2d." * extension)
+    save(fname, p; Plotter = Plotter)
+    @test isfile(fname)
+    println("line2d")
+
     fname = joinpath(picdir, "plotting_jfunc1d." * "gif")
     p = plotting_jfunc1d(; Plotter = Plotter, filename = fname)
     @test isfile(fname)

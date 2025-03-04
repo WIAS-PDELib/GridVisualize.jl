@@ -1,4 +1,4 @@
-using Test, ExtendableGrids, GridVisualize, Pkg
+using Test, ExtendableGrids, GridVisualize, Pkg, LinearAlgebra
 
 import CairoMakie, PyPlot, PlutoVista
 
@@ -24,6 +24,8 @@ for Plotter in [PyPlot, PlutoVista]
         end
     end
 end
+
+include("test_slice_plots.jl")
 
 
 if isdefined(Docs, :undocumented_names) # >=1.11

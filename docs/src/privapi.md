@@ -6,7 +6,7 @@
 Modules = [GridVisualize]
 Private = true
 Public = false
-Pages = ["dispatch.jl","common.jl"]
+Pages = ["dispatch.jl","common.jl","slice_plots.jl"]
 ```
 
 ```@docs
@@ -43,7 +43,7 @@ FlippableLayout
 Modules = [GridVisualize]
 Private = true
 Public = false
-Pages = ["plots.jl"]
+Pages = [joinpath("src","plots.jl")] # https://github.com/JuliaDocs/Documenter.jl/issues/2639
 ```
 
 ## VTKView
@@ -52,4 +52,9 @@ Modules = [GridVisualize]
 Private = true
 Public = false
 Pages = ["vtkview.jl"]
+```
+
+## Internals
+```@docs
+GridVisualize.ImplEvalSlice
 ```

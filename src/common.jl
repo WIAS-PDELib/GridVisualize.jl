@@ -82,18 +82,30 @@ end
 """
     $(SIGNATURES)
 
-Collect isoline snippets on triangles ready for linesegments!
+Deprecated
 """
 function GridVisualizeTools.marching_triangles(grid::ExtendableGrid, func, levels; gridscale = 1.0)
     coord::Matrix{Float64} = grid[Coordinates] * gridscale
     cellnodes::Matrix{Int32} = grid[CellNodes]
-    return marching_triangles(coord, cellnodes, func, levels)
+    points, _, _ = marching_triangles(coord, cellnodes, func, [], levels)
+    return points
 end
 
-function GridVisualizeTools.marching_triangles(grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, levels; gridscale = 1.0) where {Tv, Ti}
+"""
+    $(SIGNATURES)
+
+Collect isoline snippets and/or intersection points with lines and values ready for linesegments!
+"""
+function GridVisualizeTools.marching_triangles(grid::ExtendableGrid, func, lines, levels; gridscale = 1.0)
+    coord::Matrix{Float64} = grid[Coordinates] * gridscale
+    cellnodes::Matrix{Int32} = grid[CellNodes]
+    return marching_triangles(coord, cellnodes, func, lines, levels)
+end
+
+function GridVisualizeTools.marching_triangles(grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, lines, levels; gridscale = 1.0) where {Tv, Ti}
     coords = [grid[Coordinates] * gridscale for grid in grids]
     cellnodes = [grid[CellNodes] for grid in grids]
-    return marching_triangles(coords, cellnodes, funcs, levels)
+    return marching_triangles(coords, cellnodes, funcs, lines, levels)
 end
 
 ##############################################

@@ -110,6 +110,59 @@ function plotting_func3d(;
 end
 # ![](plotting_func3d.svg)
 
+# ## d-1 dim slice in d-dim data
+# ### 2D slice of a 3D grid
+#
+# You can plot a 2D slice of a function defined on a
+# 3D grid by providing a `slice` key word argument which
+# describes a plane equation of a fixed value to one axis.
+#
+# The example shows a plot for a fixed axis y = 0.5.
+# Note that labeling the other axes may be useful
+function plotting_slice3d(;
+        Plotter = default_plotter(),
+        slice = :y => 0.5,
+        xlabel = "x",
+        ylabel = "z",
+        kwargs...,
+    )
+    g, f = func3d()
+    return scalarplot(g, f; Plotter, slice, xlabel, ylabel, kwargs...)
+end
+# ![](plotting_slice3d.svg)
+
+
+# ### 1D line of a 2D grid
+#
+# You can plot a 1D line of a function defined on a
+# 2D grid by providing a `slice` key word argument which
+# describes a line equation of a fixed value to one axis.
+#
+# The example shows a plot along the diagonal x + y - 1 = 0
+# Note that you should provide meaningful axes labels
+function plotting_line2d(;
+        Plotter = default_plotter(),
+        slice = :(x + y - 1),
+        xlabel = "line",
+        ylabel = "value",
+        kwargs...,
+    )
+    g, f = func2d()
+    return scalarplot(g, f; Plotter, slice, xlabel, ylabel, kwargs...)
+end
+# ![](plotting_line2d.svg)
+
+
+#
+# Plotting a function then goes as follows:
+# `xplane`, `yplane` and `zplane` now define cut planes where
+# the function projection is plotted as a heatmap.
+# The additional `flevel` keyword argument allows
+# to control an isolevel.
+#
+# For Makie and VTKView, the cutplane values and the flevel can be controlled interactively.
+
+
 # ## Vector and stream plots
 # ### 2D vector
 function vec2d(; n = 20)

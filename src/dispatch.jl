@@ -377,7 +377,8 @@ function default_plot_kwargs()
         :regions => Pair(:all, "List of regions to plot"),
         :species => Pair(1, "Number of species to plot or number of species in regions"),
         :spacing => Pair(nothing, "Removed from API"),
-        :show_colorbar => Pair(true, "Show color bar next to grid plots")
+        :show_colorbar => Pair(true, "Show color bar next to grid plots"),
+        :slice => Pair(nothing, "Plot a dim-1 slice along a hyperplane expression :(αx ± βy [± γz] ± δ)) or a fixed axis pair, e.g., :x => 3")
     )
 end
 
@@ -515,7 +516,13 @@ Keyword arguments: see [`available_kwargs`](@ref)
 function scalarplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
     _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
-    return scalarplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, [grid], grid, [func])
+
+    # call a specialized function if the user want to plot only a dim-1 slice of the data
+    if haskey(ctx, :slice) && ctx[:slice] !== nothing
+        return slice_plot!(ctx, Val{dim_space(grid)}, grid, func)
+    else
+        return scalarplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, [grid], grid, [func])
+    end
 end
 
 """
