@@ -5,6 +5,8 @@ docs/src/examples/*.png
 docs/src/examples/*.svg
 docs/src/examples/*.gif
 docs/src/examples/*.md
+docs/src/script_examples/*
+docs/src/pluto_examples/*
 *~
 *.html
 *.svg

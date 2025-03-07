@@ -6,12 +6,15 @@ CairoMakie.activate!(; type = "svg", visible = false)
 
 plotting = joinpath(@__DIR__, "..", "examples", "plotting.jl")
 include(plotting)
-include("../docs/makeplots.jl")
 
 for Plotter in [CairoMakie]
     @eval begin
-        @testset "makeplots - $(nameof($Plotter))" begin
-            makeplots(mktempdir(); Plotter = $Plotter, extension = ".svg")
+        @testset "generateplots - $(nameof($Plotter))" begin
+            filepaths = generateplots(mktempdir(); Plotter = $Plotter)
+
+            for path in filepaths
+                @test isfile(path)
+            end
         end
     end
 end
