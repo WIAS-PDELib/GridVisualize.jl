@@ -55,12 +55,7 @@ WGLMakie = "0.10, 0.11"
 julia = "1.9"
 
 [extras]
-CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
-ExtendableGrids = "cfc395e8-590f-11e8-1f13-43a2532b2fa8"
-Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-PlutoVista = "646e1f28-b900-46d7-9d87-d554eb38a413"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["CairoMakie", "ExtendableGrids", "Pkg", "PlutoVista", "PyPlot", "Test"]
+test = ["PyPlot"]
