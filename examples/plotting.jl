@@ -396,3 +396,52 @@ function plotting_custom(; Plotter = default_plotter(), kwargs...)
 end
 
 # ![](plotting_custom.svg)
+
+plotting_functions_svg = [
+    :plotting_multiscene,
+    :plotting_func1d,
+    :plotting_func2d,
+    :plotting_func3d,
+    :plotting_slice3d,
+    :plotting_line2d,
+    :plotting_jfunc2d,
+    :plotting_jfunc3d,
+    :plotting_vec2d,
+    :plotting_stream2d,
+    :plotting_grid1d,
+    :plotting_grid2d,
+    :plotting_grid3d,
+    :plotting_custom,
+]
+
+plotting_functions_gif = [
+    :plotting_jfunc1d,
+    :plotting_movie,
+]
+
+
+function generateplots(picdir; Plotter = nothing)
+    filepaths = String[]
+    if isdefined(Plotter, :Makie)
+        size = (600, 300)
+        Plotter.activate!(; type = "png", visible = false)
+        for plotting_f in plotting_functions_svg
+            @eval begin
+                path = joinpath($picdir, "$($plotting_f).svg")
+                p = $plotting_f(; Plotter = $Plotter)
+                $Plotter.save(path, p)
+                println("successfully generated plot for $($plotting_f)")
+                push!($filepaths, path)
+            end
+        end
+        for plotting_f in plotting_functions_gif
+            @eval begin
+                path = joinpath($picdir, "$($plotting_f).gif")
+                p = $plotting_f(; Plotter = $Plotter, filename = path)
+                println("successfully generated plot for $($plotting_f)")
+                push!($filepaths, path)
+            end
+        end
+    end
+    return filepaths
+end
