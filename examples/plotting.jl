@@ -25,7 +25,7 @@ end
 function plotting_grid1d(; Plotter = default_plotter(), kwargs...)
     return gridplot(grid1d(); Plotter = Plotter, resolution = (500, 200), kwargs...)
 end
-# ![](plotting_grid1d.svg)
+# ![](plotting_grid1d.png)
 
 # ### 2D grids
 
@@ -37,7 +37,7 @@ end
 function plotting_grid2d(; Plotter = default_plotter(), kwargs...)
     return gridplot(grid2d(); Plotter = Plotter, kwargs...)
 end
-# ![](plotting_grid2d.svg)
+# ![](plotting_grid2d.png)
 
 # ### 3D grids
 # The kwargs `xplane`, `yplane` and `zplane` which allow to control
@@ -54,7 +54,7 @@ end
 function plotting_grid3d(; Plotter = default_plotter(), kwargs...)
     return gridplot(grid3d(); Plotter = Plotter, kwargs...)
 end
-# ![](plotting_grid3d.svg)
+# ![](plotting_grid3d.png)
 
 # ## Function plots
 
@@ -68,7 +68,7 @@ function plotting_func1d(; Plotter = default_plotter(), kwargs...)
     g, f = func1d()
     return scalarplot(g, f; Plotter = Plotter, resolution = (500, 300), kwargs...)
 end
-# ![](plotting_func1d.svg)
+# ![](plotting_func1d.png)
 
 # ### Function on 2D grid
 function func2d(; n = 30)
@@ -80,7 +80,7 @@ function plotting_func2d(; Plotter = default_plotter(), kwargs...)
     g, f = func2d()
     return scalarplot(g, f; Plotter = Plotter, levels = 10, kwargs...)
 end
-# ![](plotting_func2d.svg)
+# ![](plotting_func2d.png)
 
 # ### Function on 3D grid
 #
@@ -108,7 +108,7 @@ function plotting_func3d(;
     g, f = func3d()
     return scalarplot(g, f; Plotter = Plotter, levels, xplanes, yplanes, zplanes, kwargs...)
 end
-# ![](plotting_func3d.svg)
+# ![](plotting_func3d.png)
 
 # ## d-1 dim slice in d-dim data
 # ### 2D slice of a 3D grid
@@ -129,7 +129,7 @@ function plotting_slice3d(;
     g, f = func3d()
     return scalarplot(g, f; Plotter, slice, xlabel, ylabel, kwargs...)
 end
-# ![](plotting_slice3d.svg)
+# ![](plotting_slice3d.png)
 
 
 # ### 1D line of a 2D grid
@@ -150,7 +150,7 @@ function plotting_line2d(;
     g, f = func2d()
     return scalarplot(g, f; Plotter, slice, xlabel, ylabel, kwargs...)
 end
-# ![](plotting_line2d.svg)
+# ![](plotting_line2d.png)
 
 
 #
@@ -178,7 +178,7 @@ function plotting_vec2d(; Plotter = default_plotter(), n = 20, kwargs...)
     g, f = vec2d(; n = n)
     return vectorplot(g, f; Plotter = Plotter, kwargs...)
 end
-# ![](plotting_vec2d.svg)
+# ![](plotting_vec2d.png)
 
 # ### 2D stream
 # Stream plots are currently only available with PyPlot and Makie
@@ -186,7 +186,7 @@ function plotting_stream2d(; Plotter = default_plotter(), n = 50, kwargs...)
     g, f = vec2d(; n = n)
     return GridVisualize.streamplot(g, f; Plotter = Plotter, rasterpoints = 100, kwargs...)
 end
-# ![](plotting_stream2d.svg)
+# ![](plotting_stream2d.png)
 
 # ### Movie
 # Movies can contain  any of the previous plots.
@@ -282,7 +282,7 @@ function plotting_multiscene(; Plotter = default_plotter(), resolution = (1000, 
         )
     )
 end
-# ![](plotting_multiscene.svg)
+# ![](plotting_multiscene.png)
 
 # ## Plots of functions on subgrids
 # We can jointly plot functions on different subgrids which
@@ -345,7 +345,7 @@ function plotting_jfunc2d(; Plotter = default_plotter(), kwargs...)
     return scalarplot([g1, g2], g, [func1, func2]; Plotter, kwargs...)
 end
 
-# ![](plotting_jfunc2d.svg)
+# ![](plotting_jfunc2d.png)
 
 # ### 3D case
 function plotting_jfunc3d(;
@@ -380,7 +380,7 @@ function plotting_jfunc3d(;
     )
 end
 
-# ![](plotting_jfunc3d.svg)
+# ![](plotting_jfunc3d.png)
 
 # ## Custom plots
 function plotting_custom(; Plotter = default_plotter(), kwargs...)
@@ -395,9 +395,9 @@ function plotting_custom(; Plotter = default_plotter(), kwargs...)
     return reveal(vis)
 end
 
-# ![](plotting_custom.svg)
+# ![](plotting_custom.png)
 
-plotting_functions_svg = [
+plotting_functions_png = [
     :plotting_multiscene,
     :plotting_func1d,
     :plotting_func2d,
@@ -425,9 +425,9 @@ function generateplots(picdir; Plotter = nothing)
     if isdefined(Plotter, :Makie)
         size = (600, 300)
         Plotter.activate!(; type = "png", visible = false)
-        for plotting_f in plotting_functions_svg
+        for plotting_f in plotting_functions_png
             @eval begin
-                path = joinpath($picdir, "$($plotting_f).svg")
+                path = joinpath($picdir, "$($plotting_f).png")
                 p = $plotting_f(; Plotter = $Plotter)
                 $Plotter.save(path, p)
                 println("successfully generated plot for $($plotting_f)")

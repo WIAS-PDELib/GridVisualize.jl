@@ -11,7 +11,7 @@ function mkdocs()
     example_dir = joinpath(@__DIR__, "..", "examples")
     notebook_dir = joinpath(@__DIR__, "..", "examples")
 
-    generated_examples = @docscripts(example_dir, ["plotting.jl"], Plotter = CairoMakie)
+    generated_examples = @docscripts(example_dir, ["Plotting Examples" => "plotting.jl"], Plotter = CairoMakie)
     notebook_examples = @docplutonotebooks(notebook_dir, ["plutovista.jl"], iframe = true, iframe_height = "2000px")
 
     makedocs(;
