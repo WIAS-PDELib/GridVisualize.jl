@@ -24,10 +24,8 @@ function mkdocs()
         pages = [
             "Home" => "index.md",
             "Public API" => "api.md",
-            "Examples" => [
-                "Plotting examples" => generated_examples,
-                "Pluto notebooks" => notebook_examples,
-            ],
+            "Examples" => generated_examples,
+            "Pluto notebooks" => notebook_examples,
             "Private API" => "privapi.md",
             "Contributing" => "contributing.md",
         ]
