@@ -367,8 +367,9 @@ function default_plot_kwargs()
         ),
         :scene3d => Pair(
             :Axis3,
-            "3D plot type of Makie scene. Alternaitve to `:Axis3` is `:LScene`"
+            "3D plot type of Makie scene. Alternative to `:Axis3` is `:LScene`"
         ),
+        :viewmode => Pair(:fit, "Axis3d viewmode for Makie plots. Possible values :fit or :free"),
         :fignumber => Pair(1, "Figure number (PyPlot)"),
         :framepos => Pair(1, "Subplot position in frame (VTKView)"),
         :subplot => Pair((1, 1), "Private: Actual subplot"),
@@ -377,7 +378,7 @@ function default_plot_kwargs()
         :regions => Pair(:all, "List of regions to plot"),
         :species => Pair(1, "Number of species to plot or number of species in regions"),
         :spacing => Pair(nothing, "Removed from API"),
-        :show_colorbar => Pair(true, "Show color bar next to grid plots"),
+        :show_colorbar => Pair(true, "Show color bar next to plots"),
         :slice => Pair(nothing, "Plot a dim-1 slice along a hyperplane expression :(αx ± βy [± γz] ± δ)) or a fixed axis pair, e.g., :x => 3")
     )
 end

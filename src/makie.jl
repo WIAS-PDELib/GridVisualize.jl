@@ -670,23 +670,25 @@ function makescene2d(ctx, key)
     GL[1, 1] = ctx[:scene]
 
     # , fontsize=0.5*ctx[:fontsize],ticklabelsize=0.5*ctx[:fontsize]
-    if ctx[:colorbar] == :vertical
-        GL[1, 2] = XMakie.Colorbar(
-            ctx[:figure],
-            ctx[key];
-            width = 10,
-            ticks = unique(ctx[:cbarticks]),
-            tickformat = "{:.2e}",
-        )
-    elseif ctx[:colorbar] == :horizontal
-        GL[2, 1] = XMakie.Colorbar(
-            ctx[:figure],
-            ctx[key];
-            height = 10,
-            ticks = unique(ctx[:cbarticks]),
-            vertical = false,
-            tickformat = "{:.2e}",
-        )
+    if ctx[:show_colorbar]
+        if ctx[:colorbar] == :vertical
+            GL[1, 2] = XMakie.Colorbar(
+                ctx[:figure],
+                ctx[key];
+                width = 10,
+                ticks = unique(ctx[:cbarticks]),
+                tickformat = "{:.2e}",
+            )
+        elseif ctx[:colorbar] == :horizontal
+            GL[2, 1] = XMakie.Colorbar(
+                ctx[:figure],
+                ctx[key];
+                height = 10,
+                ticks = unique(ctx[:cbarticks]),
+                vertical = false,
+                tickformat = "{:.2e}",
+            )
+        end
     end
     return GL
 end
@@ -940,13 +942,17 @@ function makeaxis3d(ctx)
     XMakie = ctx[:Plotter]
     if ctx[:scene3d] == :LScene
         # "Old" LScene with zoom-in functionality
-        return XMakie.LScene(ctx[:figure])
+        lim = ctx[:limits]
+        lim = Observable(Rect3f(Vec3f(lim[1], lim[3], lim[5]), Vec3f(lim[2], lim[4], lim[6])))
+        scene = XMakie.LScene(ctx[:figure], scenekw = (; limits = lim))
+        return scene
     else
         # "New" Axis3 with prospective new stuff by Julius.
         return XMakie.Axis3(
             ctx[:figure];
             aspect = :data,
-            viewmode = :fit,
+            viewmode = ctx[:viewmode],
+            limits = ctx[:limits],
             elevation = ctx[:elev] * π / 180,
             azimuth = ctx[:azim] * π / 180,
             perspectiveness = ctx[:perspectiveness],
@@ -977,31 +983,32 @@ function makescene3d(ctx)
     end
     GL[1, 1] = ctx[:scene]
     # Horizontal or vertical colorbar
-    if haskey(ctx, :crange)
-        if ctx[:colorbar] == :vertical
-            GL[1, 2] = XMakie.Colorbar(
-                ctx[:figure];
-                colormap = ctx[:colormap],
-                colorrange = ctx[:crange],
-                ticks = map(d -> d.c, ctx[:data]),
-                tickformat = "{:.2e}",
-                width = 15,
-                ticklabelsize = 0.5 * ctx[:fontsize],
-            )
-        elseif ctx[:colorbar] == :horizontal
-            GL[2, 1] = XMakie.Colorbar(
-                ctx[:figure];
-                colormap = ctx[:colormap],
-                colorrange = ctx[:crange],
-                ticks = map(d -> d.c, ctx[:data]),
-                tickformat = "{:.2e}",
-                height = 15,
-                ticklabelsize = 0.5 * ctx[:fontsize],
-                vertical = false,
-            )
+    if ctx[:show_colorbar]
+        if haskey(ctx, :crange)
+            if ctx[:colorbar] == :vertical
+                GL[1, 2] = XMakie.Colorbar(
+                    ctx[:figure];
+                    colormap = ctx[:colormap],
+                    colorrange = ctx[:crange],
+                    ticks = map(d -> d.c, ctx[:data]),
+                    tickformat = "{:.2e}",
+                    width = 15,
+                    ticklabelsize = 0.5 * ctx[:fontsize],
+                )
+            elseif ctx[:colorbar] == :horizontal
+                GL[2, 1] = XMakie.Colorbar(
+                    ctx[:figure];
+                    colormap = ctx[:colormap],
+                    colorrange = ctx[:crange],
+                    ticks = map(d -> d.c, ctx[:data]),
+                    tickformat = "{:.2e}",
+                    height = 15,
+                    ticklabelsize = 0.5 * ctx[:fontsize],
+                    vertical = false,
+                )
+            end
         end
     end
-
     # Put the status label into protrusion space on the bottom of the scene
     GL[1, 1, XMakie.Bottom()] = XMakie.Label(
         ctx[:figure],
@@ -1038,6 +1045,11 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grid)
     XMakie = ctx[:Plotter]
     xyzmin, xyzmax = xyzminmax(grid, ctx[:gridscale])
     xyzstep = (xyzmax - xyzmin) / 100
+    ctx[:limits] = (
+        xyzmin[1], xyzmax[1],
+        xyzmin[2], xyzmax[2],
+        xyzmin[3], xyzmax[3],
+    )
 
     function adjust_planes(xplane, yplane, zplane)
         ctx[:ixplane] = max(xyzmin[1], min(xyzmax[1], xplane))
@@ -1195,6 +1207,7 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grid)
 
         ctx[:status] = Observable(" ")
 
+        XMakie.reset_limits!(ctx[:scene])
         add_scene!(ctx, makescene_grid(ctx))
 
     else
@@ -1249,6 +1262,12 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
     if fstep ≈ 0
         fstep = 0.1
     end
+
+    ctx[:limits] = (
+        xyzmin[1], xyzmax[1],
+        xyzmin[2], xyzmax[2],
+        xyzmin[3], xyzmax[3],
+    )
 
     ctx[:ixplanes] = collect(ctx[:xplanes]) * ctx[:gridscale]
     ctx[:iyplanes] = collect(ctx[:yplanes]) * ctx[:gridscale]
