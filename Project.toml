@@ -1,7 +1,7 @@
 name = "GridVisualize"
 uuid = "5eed8a63-0fb0-45eb-886d-8d5a387d12b8"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>", "Patrick Jaap <patrick.jaap@wias-berlin.de>"]
-version = "1.11.0"
+version = "1.12.0"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
