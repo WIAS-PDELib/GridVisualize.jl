@@ -850,16 +850,28 @@ function vectorplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid, func)
             )
             add_scene!(ctx, ctx[:scene])
         end
-
-        ctx[:arrowplot] = XMakie.arrows!(
-            ctx[:scene],
-            map(data -> data.qc[1, :], ctx[:arrowdata]),
-            map(data -> data.qc[2, :], ctx[:arrowdata]),
-            map(data -> data.qv[1, :], ctx[:arrowdata]),
-            map(data -> data.qv[2, :], ctx[:arrowdata]);
-            color = :black,
-            linewidth = ctx[:linewidth],
-        )
+        if isdefined(XMakie, :arrows2d!) # Makie >=0.23
+            ctx[:arrowplot] = XMakie.arrows2d!(
+                ctx[:scene],
+                map(data -> data.qc[1, :], ctx[:arrowdata]),
+                map(data -> data.qc[2, :], ctx[:arrowdata]),
+                map(data -> data.qv[1, :], ctx[:arrowdata]),
+                map(data -> data.qv[2, :], ctx[:arrowdata]);
+                color = :black,
+                shaftwidth = ctx[:linewidth],
+                tipwidth = 3 * ctx[:linewidth],
+            )
+        else
+            ctx[:arrowplot] = XMakie.arrows!(
+                ctx[:scene],
+                map(data -> data.qc[1, :], ctx[:arrowdata]),
+                map(data -> data.qc[2, :], ctx[:arrowdata]),
+                map(data -> data.qv[1, :], ctx[:arrowdata]),
+                map(data -> data.qv[2, :], ctx[:arrowdata]);
+                color = :black,
+                linewidth = ctx[:linewidth],
+            )
+        end
         XMakie.reset_limits!(ctx[:scene])
     end
     return reveal(ctx, TP)
