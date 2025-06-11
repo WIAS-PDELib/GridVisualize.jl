@@ -184,7 +184,7 @@ end
 # Stream plots are currently only available with PyPlot and Makie
 function plotting_stream2d(; Plotter = default_plotter(), n = 50, kwargs...)
     g, f = vec2d(; n = n)
-    return GridVisualize.streamplot(g, f; Plotter = Plotter, rasterpoints = 100, kwargs...)
+    return GridVisualize.streamplot(g, f; Plotter = Plotter, rasterpoints = 20, kwargs...)
 end
 # ![](plotting_stream2d.png)
 
