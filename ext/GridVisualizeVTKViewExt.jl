@@ -1,3 +1,14 @@
+module GridVisualizeVTKViewExt
+
+using Colors
+using ColorSchemes
+using DocStringExtensions
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
+using GridVisualize: VTKViewType, GridVisualizer, SubVisualizer
+using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata
+using ExtendableGrids
+using GridVisualizeTools
+
 function initialize!(p::GridVisualizer, ::Type{VTKViewType})
     pctx = p.context
     VTKView = pctx[:Plotter]
@@ -140,3 +151,5 @@ vectorplot!(ctx, TP::Type{VTKViewType}, ::Type{Val{3}}, grid, func) = nothing
 streamplot!(ctx, TP::Type{VTKViewType}, ::Type{Val{1}}, grid, func) = nothing
 streamplot!(ctx, TP::Type{VTKViewType}, ::Type{Val{2}}, grid, func) = nothing
 streamplot!(ctx, TP::Type{VTKViewType}, ::Type{Val{3}}, grid, func) = nothing
+
+end
