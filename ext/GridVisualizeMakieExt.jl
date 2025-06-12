@@ -1,3 +1,19 @@
+module GridVisualizeMakieExt
+
+using Colors
+using ColorSchemes
+using DocStringExtensions
+using Printf
+using GeometryBasics
+using Interpolations: linear_interpolation
+using IntervalSets
+
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!
+using GridVisualize: MakieType, GridVisualizer, SubVisualizer
+using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, regionmesh, bfacesegments
+
+using ExtendableGrids
+using GridVisualizeTools
 using Observables
 
 include("flippablelayout.jl")
@@ -1488,4 +1504,6 @@ function customplot!(ctx, TP::Type{MakieType}, func)
     end
     func(ctx[:scene])
     return reveal(ctx, TP)
+end
+
 end
