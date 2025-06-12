@@ -30,7 +30,10 @@ VTKView = "63b67fce-66f7-11ea-1808-1361d8c55bf4"
 
 [extensions]
 GridVisualizeMakieExt = "Makie"
+GridVisualizeVTKViewExt = "VTKView"
+GridVisualizeMeshCatExt = "MeshCat"
 GridVisualizePyPlotExt = "PyPlot"
+GridVisualizePlotsExt = "Plots"
 
 [compat]
 ColorSchemes = "3"

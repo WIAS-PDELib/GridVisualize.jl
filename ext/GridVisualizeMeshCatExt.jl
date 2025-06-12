@@ -1,11 +1,12 @@
-module GridVisualizePyPlotExt
+module GridVisualizeMeshCatExt
 
 using Colors
 using ColorSchemes
 using DocStringExtensions
+using GeometryBasics
 import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
 using GridVisualize: MeshCatType, GridVisualizer, SubVisualizer
-using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata
+using GridVisualize: isolevels, cellcolors, num_cellcolors, regionmesh, bfacesegments3
 using ExtendableGrids
 using GridVisualizeTools
 
@@ -53,7 +54,7 @@ function gridplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{2}}, grid)
     cmap = region_cmap(nregions)
     bcmap = bregion_cmap(nbregions)
     for i in 1:nregions
-        mesh = regionmesh(grid, i; cellcoloring = ctx[:cellcoloring])
+        mesh = regionmesh(grid, 1.0, i; cellcoloring = ctx[:cellcoloring])
         MeshCat.setobject!(
             vis["interior"]["r$(i)"],
             mesh,
@@ -70,7 +71,7 @@ function gridplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{2}}, grid)
     end
 
     for i in 1:nbregions
-        points = bfacesegments3(grid, i)
+        points = bfacesegments3(grid,1.0, i)
         mat = MeshCat.MeshLambertMaterial(; color = RGBA{Float32}(bcmap[i], 1.0))
         ls = MeshCat.LineSegments(points, mat)
         MeshCat.setobject!(vis["boundary"]["b$(i)"], ls)
@@ -97,9 +98,9 @@ function gridplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{3}}, grid)
         xyzmax[idim] = maximum(coord[idim, :])
     end
 
-    ctx[:xplane] = max(xyzmin[1], min(xyzmax[1], ctx[:xplane]))
-    ctx[:yplane] = max(xyzmin[2], min(xyzmax[2], ctx[:yplane]))
-    ctx[:zplane] = max(xyzmin[3], min(xyzmax[3], ctx[:zplane]))
+    ctx[:xplane] = max(xyzmin[1], min(xyzmax[1], ctx[:xplanes][1]))
+    ctx[:yplane] = max(xyzmin[2], min(xyzmax[2], ctx[:yplanes][1]))
+    ctx[:zplane] = max(xyzmin[3], min(xyzmax[3], ctx[:zplanes][1]))
 
     xyzcut = [ctx[:xplane], ctx[:yplane], ctx[:zplane]]
 
@@ -175,13 +176,13 @@ function scalarplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{3}}, grids, parentgr
         xyzmin[idim] = minimum(coord[idim, :])
         xyzmax[idim] = maximum(coord[idim, :])
     end
-    xyzcut = [ctx[:xplane], ctx[:yplane], ctx[:zplane]]
+    xyzcut = [ctx[:xplanes][1], ctx[:yplanes][1], ctx[:zplanes][1]]
     fminmax = extrema(func)
 
-    ctx[:xplane] = max(xyzmin[1], min(xyzmax[1], ctx[:xplane]))
-    ctx[:yplane] = max(xyzmin[2], min(xyzmax[2], ctx[:yplane]))
-    ctx[:zplane] = max(xyzmin[3], min(xyzmax[3], ctx[:zplane]))
-    ctx[:flevel] = max(fminmax[1], min(fminmax[2], ctx[:flevel]))
+    ctx[:xplane] = max(xyzmin[1], min(xyzmax[1], ctx[:xplanes][1]))
+    ctx[:yplane] = max(xyzmin[2], min(xyzmax[2], ctx[:yplanes][1]))
+    ctx[:zplane] = max(xyzmin[3], min(xyzmax[3], ctx[:zplanes][1]))
+    ctx[:flevel] = max(fminmax[1], min(fminmax[2], ctx[:levels][1]))
 
     makeplanes(x, y, z) = [[1, 0, 0, -x], [0, 1, 0, -y], [0, 0, 1, -z]]
 
@@ -202,12 +203,12 @@ function scalarplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{3}}, grids, parentgr
     rgb(v) = RGB(v, 0.0, 1.0 - v)
 
     vcmap = colorschemes[ctx[:colormap]]
-    mesh_meta = meta(mesh; vertexColors = [get(vcmap, values[i]) for i in 1:length(values)])
+    mesh = GeometryBasics.Mesh(ccoord, faces; color = [get(vcmap, values[i]) for i in 1:length(values)],  normal = normals(ccoord, faces))
     material = MeshCat.MeshLambertMaterial(; vertexColors = true)
 
-    MeshCat.setobject!(vis[:marching_tets], mesh_meta, material)
+    MeshCat.setobject!(vis[:marching_tets], mesh, material)
 
-    if ctx[:outline]
+    if ctx[:outlinealpha]>0
         pts, fcs = extract_visible_bfaces3D(
             grid,
             xyzmax;
