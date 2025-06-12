@@ -3,7 +3,7 @@ module GridVisualizePyPlotExt
 using Colors
 using ColorSchemes
 using DocStringExtensions
-import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
 using GridVisualize: PyPlotType, GridVisualizer, SubVisualizer
 using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata
 using ExtendableGrids

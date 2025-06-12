@@ -1,3 +1,14 @@
+module GridVisualizePyPlotExt
+
+using Colors
+using ColorSchemes
+using DocStringExtensions
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
+using GridVisualize: MeshCatType, GridVisualizer, SubVisualizer
+using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata
+using ExtendableGrids
+using GridVisualizeTools
+
 function initialize!(p::GridVisualizer, ::Type{MeshCatType})
     MeshCat = p.context[:Plotter]
     layout = p.context[:layout]
@@ -216,4 +227,5 @@ function scalarplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{3}}, grids, parentgr
         end
     end
     return reveal(ctx, TP)
+end
 end
