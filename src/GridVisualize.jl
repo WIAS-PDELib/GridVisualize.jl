@@ -22,7 +22,6 @@ using ExtendableGrids
 include("dispatch.jl")
 include("common.jl")
 export quiverdata, vectorsample
-include("plots.jl")
 include("plutovista.jl")
 include("slice_plots.jl")
 
