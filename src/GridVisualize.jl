@@ -15,8 +15,6 @@ using StaticArrays
 using Colors
 using ColorSchemes
 using GeometryBasics
-using Interpolations: linear_interpolation
-using IntervalSets
 
 using GridVisualizeTools
 using ExtendableGrids
@@ -24,7 +22,6 @@ using ExtendableGrids
 include("dispatch.jl")
 include("common.jl")
 export quiverdata, vectorsample
-include("makie.jl")
 include("vtkview.jl")
 include("meshcat.jl")
 include("plots.jl")
