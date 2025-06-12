@@ -1,3 +1,15 @@
+module GridVisualizePyPlotExt
+
+using Colors
+using ColorSchemes
+using DocStringExtensions
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!
+using GridVisualize: PyPlotType, GridVisualizer, SubVisualizer
+using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata
+using ExtendableGrids
+using GridVisualizeTools
+
+
 function initialize!(p, ::Type{PyPlotType})
     PyPlot = p.context[:Plotter]
     PyPlot.PyObject(PyPlot.axes3D) # see https://github.com/JuliaPy/PyPlot.jl/issues/351
@@ -836,4 +848,6 @@ function customplot!(ctx, TP::Type{PyPlotType}, func)
     # end
     func(ctx[:ax])
     return reveal(ctx, TP)
+end
+
 end
