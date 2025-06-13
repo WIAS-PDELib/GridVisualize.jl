@@ -58,4 +58,3 @@ GridVisualize.ImplEvalSlice
 
 ## Experimental
 There are experimental extensions for VTKView and MeshCat which are not part of the "official" API.
-
