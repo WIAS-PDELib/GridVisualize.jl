@@ -973,6 +973,41 @@ movie(func, visualizer::GridVisualizer, pltype::Any; kwargs...) = nothing
 
 movie(func, visualizer::GridVisualizer; kwargs...) = movie(func, visualizer, plottertype(visualizer.Plotter); kwargs...)
 
+###################################################################################
+"""
+    plot_triangulateio(;Plotter, 
+                       triangulateio; 
+                       voronoi=nothing, 
+                       circumicircles = false, 
+                       kwargs...)
+
+Plot TriangulateIO struct exported by Triangulate.jl. 
+"""
+function plot_triangulateio end
+
+function plot_triangulateio(
+    Plotter,
+    triangulateio;
+    voronoi = nothing,
+    circumcircles = false,
+    kwargs...
+)
+    vis=GridVisualizer(; Plotter = Plotter, show = true, kwargs...)
+    return plot_triangulateio!(vis, triangulateio; voronoi, circumcircles)
+end
+
+"$(TYPEDSIGNATURES)"
+function plot_triangulateio!(ctx::SubVisualizer, triangulateio; kwargs...)
+    _update_context!(ctx, kwargs)
+    return plot_triangulateio!(ctx, plottertype(ctx[:Plotter]), triangulateio; kwargs...)
+end
+
+"$(TYPEDSIGNATURES)"
+function plot_triangulateio!(p::GridVisualizer, triangulatio; kwargs...)
+    return plot_triangulateio!(p[1, 1], triangulateio; kwargs...)
+end
+    
+
 
 ###################################################################################
 function save(fname, p, ::Type{T}) where {T <: AbstractPlotterType}
