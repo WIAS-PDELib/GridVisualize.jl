@@ -1,5 +1,5 @@
 """
-This module is a submodule of `GridVisualize`.
+This module is a submodule of `[GridVisualizeMakieExt](@ref)`.
 
 It manages a layoutscene with interactive layout and blocking functionality.
 
@@ -8,7 +8,7 @@ Thanks to Julius Krumbiegel for providing  a basic implementation of focus switc
 
 `GridVisualize` avoids creating dependencies on plotting backends.
 So we provide a way to emulate "import Makie" by allowing
-to set it as a global variable in the [`setmakie!`](@ref). 
+to set it as a global variable in the [`GridVisualizeMakieExt.FlippableLayout.setmakie!`](@ref). 
 As a consequence, we can't use Makie types at compile time.
 """
 module FlippableLayout

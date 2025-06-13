@@ -1,3 +1,8 @@
+"""
+    module GridVisualizePlotsExt
+    
+Extension module for Plots.jl. Supports part of the frontend methods.
+"""
 module GridVisualizePlotsExt
 
 using Colors
