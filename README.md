@@ -131,21 +131,21 @@ and all plotting functions will do nothing.
 - 'p':  planned (no schedule though)
 - 'n': probably not, also in the future
 
-|                | PyPlot | Makie   | PlutoVista | Plots | VTKView |
-|----------------|--------|---------|------------|-------|---------|
-| scalarplot, 1D | y      | y       | y,i        | y     | y       |
-| vectorplot, 1D | y      | y       | y          | y     | y       |
-| gridplot, 1D   | y      | y       | y          | y     |         |
-| scalarplot, 2D | y      | y       | y          | (y)   | y,i     |
-| vectorplot, 2D | y      | y       | y          | y     |         |
-| streamplot, 2D | y      | y       | p          |  n    |         |
-| gridplot, 2D   | y      | y,i     | y          | (y)   | y,i     |
-| scalarplot, 3D | y      | y,i     | y,i        |  n    | y,i     |
-| gridplot, 3D   | y      | y,i     | y,i        |  n    | y,i     |
-| vectorplot, 3D | p      | p       | p          |  n    |         |
-| streamplot, 3D |        | p       | p          |  n    |         |
-| movie          | n      | y       | n          |  y    |         |
-| triangulateio  | y      | y       | n          |  n    | n       |
+|                | PyPlot | Makie | PlutoVista | Plots | VTKView |
+|----------------|--------|-------|------------|-------|---------|
+| scalarplot, 1D | y      | y     | y,i        | y     | y       |
+| vectorplot, 1D | y      | y     | y          | y     | y       |
+| gridplot, 1D   | y      | y     | y          | y     |         |
+| scalarplot, 2D | y      | y     | y          | (y)   | y,i     |
+| vectorplot, 2D | y      | y     | y          | y     |         |
+| streamplot, 2D | y      | y     | p          | n     |         |
+| gridplot, 2D   | y      | y,i   | y          | (y)   | y,i     |
+| scalarplot, 3D | y      | y,i   | y,i        | n     | y,i     |
+| gridplot, 3D   | y      | y,i   | y,i        | n     | y,i     |
+| vectorplot, 3D | p      | p     | p          | n     |         |
+| streamplot, 3D |        | p     | p          | n     |         |
+| movie          | n      | y     | n          | y     |         |
+| triangulateio  | y      | y     | n          | n     | n       |
 
 ## Sample output
 
@@ -155,7 +155,6 @@ and all plotting functions will do nothing.
 
 
 ### [GLMakie](https://github.com/JuliaPlots/GLMakie.jl):
-
 ![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_glmakie.png?raw=true)
 
 
@@ -163,7 +162,7 @@ and all plotting functions will do nothing.
 ![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_plots.png?raw=true")
 
 
-### [VTKView](https://github.com/j-fu/VTKView.jl):
+### [VTKView](https://github.com/j-fu/VTKView.jl) (experimental):
 ![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_vtkview.png?raw=true")
 
 ## vscode
