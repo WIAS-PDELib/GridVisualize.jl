@@ -1644,13 +1644,14 @@ function plot_triangulateio!(
             markermax = maximum(triangulateio.regionlist)
             xx = triangulateio.regionlist[1, :]
             yy = triangulateio.regionlist[2, :]
-            r = triangulateio.regionlist[3, :]
+            reg = triangulateio.regionlist[3, :]
+            color = [frgb(XMakie, reg[i], markermax) for i in 1:size(triangulateio.regionlist, 2)]
             XMakie.scatter!(
                 axis,
                 xx,
                 yy;
                 markersize = 10,
-                color = [frgb(XMakie, r[i], markermax) for i in 1:size(triangulateio.regionlist, 2)]
+                color
             )
         end
 
