@@ -456,7 +456,6 @@ plotting_functions_gif = [
 ]
 
 
-
 function generateplots(picdir; Plotter = nothing)
     filepaths = String[]
     if isdefined(Plotter, :Makie)
