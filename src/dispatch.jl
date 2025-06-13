@@ -978,7 +978,7 @@ movie(func, visualizer::GridVisualizer; kwargs...) = movie(func, visualizer, plo
     plot_triangulateio(;Plotter, 
                        triangulateio; 
                        voronoi=nothing, 
-                       circumicircles = false, 
+                       circumcircles = false, 
                        kwargs...)
 
 Plot TriangulateIO struct exported by Triangulate.jl. 
@@ -1003,7 +1003,7 @@ function plot_triangulateio!(ctx::SubVisualizer, triangulateio; kwargs...)
 end
 
 "$(TYPEDSIGNATURES)"
-function plot_triangulateio!(p::GridVisualizer, triangulatio; kwargs...)
+function plot_triangulateio!(p::GridVisualizer, triangulateio; kwargs...)
     return plot_triangulateio!(p[1, 1], triangulateio; kwargs...)
 end
 
