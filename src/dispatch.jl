@@ -72,7 +72,7 @@ abstract type AbstractPlotterType end
 
 
 function initialize!(p, ::Type{T}) where T<:AbstractPlotterType
-    error("Missing implementation of inititialize!(p,::Type{$(T)})")
+    error("Missing implementation of initialize!(p,::Type{$(T)})")
 end
 
 function save(fname, p, ::Type{T})  where T<:AbstractPlotterType
