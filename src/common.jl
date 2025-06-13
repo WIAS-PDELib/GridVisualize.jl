@@ -506,3 +506,18 @@ function num_cellcolors(grid, coloring)
         return num_cellregions(grid)
     end
 end
+
+
+const leglocs = Dict(
+    :none => "",
+    :best => "best",
+    :lt => "upper left",
+    :ct => "upper center",
+    :rt => "upper right",
+    :lc => "center left",
+    :cc => "center center",
+    :rc => "center right",
+    :lb => "lower left",
+    :cb => "lower center",
+    :rb => "lower right"
+)

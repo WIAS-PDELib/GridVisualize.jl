@@ -8,7 +8,7 @@ using GeometryBasics
 using Interpolations: linear_interpolation
 using IntervalSets
 
-import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!, movie
 using GridVisualize: MakieType, GridVisualizer, SubVisualizer
 using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, regionmesh, bfacesegments
 

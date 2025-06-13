@@ -34,6 +34,7 @@ GridVisualizeVTKViewExt = "VTKView"
 GridVisualizeMeshCatExt = "MeshCat"
 GridVisualizePyPlotExt = "PyPlot"
 GridVisualizePlotsExt = "Plots"
+GridVisualizePlutoVistaExt = "PlutoVista"
 
 [compat]
 ColorSchemes = "3"

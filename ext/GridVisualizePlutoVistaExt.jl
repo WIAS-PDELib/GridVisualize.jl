@@ -1,4 +1,16 @@
+module GridVisualizePlutoVistaExt
+
+using Colors
+using ColorSchemes
+using DocStringExtensions
 using HypertextLiteral
+
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
+using GridVisualize: PlutoVistaType, GridVisualizer, SubVisualizer
+using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, leglocs
+using ExtendableGrids
+using GridVisualizeTools
+
 
 function initialize!(p::GridVisualizer, ::Type{PlutoVistaType})
     PlutoVista = p.context[:Plotter]
@@ -456,4 +468,6 @@ function scalarplot!(
         zlabel = ctx[:zlabel],
     )
     return reveal(ctx, TP)
+end
+
 end

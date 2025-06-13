@@ -15,14 +15,11 @@ using StaticArrays
 using Colors
 using ColorSchemes
 using GeometryBasics
-
 using GridVisualizeTools
 using ExtendableGrids
 
 include("dispatch.jl")
 include("common.jl")
-export quiverdata, vectorsample
-include("plutovista.jl")
 include("slice_plots.jl")
 
 export scalarplot, scalarplot!
@@ -30,6 +27,7 @@ export gridplot, gridplot!
 export vectorplot, vectorplot!
 export streamplot, streamplot!
 export customplot, customplot!
+export quiverdata, vectorsample
 export save, reveal
 export isplots, isvtkview, ispyplot, ismakie, isplutovista
 export GridVisualizer, SubVisualizer
