@@ -986,13 +986,13 @@ Plot TriangulateIO struct exported by Triangulate.jl.
 function plot_triangulateio end
 
 function plot_triangulateio(
-    Plotter,
-    triangulateio;
-    voronoi = nothing,
-    circumcircles = false,
-    kwargs...
-)
-    vis=GridVisualizer(; Plotter = Plotter, show = true, kwargs...)
+        Plotter,
+        triangulateio;
+        voronoi = nothing,
+        circumcircles = false,
+        kwargs...
+    )
+    vis = GridVisualizer(; Plotter = Plotter, show = true, kwargs...)
     return plot_triangulateio!(vis, triangulateio; voronoi, circumcircles)
 end
 
@@ -1006,7 +1006,6 @@ end
 function plot_triangulateio!(p::GridVisualizer, triangulatio; kwargs...)
     return plot_triangulateio!(p[1, 1], triangulateio; kwargs...)
 end
-    
 
 
 ###################################################################################

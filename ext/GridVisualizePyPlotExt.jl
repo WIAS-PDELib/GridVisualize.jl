@@ -847,8 +847,8 @@ function plot_triangulateio!(
         TP::Type{PyPlotType},
         triangulateio;
         voronoi = nothing,
-    circumcircles = false,
-    kwargs...
+        circumcircles = false,
+        kwargs...
     )
 
     function frgb(Plotter, i, max; pastel = false)
@@ -888,7 +888,7 @@ function plot_triangulateio!(
 
     ax = ctx[:ax]
     ax.set_title(ctx[:title])
-    
+
     ax.set_aspect(ctx[:aspect])
     if size(triangulateio.pointlist, 2) > 0
         ax.set_ylim(yminmax[1] - dy / 10, yminmax[2] + dy / 10)
