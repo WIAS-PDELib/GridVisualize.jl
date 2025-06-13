@@ -3,7 +3,7 @@ module GridVisualizePlotsExt
 using Colors
 using ColorSchemes
 using DocStringExtensions
-import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!, movie
 using GridVisualize: PlotsType, GridVisualizer, SubVisualizer
 using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata
 using ExtendableGrids
@@ -57,11 +57,6 @@ function save(fname, scene, Plots, ::Type{PlotsType})
     return isnothing(scene) ? nothing : Plots.savefig(scene, fname)
 end
 
-"""
-    movie( func, vis::GridVisualizer, ::Type{PlotsType}; file = nothing, format = "gif", kwargs... )
-
-Record a movie with Plots backend. MP4 files and gifs can be created.
-"""
 function movie(
         func,
         vis::GridVisualizer,

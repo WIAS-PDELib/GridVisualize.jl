@@ -10,10 +10,11 @@ include(plotting)
 for Plotter in [CairoMakie]
     @eval begin
         @testset "generateplots - $(nameof($Plotter))" begin
-            filepaths = generateplots(mktempdir(); Plotter = $Plotter)
-
-            for path in filepaths
-                @test isfile(path)
+            mktempdir() do dir
+                filepaths = generateplots(dir; Plotter = $Plotter)
+                for path in filepaths
+                    @test isfile(path)
+                end
             end
         end
     end

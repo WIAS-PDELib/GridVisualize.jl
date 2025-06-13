@@ -5,7 +5,7 @@ using ColorSchemes
 using DocStringExtensions
 import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!
 using GridVisualize: PyPlotType, GridVisualizer, SubVisualizer
-using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata
+using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, leglocs
 using ExtendableGrids
 using GridVisualizeTools
 
@@ -86,19 +86,6 @@ const lstyles = Dict(
     :dashdotdot => (0, (3, 1, 1, 1))
 )
 
-const leglocs = Dict(
-    :none => "",
-    :best => "best",
-    :lt => "upper left",
-    :ct => "upper center",
-    :rt => "upper right",
-    :lc => "center left",
-    :cc => "center center",
-    :rc => "center right",
-    :lb => "lower left",
-    :cb => "lower center",
-    :rb => "lower right"
-)
 
 """
 $(SIGNATURES)

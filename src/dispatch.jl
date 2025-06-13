@@ -970,6 +970,14 @@ for a context.
 """
 reveal(visualizer::GridVisualizer) = reveal(visualizer, plottertype(visualizer.Plotter))
 
+
+"""
+    movie( func, vis::GridVisualizer; file = nothing, format = "gif", kwargs... )
+
+Record a movie with GLMakie backend. MP4 files and gifs can be created.
+"""
+function movie end
+
 movie(func, visualizer::GridVisualizer, pltype::Any; kwargs...) = nothing
 
 movie(func, visualizer::GridVisualizer; kwargs...) = movie(func, visualizer, plottertype(visualizer.Plotter); kwargs...)
