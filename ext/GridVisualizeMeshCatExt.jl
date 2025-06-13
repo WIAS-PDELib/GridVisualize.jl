@@ -1,3 +1,8 @@
+"""
+    module GridVisualizeMeshCatExt
+    
+Extension module for MeshCat.jl. Experimental.
+"""
 module GridVisualizeMeshCatExt
 
 using Colors

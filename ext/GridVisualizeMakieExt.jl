@@ -1,3 +1,9 @@
+"""
+    module GridVisualizeMakieExt
+
+Makie extension module for GridVisualize.jl. This is almost fully supported and works with GLMakie,
+CairoMalie and WGLMakie.
+"""
 module GridVisualizeMakieExt
 
 using Colors
@@ -94,11 +100,6 @@ function save(fname, scene, XMakie, ::Type{MakieType})
 end
 
 
-"""
-    movie( func, vis::GridVisualizer, ::Type{MakieType}; file = nothing, format = "gif", kwargs... )
-
-Record a movie with GLMakie backend. MP4 files and gifs can be created.
-"""
 function movie(
         func,
         vis::GridVisualizer,

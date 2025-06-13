@@ -1,3 +1,8 @@
+"""
+    module GridVisualizeVTKViewExt
+    
+Extension module for VTKView.jl. Experimental.
+"""
 module GridVisualizeVTKViewExt
 
 using Colors

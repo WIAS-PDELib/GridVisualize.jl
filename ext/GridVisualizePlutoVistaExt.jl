@@ -1,3 +1,8 @@
+"""
+    module GridVisualizePlutoVistaExt
+    
+Extension module for PlutoVista.jl
+"""
 module GridVisualizePlutoVistaExt
 
 using Colors
