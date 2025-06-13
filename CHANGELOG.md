@@ -1,4 +1,13 @@
 # Changelog
+## [1.15.0] - 2025-06-13
+- Move plotting code to extensions
+- Add `plot_triangulateio` method moved from [Triangulate.jl](https://github.com/JuliaGeometry/Triangulate.jl
+
+## [1.13.0] - 2025-06-12
+- Bump makie dependency
+
+## [1.12.0] - 2025-05-12
+- Manage documentation examples with ExampleJuggler
 
 ## [1.11.0] - 2025-03-04
 
