@@ -145,7 +145,7 @@ and all plotting functions will do nothing.
 | vectorplot, 3D | p      | p       | p          |  n    |         |
 | streamplot, 3D |        | p       | p          |  n    |         |
 | movie          | n      | y       | n          |  y    |         |
-
+| triangulateio  | y      | y       | n          |  n    | n       |
 
 ## Sample output
 

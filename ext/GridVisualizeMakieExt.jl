@@ -14,7 +14,7 @@ using GeometryBasics
 using Interpolations: linear_interpolation
 using IntervalSets
 
-import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!, movie
+import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!, movie, plot_triangulateio!
 using GridVisualize: MakieType, GridVisualizer, SubVisualizer
 using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, regionmesh, bfacesegments
 
@@ -1506,5 +1506,211 @@ function customplot!(ctx, TP::Type{MakieType}, func)
     func(ctx[:scene])
     return reveal(ctx, TP)
 end
+
+function plot_triangulateio!(
+        ctx,
+        TP::Type{MakieType},
+        triangulateio;
+        voronoi = nothing,
+        circumcircles = false,
+        kwargs...
+    )
+    XMakie = ctx[:Plotter]
+
+    function frgb(Plotter, i, max; pastel = false)
+        x = Float64(i - 1) / Float64(max)
+        if (x < 0.5)
+            r = 1.0 - 2.0 * x
+            g = 2.0 * x
+            b = 0.0
+        else
+            r = 0.0
+            g = 2.0 - 2.0 * x
+            b = 2.0 * x - 1.0
+        end
+        if pastel
+            r = 0.5 + 0.5 * r
+            g = 0.5 + 0.5 * g
+            b = 0.5 + 0.5 * b
+        end
+        return XMakie.RGBA(r, g, b)
+    end
+
+
+    x = view(triangulateio.pointlist, 1, :)
+    y = view(triangulateio.pointlist, 2, :)
+
+    xminmax = extrema(x)
+    yminmax = extrema(y)
+
+    dx = xminmax[2] - xminmax[1]
+    dy = yminmax[2] - yminmax[1]
+
+    if !haskey(ctx, :scene)
+        if ctx[:aspect] ≈ 1.0
+            aspect = XMakie.DataAspect()
+        else
+            autolimitaspect = ctx[:aspect]
+        end
+        ctx[:scene] = XMakie.Axis(
+            ctx[:figure];
+            title = ctx[:title],
+            aspect,
+            scenekwargs(ctx)...,
+        )
+    end
+    axis = ctx[:scene]
+
+
+    if size(triangulateio.pointlist, 2) > 0
+        XMakie.ylims!(axis, (yminmax[1] - dy / 10, yminmax[2] + dy / 10))
+        XMakie.xlims!(axis, (xminmax[1] - dx / 10, xminmax[2] + dx / 10))
+
+        points = reshape(reinterpret(XMakie.Point{2, Cdouble}, triangulateio.pointlist), size(triangulateio.pointlist, 2))
+        if size(triangulateio.trianglelist, 2) > 0
+            if size(triangulateio.triangleattributelist, 2) > 0
+                attr = triangulateio.triangleattributelist[1, :]
+                maxattr = maximum(attr)
+                for i in 1:size(triangulateio.trianglelist, 2)
+                    XMakie.poly!(
+                        axis,
+                        view(points, view(triangulateio.trianglelist, :, i));
+                        strokecolor = :black,
+                        strokewidth = 1,
+                        color = frgb(XMakie, attr[i], maxattr; pastel = true)
+                    )
+                end
+
+            else
+                for i in 1:size(triangulateio.trianglelist, 2)
+                    XMakie.poly!(
+                        axis,
+                        view(points, view(triangulateio.trianglelist, :, i));
+                        strokecolor = :black,
+                        strokewidth = 1,
+                        color = :white,
+                        alpha = 0.75
+                    )
+                end
+            end
+        end
+
+        if circumcircles
+            col = XMakie.RGB(0.4, 0.05, 0.4)
+
+            t = 0:(0.025 * π):(2π)
+            circle(x, y, r) = XMakie.lines!(
+                axis,
+                x .+ r .* cos.(t),
+                y .+ r .* sin.(t);
+                color = col,
+                linewidth = 0.3
+            )
+            cc = zeros(2)
+            for itri in 1:size(triangulateio.trianglelist, 2)
+                a = view(triangulateio.pointlist, :, triangulateio.trianglelist[1, itri])
+                b = view(triangulateio.pointlist, :, triangulateio.trianglelist[2, itri])
+                c = view(triangulateio.pointlist, :, triangulateio.trianglelist[3, itri])
+                tricircumcenter!(cc, a, b, c)
+                r = sqrt((cc[1] - a[1])^2 + (cc[2] - a[2])^2)
+                circle(cc[1], cc[2], r)
+                XMakie.scatter!(axis, [cc[1]], [cc[2]]; markersize = 5, color = col)
+            end
+        end
+        if size(triangulateio.segmentlist, 2) > 0
+            markermax = maximum(triangulateio.segmentmarkerlist)
+            # see https://gist.github.com/gizmaa/7214002
+            xx = zeros(2)
+            yy = zeros(2)
+            for i in 1:size(triangulateio.segmentlist, 2)
+                xx[1] = triangulateio.pointlist[1, triangulateio.segmentlist[1, i]]
+                yy[1] = triangulateio.pointlist[2, triangulateio.segmentlist[1, i]]
+                xx[2] = triangulateio.pointlist[1, triangulateio.segmentlist[2, i]]
+                yy[2] = triangulateio.pointlist[2, triangulateio.segmentlist[2, i]]
+                XMakie.lines!(
+                    axis,
+                    xx,
+                    yy;
+                    color = frgb(XMakie, triangulateio.segmentmarkerlist[i], markermax),
+                    linewidth = 3
+                )
+            end
+        end
+
+        if size(triangulateio.trianglelist, 2) == 0 && size(triangulateio.regionlist, 2) > 0
+            markermax = maximum(triangulateio.regionlist)
+            xx = triangulateio.regionlist[1, :]
+            yy = triangulateio.regionlist[2, :]
+            r = triangulateio.regionlist[3, :]
+            XMakie.scatter!(
+                axis,
+                xx,
+                yy;
+                markersize = 10,
+                color = [frgb(XMakie, r[i], markermax) for i in 1:size(triangulateio.regionlist, 2)]
+            )
+        end
+
+        if size(triangulateio.trianglelist, 2) == 0 && size(triangulateio.holelist, 2) > 0
+            xx = triangulateio.holelist[1, :]
+            yy = triangulateio.holelist[2, :]
+            XMakie.scatter!(axis, xx, yy; markersize = 10, color = :brown)
+        end
+
+        if voronoi != nothing && size(voronoi.edgelist, 2) > 0
+            bcx = sum(x) / size(triangulateio.pointlist, 2)
+            bcy = sum(y) / size(triangulateio.pointlist, 2)
+            wx = maximum(abs.(x .- bcx))
+            wy = maximum(abs.(y .- bcy))
+            ww = max(wx, wy)
+
+            x = voronoi.pointlist[1, :]
+            y = voronoi.pointlist[2, :]
+            XMakie.scatter!(axis, x, y; markersize = 10, color = :green)
+            for i in 1:size(voronoi.edgelist, 2)
+                i1 = voronoi.edgelist[1, i]
+                i2 = voronoi.edgelist[2, i]
+                if i1 > 0 && i2 > 0
+                    XMakie.lines!(
+                        axis,
+                        [voronoi.pointlist[1, i1], voronoi.pointlist[1, i2]],
+                        [voronoi.pointlist[2, i1], voronoi.pointlist[2, i2]];
+                        color = :green
+                    )
+                else
+                    x0 = voronoi.pointlist[1, i1]
+                    y0 = voronoi.pointlist[2, i1]
+                    xn = voronoi.normlist[1, i]
+                    yn = voronoi.normlist[2, i]
+                    normscale = 1.0e10
+                    if x0 + normscale * xn > bcx + ww
+                        normscale = min(normscale, abs((bcx + ww - x0) / xn))
+                    end
+                    if x0 + normscale * xn < bcx - ww
+                        normscale = min(normscale, abs((bcx - ww - x0) / xn))
+                    end
+                    if y0 + normscale * yn > bcy + ww
+                        normscale = min(normscale, abs((bcy + ww - y0) / yn))
+                    end
+                    if y0 + normscale * yn < bcy - ww
+                        normscale = min(normscale, abs((bcy - ww - y0) / yn))
+                    end
+                    XMakie.lines!(
+                        axis,
+                        [x0, x0 + normscale * xn],
+                        [y0, y0 + normscale * yn];
+                        color = :green
+                    )
+                end
+            end
+        end
+        XMakie.scatter!(axis, points; markersize = 7.5, color = :black)
+        GL = XMakie.GridLayout(ctx[:figure])
+        GL[1, 1] = ctx[:scene]
+        add_scene!(ctx,GL)
+    end
+    return reveal(ctx, TP)
+end
+
 
 end

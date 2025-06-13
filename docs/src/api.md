@@ -50,6 +50,11 @@ streamplot!
 customplot
 customplot!
 ```
+## Plotting TriangulateIO
+```@docs
+plot_triangulateio
+plot_triangulateio!
+```
 
 ## Keyword Arguments
 ```@docs

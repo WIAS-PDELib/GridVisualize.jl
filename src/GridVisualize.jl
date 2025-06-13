@@ -28,6 +28,7 @@ export vectorplot, vectorplot!
 export streamplot, streamplot!
 export customplot, customplot!
 export quiverdata, vectorsample
+export plot_triangulateio, plot_triangulateio!
 export save, reveal
 export isplots, isvtkview, ispyplot, ismakie, isplutovista
 export GridVisualizer, SubVisualizer
