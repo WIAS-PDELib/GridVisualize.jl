@@ -1507,6 +1507,9 @@ function customplot!(ctx, TP::Type{MakieType}, func)
     return reveal(ctx, TP)
 end
 
+#
+# Code moved from https://github.com/JuliaGeometry/Triangulate.jl/blob/2aa1196625832b622eb808b165cab8c7a098c6c5/src/plot.jl
+#
 function plot_triangulateio!(
         ctx,
         TP::Type{MakieType},
