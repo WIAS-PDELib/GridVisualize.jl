@@ -53,4 +53,4 @@ end
 
 mkdocs()
 
-#deploydocs(; repo = "github.com/WIAS-PDELib/GridVisualize.jl.git", devbranch = "main")
+deploydocs(; repo = "github.com/WIAS-PDELib/GridVisualize.jl.git", devbranch = "main")
