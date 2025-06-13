@@ -24,7 +24,6 @@ function mkdocs()
     generated_examples = @docscripts(
         example_dir, [
             "Plotting Examples" => "plotting.jl",
-            "Plotting TriangulateIO" => "triangulateio.jl",
         ], Plotter = CairoMakie
     )
     notebook_examples = @docplutonotebooks(notebook_dir, ["plutovista.jl"], iframe = true, iframe_height = "2000px")
