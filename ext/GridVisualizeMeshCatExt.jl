@@ -76,7 +76,7 @@ function gridplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{2}}, grid)
     end
 
     for i in 1:nbregions
-        points = bfacesegments3(grid,1.0, i)
+        points = bfacesegments3(grid, 1.0, i)
         mat = MeshCat.MeshLambertMaterial(; color = RGBA{Float32}(bcmap[i], 1.0))
         ls = MeshCat.LineSegments(points, mat)
         MeshCat.setobject!(vis["boundary"]["b$(i)"], ls)
@@ -208,12 +208,12 @@ function scalarplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{3}}, grids, parentgr
     rgb(v) = RGB(v, 0.0, 1.0 - v)
 
     vcmap = colorschemes[ctx[:colormap]]
-    mesh = GeometryBasics.Mesh(ccoord, faces; color = [get(vcmap, values[i]) for i in 1:length(values)],  normal = normals(ccoord, faces))
+    mesh = GeometryBasics.Mesh(ccoord, faces; color = [get(vcmap, values[i]) for i in 1:length(values)], normal = normals(ccoord, faces))
     material = MeshCat.MeshLambertMaterial(; vertexColors = true)
 
     MeshCat.setobject!(vis[:marching_tets], mesh, material)
 
-    if ctx[:outlinealpha]>0
+    if ctx[:outlinealpha] > 0
         pts, fcs = extract_visible_bfaces3D(
             grid,
             xyzmax;
