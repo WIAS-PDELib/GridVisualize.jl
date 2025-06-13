@@ -71,35 +71,35 @@ Abstract type for dispatching on plotter
 abstract type AbstractPlotterType end
 
 
-function initialize!(p, ::Type{T}) where T<:AbstractPlotterType
+function initialize!(p, ::Type{T}) where {T <: AbstractPlotterType}
     error("Missing implementation of initialize!(p,::Type{$(T)})")
 end
 
-function save(fname, p, ::Type{T})  where T<:AbstractPlotterType
+function save(fname, p, ::Type{T}) where {T <: AbstractPlotterType}
     error("Missing implementation of save!(fname,p,::Type{$(T)})")
 end
 
-function save(fname, scene, PyPlot, ::Type{T})  where T<:AbstractPlotterType
+function save(fname, scene, PyPlot, ::Type{T}) where {T <: AbstractPlotterType}
     error("Missing implementation of save!(fname,scene, p,::Type{$(T)})")
 end
 
-function reveal(p, ::Type{T}) where T<:AbstractPlotterType
+function reveal(p, ::Type{T}) where {T <: AbstractPlotterType}
     error("Missing implementation of reveal!(p,::Type{$(T)})")
 end
 
-function gridplot!(ctx, ::Type{T},  ::Type{Val{D}}, grid) where {T<:AbstractPlotterType, D}
+function gridplot!(ctx, ::Type{T}, ::Type{Val{D}}, grid) where {T <: AbstractPlotterType, D}
     error("Missing implementation of gridplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grid)")
 end
 
-function scalarplot!(ctx,::Type{T},  ::Type{Val{D}}, grids, parentgrid, funcs)  where {T<:AbstractPlotterType, D}
+function scalarplot!(ctx, ::Type{T}, ::Type{Val{D}}, grids, parentgrid, funcs) where {T <: AbstractPlotterType, D}
     error("Missing implementation of scalarplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grids, parentgrid, funcs)")
 end
 
-function vectorplot!(ctx, ::Type{T},  ::Type{Val{D}}, grid, func)  where {T<:AbstractPlotterType, D}
+function vectorplot!(ctx, ::Type{T}, ::Type{Val{D}}, grid, func) where {T <: AbstractPlotterType, D}
     error("Missing implementation of vectorplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grids, grid,func)")
 end
 
-function streamplot!(ctx, ::Type{T},  ::Type{Val{D}}, grid, func)  where {T<:AbstractPlotterType, D}
+function streamplot!(ctx, ::Type{T}, ::Type{Val{D}}, grid, func) where {T <: AbstractPlotterType, D}
     error("Missing implementation of streamplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grids, grid,func)")
 end
 
