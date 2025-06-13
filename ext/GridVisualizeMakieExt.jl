@@ -1707,7 +1707,7 @@ function plot_triangulateio!(
         XMakie.scatter!(axis, points; markersize = 7.5, color = :black)
         GL = XMakie.GridLayout(ctx[:figure])
         GL[1, 1] = ctx[:scene]
-        add_scene!(ctx,GL)
+        add_scene!(ctx, GL)
     end
     return reveal(ctx, TP)
 end
