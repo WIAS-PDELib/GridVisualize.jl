@@ -58,7 +58,7 @@ Printf = "1.6"
 PyPlot = "2"
 StaticArrays = "1"
 Triangulate = "2"
-VTKView = "0.1"
+VTKView = "0.1,0.2"
 julia = "1.9"
 
 [extras]
