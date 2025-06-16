@@ -528,10 +528,9 @@ If instead of the grid, coordinate vectors are given, a temporary grid is create
 Keyword arguments: see [`available_kwargs`](@ref)
 """
 function scalarplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
-    _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
 
-    # call a specialized function if the user want to plot only a dim-1 slice of the data
+    # call a specialized function if the user wants to plot only a dim-1 slice of the data
     if haskey(ctx, :slice) && ctx[:slice] !== nothing
         return slice_plot!(ctx, Val{dim_space(grid)}, grid, func)
     else
@@ -544,7 +543,7 @@ $(TYPEDSIGNATURES)
 
 Plot node vectors on subgrids of parent grid as P1 FEM function on the triangulation into subplot in the visualizer.
 If `[i,j]` is omitted, `[1,1]` is assumed.
-eyword arguments: see [`available_kwargs`](@ref)
+Keyword arguments: see [`available_kwargs`](@ref)
 """
 function scalarplot!(
         ctx::SubVisualizer,
@@ -553,7 +552,6 @@ function scalarplot!(
         funcs::AbstractVector;
         kwargs...,
     ) where {Tv, Ti}
-    _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
     if length(grids) != length(funcs)
         error("number of subgrids: $(length(grids)) and number of functions: $(length(funcs)) not equal")
@@ -725,7 +723,6 @@ $(TYPEDSIGNATURES)
 Plot piecewise linear vector field  as quiver plot.
 """
 function vectorplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
-    _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
     if ctx[:spacing] != nothing
         @warn "`spacing` has been removed from keyword arguments, use `rasterpoints` to control spacing"
@@ -822,7 +819,6 @@ Plot piecewise linear vector field  as stream plot.
 (2D pyplot only)
 """
 function streamplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
-    _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
     if ctx[:spacing] != nothing
         @warn "`spacing` has been removed from keyword arguments, use `rasterpoints` to control spacing"
@@ -907,7 +903,6 @@ end
 ###################################################################################
 "$(TYPEDSIGNATURES)"
 function customplot!(ctx::SubVisualizer, func; kwargs...)
-    _update_context!(ctx, Dict(:clear => true, :show => false, :reveal => false))
     _update_context!(ctx, kwargs)
     if ctx[:spacing] != nothing
         @warn "`spacing` has been removed from keyword arguments, use `rasterpoints` to control spacing"

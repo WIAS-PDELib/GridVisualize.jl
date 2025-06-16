@@ -42,6 +42,7 @@ function mkdocs()
         repo = "https://github.com/WIAS-PDELib/GridVisualize.jl",
         pages = [
             "Home" => "index.md",
+            "Changelog" => "changes.md",
             "Public API" => "api.md",
             "Examples" => generated_examples,
             "Pluto notebooks" => notebook_examples,
