@@ -1,6 +1,6 @@
 name = "GridVisualize"
 uuid = "5eed8a63-0fb0-45eb-886d-8d5a387d12b8"
-version = "1.14.0"
+version = "1.14.1"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>", "Patrick Jaap <patrick.jaap@wias-berlin.de>"]
 
 [deps]

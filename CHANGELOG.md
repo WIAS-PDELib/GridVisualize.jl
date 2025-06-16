@@ -1,7 +1,11 @@
 # Changelog
+## [1.14.1] - 2025-06-16
+- Removed automatic overrides of user-supplied keywords `clear` , `show`, and `reveal` in `scalarplot!`, `vectorplot!`, `streamplot!`, and `customplot!`.
+- Included `CHANGELOG.md` in docs.
+
 ## [1.14.0] - 2025-06-13
 - Move plotting code to extensions
-- Add `plot_triangulateio` method moved from [Triangulate.jl](https://github.com/JuliaGeometry/Triangulate.jl
+- Add `plot_triangulateio` method moved from [Triangulate.jl](https://github.com/JuliaGeometry/Triangulate.jl)
 
 ## [1.13.0] - 2025-06-12
 - Bump makie dependency
