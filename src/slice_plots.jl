@@ -254,7 +254,6 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
         @views grid_2d[CellNodes][:, it] .= t
     end
 
-    # kwargs are merged into ctx
     return scalarplot!(ctx, grid_2d, new_values)
 end
 
@@ -331,6 +330,5 @@ function slice_plot!(ctx, ::Type{Val{2}}, grid, values)
     grid_1d[Coordinates] = @views grid_1d[Coordinates][:, p]
     new_values = new_values[p]
 
-    # kwargs are merged into ctx
     return scalarplot!(ctx, grid_1d, new_values)
 end
