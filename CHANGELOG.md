@@ -1,5 +1,5 @@
 # Changelog
-## [1.14.1] - 2025-06-16
+## [1.15.0] - 2025-06-17
 - Removed automatic overrides of user-supplied keywords `clear` , `show`, and `reveal` in `scalarplot!`, `vectorplot!`, `streamplot!`, and `customplot!`.
 - Included `CHANGELOG.md` in docs.
 
