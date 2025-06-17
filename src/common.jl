@@ -82,17 +82,16 @@ end
 """
     $(SIGNATURES)
 
-Deprecated
 """
 function GridVisualizeTools.marching_triangles(grid::ExtendableGrid, func, levels; gridscale = 1.0)
     ls=LinearSimplices(grid,func;gridscale)
     vcat(marching_triangles(ls,levels)...)
 end
 
-function GridVisualizeTools.marching_triangles(grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, levels; gridscale = 1.0) where {Tv, Ti}
+function GridVisualizeTools.marching_triangles(grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, lines, levels; gridscale = 1.0) where {Tv, Ti}
     all_ls = [LinearSimplices(grids[i],funcs[i];gridscale) for i=1:length(grids)]
     all_lines=vcat([marching_triangles(ls,levels) for ls in all_ls]...)
-    vcat(all_lines...)
+    [vcat(all_lines...)]
 end
 
 ##############################################
