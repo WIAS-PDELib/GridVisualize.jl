@@ -1,7 +1,5 @@
-````@eval
-using Markdown
-Markdown.parse("""
-$(read("../../README.md",String))
-""")
-````
+# GridVisualize.jl
 
+```@docs
+GridVisualize
+```

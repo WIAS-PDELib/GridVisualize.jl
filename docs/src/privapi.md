@@ -6,7 +6,7 @@
 Modules = [GridVisualize]
 Private = true
 Public = false
-Pages = ["dispatch.jl","common.jl"]
+Pages = ["dispatch.jl","common.jl","slice_plots.jl"]
 ```
 
 ```@docs
@@ -17,39 +17,47 @@ ismakie
 isvtkview
 ```
 
-
-## PyPlot
-```@autodocs
-Modules = [GridVisualize]
-Private = true
-Public = false
-Pages = ["pyplot.jl"]
-```
-
 ## Makie
-```@autodocs
-Modules = [GridVisualize,FlippableLayout]
-Private = true
-Public = false
-Pages = ["makie.jl", "flippablelayout.jl"]
+```@docs
+GridVisualizeMakieExt
+GridVisualizeMakieExt.makescene2d
+GridVisualizeMakieExt.makescene3d
+GridVisualizeMakieExt.makeaxis3d
+GridVisualizeMakieExt.scene_interaction
 ```
+### FlippableLayout
 
 ```@docs
-FlippableLayout
+GridVisualizeMakieExt.FlippableLayout
+GridVisualizeMakieExt.FlippableLayout.FLayout
+GridVisualizeMakieExt.FlippableLayout.setmakie!
+GridVisualizeMakieExt.FlippableLayout.yieldwait
+GridVisualizeMakieExt.FlippableLayout.flayoutscene
 ```
 
+## PlutoVista
+```@docs
+GridVisualizePlutoVistaExt
+```
+
+## PyPlot
+```@docs
+GridVisualizePyPlotExt
+GridVisualizePyPlotExt.tridata
+```
 ## Plots
-```@autodocs
-Modules = [GridVisualize]
-Private = true
-Public = false
-Pages = ["plots.jl"]
+```@docs
+GridVisualizePlotsExt
+GridVisualizePlotsExt.rectdata
 ```
 
-## VTKView
-```@autodocs
-Modules = [GridVisualize]
-Private = true
-Public = false
-Pages = ["vtkview.jl"]
+## ImplEvalSlice
+```@docs
+GridVisualize.ImplEvalSlice
+```
+
+## Experimental
+```@docs
+GridVisualizeVTKViewExt
+GridVisualizeMeshCatExt
 ```

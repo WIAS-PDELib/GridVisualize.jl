@@ -6,7 +6,7 @@ using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
-    quote
+    return quote
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
         el
@@ -57,9 +57,11 @@ md"""
 # ╔═╡ a20d74c9-16da-408a-b247-0c17321888f9
 function testplot1(Plotter)
     grid = simplexgrid(0:0.01:10)
-    scalarplot(grid, map(sin, grid); Plotter = Plotter, resolution = (600, 200),
-               markershape = :star5, markevery = 20, xlabel = "x", ylabel = "z",
-               legend = :rt, label = "sin")
+    return scalarplot(
+        grid, map(sin, grid); Plotter = Plotter, resolution = (600, 200),
+        markershape = :star5, markevery = 20, xlabel = "x", ylabel = "z",
+        legend = :rt, label = "sin"
+    )
 end
 
 # ╔═╡ cc17187f-404c-4c31-8625-fa067eea7273
@@ -76,14 +78,20 @@ testplot1(GLMakie)
 
 # ╔═╡ c4eeb06f-932e-4acc-8e5b-f2a7f9242a42
 function testplot2(Plotter; t = 0)
-    p = GridVisualizer(; Plotter = Plotter, resolution = (500, 200), legend = :rt,
-                       xlabel = "x")
+    p = GridVisualizer(;
+        Plotter = Plotter, resolution = (500, 200), legend = :rt,
+        xlabel = "x"
+    )
     grid = simplexgrid(0:0.01:10)
-    scalarplot!(p, grid, map(x -> sin(x - t), grid); Plotter = Plotter, color = :red,
-                label = "sin(x-$(t))", linestyle = :dash)
-    scalarplot!(p, grid, map(cos, grid); Plotter = Plotter, color = :green, clear = false,
-                label = "cos", linestyle = :dashdot, linewidth = 3)
-    reveal(p)
+    scalarplot!(
+        p, grid, map(x -> sin(x - t), grid); Plotter = Plotter, color = :red,
+        label = "sin(x-$(t))", linestyle = :dash
+    )
+    scalarplot!(
+        p, grid, map(cos, grid); Plotter = Plotter, color = :green, clear = false,
+        label = "cos", linestyle = :dashdot, linewidth = 3
+    )
+    return reveal(p)
 end
 
 # ╔═╡ 29ca4775-6ba5-474c-bd2c-8f770b09addd
@@ -145,7 +153,7 @@ function testgridplot(Plotter)
     grid = simplexgrid(0:1:10)
     cellmask!(grid, [0.0], [5], 2)
     bfacemask!(grid, [5], [5], 3)
-    gridplot(grid; Plotter = Plotter, resolution = (600, 200), legend = :rt)
+    return gridplot(grid; Plotter = Plotter, resolution = (600, 200), legend = :rt)
 end
 
 # ╔═╡ 77eeefc7-e416-426b-8f87-1bc8439dae6d
@@ -167,8 +175,10 @@ function testplot3(Plotter)
     X = 0:0.1:10
     grid = simplexgrid(X, X)
     f = map((x, y) -> sin(x) * atan(y), grid)
-    scalarplot(grid, f; Plotter = Plotter,
-               resolution = (300, 300), limits = (-π / 2, π / 2))
+    return scalarplot(
+        grid, f; Plotter = Plotter,
+        resolution = (300, 300), limits = (-π / 2, π / 2)
+    )
 end
 
 # ╔═╡ c98a90bf-1a3e-4681-a3b0-663c6844df6b
@@ -215,7 +225,7 @@ md"""
 function testgridplot2d(Plotter)
     X = -1:0.2:1
     grid = simplexgrid(X, X)
-    gridplot(grid; Plotter = Plotter, resolution = (300, 300))
+    return gridplot(grid; Plotter = Plotter, resolution = (300, 300))
 end
 
 # ╔═╡ db488643-2e6b-40d6-ba81-126c752953c5
@@ -237,13 +247,13 @@ Here we use the possibility to update plots to allow moving isosurfaces and plan
 # ╔═╡ 0c99daca-f9a8-4116-867b-e13461c3e754
 function grid3d(; n = 15)
     X = collect(0:(1 / n):1)
-    g = simplexgrid(X, X, X)
+    return g = simplexgrid(X, X, X)
 end
 
 # ╔═╡ 82ccfd24-0053-4399-9bc8-b2e4010bbc92
 function func3d(; n = 15)
     g = grid3d(; n = n)
-    g, map((x, y, z) -> sinpi(2 * x) * sinpi(3.5 * y) * sinpi(1.5 * z), g)
+    return g, map((x, y, z) -> sinpi(2 * x) * sinpi(3.5 * y) * sinpi(1.5 * z), g)
 end
 
 # ╔═╡ 8b20f720-5470-4da7-bbb6-b746e887046e
@@ -263,22 +273,28 @@ z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
 """
 
 # ╔═╡ ecd941a0-85b7-4bb7-a903-b19a500198e1
-scalarplot!(p3d, g3, f3; levels = [flevel], xplanes = [xplane], yplanes = [yplane],
-            zplanes = [zplane], colormap = :hot, outlinealpha = 0.05, show = true,
-            levelalpha = 0.5)
+scalarplot!(
+    p3d, g3, f3; levels = [flevel], xplanes = [xplane], yplanes = [yplane],
+    zplanes = [zplane], colormap = :hot, outlinealpha = 0.05, show = true,
+    levelalpha = 0.5
+)
 
 # ╔═╡ d924d90d-4102-4ae8-b8de-254a17a5d4df
 X4 = -1:0.1:1;
 g4 = simplexgrid(X4, X4, X4);
 
 # ╔═╡ 57ed5eea-bc1c-45eb-b4d3-dc63088db21a
-scalarplot(g4, map((x, y, z) -> 0.01 * exp(-10 * (x^2 + y^2 + z^2)), g4); levels = 3,
-           Plotter = PlutoVista)
+scalarplot(
+    g4, map((x, y, z) -> 0.01 * exp(-10 * (x^2 + y^2 + z^2)), g4); levels = 3,
+    Plotter = PlutoVista
+)
 
 # ╔═╡ 597849e9-b9a7-4728-a278-7571d7c1a625
-scalarplot(; Plotter = PyPlot, g3, f3, resolution = (300, 300), levels = [0.5],
-           xplanes = [0.4], yplanes = [0.4], zplanes = [0.4], show = true,
-           colormap = :viridis)
+scalarplot(;
+    Plotter = PyPlot, g3, f3, resolution = (300, 300), levels = [0.5],
+    xplanes = [0.4], yplanes = [0.4], zplanes = [0.4], show = true,
+    colormap = :viridis
+)
 
 # ╔═╡ 4b9113d2-10bd-4f7a-a2b8-22092656c6b3
 md"""
@@ -286,8 +302,10 @@ md"""
 """
 
 # ╔═╡ 81f0a07d-3d0c-4e7a-9684-1ca4d584b210
-gridplot(; Plotter = PyPlot, g3, resolution = (300, 300),
-         xplanes = [1.0], yplanes = [1.0], zplanes = [0.4], show = true)
+gridplot(;
+    Plotter = PyPlot, g3, resolution = (300, 300),
+    xplanes = [1.0], yplanes = [1.0], zplanes = [0.4], show = true
+)
 
 # ╔═╡ f78196ca-d972-4fa6-bdc2-e76eba7ca5a1
 p3dgrid = GridVisualizer(; Plotter = PlutoVista, resolution = (300, 300), dim = 3)
@@ -322,7 +340,7 @@ function qv2d(; Plotter = nothing, n = 20, stream = false, kwargs...)
     else
         vectorplot!(gvis, grid, ∇v; clear = false, show = true, kwargs...)
     end
-    reveal(gvis)
+    return reveal(gvis)
 end
 
 # ╔═╡ 812af347-7606-4c54-b155-88322d20d921

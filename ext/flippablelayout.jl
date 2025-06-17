@@ -1,5 +1,5 @@
 """
-This module is a submodule of `GridVisualize`.
+This module is a submodule of `[GridVisualizeMakieExt](@ref)`.
 
 It manages a layoutscene with interactive layout and blocking functionality.
 
@@ -8,7 +8,7 @@ Thanks to Julius Krumbiegel for providing  a basic implementation of focus switc
 
 `GridVisualize` avoids creating dependencies on plotting backends.
 So we provide a way to emulate "import Makie" by allowing
-to set it as a global variable in the [`setmakie!`](@ref). 
+to set it as a global variable in the [`GridVisualizeMakieExt.FlippableLayout.setmakie!`](@ref). 
 As a consequence, we can't use Makie types at compile time.
 """
 module FlippableLayout
@@ -53,11 +53,13 @@ mutable struct FLayout
     condition::Condition
 
     function FLayout(visible; blocked = false)
-        new(visible,
+        return new(
+            visible,
             Makie.GridLayout(; bbox = Makie.BBox(-500, -400, -500, -400)),
             blocked,
             Dict{Tuple{Int64, Int64}, Any}(),
-            Condition())
+            Condition()
+        )
     end
 end
 
@@ -72,6 +74,7 @@ function Base.setindex!(flayout::FLayout, layoutable, i, j)
         _showall(flayout)
         yield()
     end
+    return flayout
 end
 
 Base.getindex(flayout::FLayout, i, j) = flayout.layoutables[(i, j)]
@@ -80,14 +83,14 @@ function _showall(flayout::FLayout)
     for (pos, layoutable) in flayout.layoutables
         flayout.visible[pos...] = layoutable
     end
-    Makie.trim!(flayout.visible)
+    return Makie.trim!(flayout.visible)
 end
 
 #
 # Check if mouse position is  within pixel area of scene
 #
 function _inarea(area, pos)
-    pos[1] > area.origin[1] &&
+    return pos[1] > area.origin[1] &&
         pos[1] < area.origin[1] + area.widths[1] &&
         pos[2] > area.origin[2] &&
         pos[2] < area.origin[2] + area.widths[2]
@@ -95,9 +98,9 @@ end
 
 function _inscene(l, pos)
     if isa(l, Makie.Block)
-        _inarea(l.scene.viewport[], pos)
+        return _inarea(l.scene.viewport[], pos)
     elseif isa(l, Makie.GridLayout)
-        _inarea(l.layoutobservables.computedbbox[], pos)
+        return _inarea(l.layoutobservables.computedbbox[], pos)
     end
 end
 
@@ -121,10 +124,12 @@ The `kwargs...` are the same as of `AbstractPlotting.layoutscene`.
 The idea is that this can work in some cases as a drop-in replacement
 of `layoutscene`.     
 """
-function flayoutscene(; blocked = false,
-                      focuskey = Makie.Keyboard.comma,
-                      blockingkey = Makie.Keyboard.space,
-                      kwargs...)
+function flayoutscene(;
+        blocked = false,
+        focuskey = Makie.Keyboard.comma,
+        blockingkey = Makie.Keyboard.space,
+        kwargs...
+    )
     parent = Makie.Scene(; camera = Makie.campixel!, kwargs...)
     layout = Makie.GridLayout(parent; alignmode = Makie.Outside(5))
 
@@ -152,7 +157,7 @@ function flayoutscene(; blocked = false,
                 flayout.offscreen[1, 1] = layoutable
             end
         end
-        Makie.trim!(flayout.visible)
+        return Makie.trim!(flayout.visible)
     end
 
     # Figure out to which subscene the mouse position
@@ -173,6 +178,7 @@ function flayoutscene(; blocked = false,
         else
             flayout.blocked = true
         end
+        return nothing
     end
 
     # Handle global key events for `,` (focus/gallery view)
@@ -197,7 +203,7 @@ function flayoutscene(; blocked = false,
         end
         return false
     end
-    parent, flayout
+    return parent, flayout
 end
 
 """
@@ -210,6 +216,7 @@ function yieldwait(flayout::FLayout)
     if flayout.blocked
         wait(flayout.condition)
     end
+    return nothing
 end
 
 """

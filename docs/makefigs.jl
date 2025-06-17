@@ -1,9 +1,11 @@
+# Script to manually generate multiscene pictures for the README.md
+
 import VTKView
 import Plots
 import PyPlot
 import GLMakie
 
-include("examples/plotting.jl")
+include("../examples/plotting.jl")
 
 function makefigs()
     Plotter = PyPlot
@@ -20,5 +22,5 @@ function makefigs()
 
     Plotter = VTKView
     scene = plotting_multiscene(; Plotter = Plotter)
-    save("multiscene_vtkview.png", scene; Plotter = Plotter)
+    return save("multiscene_vtkview.png", scene; Plotter = Plotter)
 end

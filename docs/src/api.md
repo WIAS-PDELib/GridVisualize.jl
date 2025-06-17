@@ -50,6 +50,11 @@ streamplot!
 customplot
 customplot!
 ```
+## Plotting TriangulateIO
+```@docs
+plot_triangulateio
+plot_triangulateio!
+```
 
 ## Keyword Arguments
 ```@docs
@@ -60,4 +65,9 @@ available_kwargs
 ```@docs
 vectorsample
 quiverdata
+```
+
+## Creating movies
+```@docs
+movie
 ```

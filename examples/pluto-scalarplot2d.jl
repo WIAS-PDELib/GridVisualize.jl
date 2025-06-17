@@ -41,19 +41,23 @@ function testplot_rect(; Plotter = nothing, kwargs...)
     X = 0:0.05:5
     grid = simplexgrid(X, X)
     f = map((x, y) -> sinpi(x) * cos(x * y), grid)
-    scalarplot(grid, f; Plotter = Plotter, kwargs...)
+    return scalarplot(grid, f; Plotter = Plotter, kwargs...)
 end
 
 # ╔═╡ 0998a9a7-d57a-476e-aacd-bee9396e9b8f
 testplot_rect(; Plotter = PyPlot, colorbarticks = 15, resolution = (500, 300))
 
 # ╔═╡ 55cc2e7b-bb1e-437d-9377-75142bb003ec
-testplot_rect(; Plotter = PlutoVista, colorbarticks = 11, resolution = (400, 300),
-              backend = :plotly, colormap = :hot, levels = 0)
+testplot_rect(;
+    Plotter = PlutoVista, colorbarticks = 11, resolution = (400, 300),
+    backend = :plotly, colormap = :hot, levels = 0
+)
 
 # ╔═╡ a8cdce79-bd03-40d7-9b4d-5336b4bb1056
-testplot_rect(; Plotter = PlutoVista, colorbarticks = 15, resolution = (400, 300),
-              backend = :vtk, colormap = :hot)
+testplot_rect(;
+    Plotter = PlutoVista, colorbarticks = 15, resolution = (400, 300),
+    backend = :vtk, colormap = :hot
+)
 
 # ╔═╡ 94a905f9-83dc-47a5-8a4e-fa275ffc3408
 testplot_rect(; Plotter = GLMakie, colorbarticks = 15, resolution = (300, 300))

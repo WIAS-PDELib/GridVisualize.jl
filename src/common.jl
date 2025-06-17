@@ -1,4 +1,3 @@
-
 """
 $(SIGNATURES)
 
@@ -8,18 +7,23 @@ Extract visible tetrahedra - those intersecting with the planes
 Return corresponding points and facets for each region for drawing as mesh (Makie,MeshCat)
 or trisurf (pyplot)
 """
-function GridVisualizeTools.extract_visible_cells3D(grid::ExtendableGrid, xyzcut;
-                                                    gridscale = 1.0,
-                                                    primepoints = zeros(0, 0),
-                                                    Tp = SVector{3, Float32},
-                                                    Tf = SVector{3, Int32})
+function GridVisualizeTools.extract_visible_cells3D(
+        grid::ExtendableGrid, xyzcut;
+        cellcoloring = :cellregions,
+        gridscale = 1.0,
+        primepoints = zeros(0, 0),
+        Tp = SVector{3, Float32},
+        Tf = SVector{3, Int32}
+    )
     coord = grid[Coordinates] * gridscale
     cellnodes = grid[CellNodes]
-    cellregions = grid[CellRegions]
-    nregions = grid[NumCellRegions]
-    extract_visible_cells3D(coord, cellnodes, cellregions, nregions, [xyzcut...] * gridscale;
-                            primepoints = primepoints,
-                            Tp = Tp, Tf = Tf)
+    cellregions = cellcolors(grid, cellcoloring)
+    nregions = num_cellcolors(grid, cellcoloring)
+    return extract_visible_cells3D(
+        coord, cellnodes, cellregions, nregions, [xyzcut...] * gridscale;
+        primepoints = primepoints,
+        Tp = Tp, Tf = Tf
+    )
 end
 
 """
@@ -31,18 +35,22 @@ Extract visible boundary faces - those not cut off by the planes
 Return corresponding points and facets for each region for drawing as mesh (Makie,MeshCat)
 or trisurf (pyplot)
 """
-function GridVisualizeTools.extract_visible_bfaces3D(grid::ExtendableGrid, xyzcut;
-                                                     gridscale = 1.0,
-                                                     primepoints = zeros(0, 0),
-                                                     Tp = SVector{3, Float32},
-                                                     Tf = SVector{3, Int32})
+function GridVisualizeTools.extract_visible_bfaces3D(
+        grid::ExtendableGrid, xyzcut;
+        gridscale = 1.0,
+        primepoints = zeros(0, 0),
+        Tp = SVector{3, Float32},
+        Tf = SVector{3, Int32}
+    )
     coord = grid[Coordinates] * gridscale
     bfacenodes = grid[BFaceNodes]
     bfaceregions = grid[BFaceRegions]
     nbregions = grid[NumBFaceRegions]
 
-    extract_visible_bfaces3D(coord, bfacenodes, bfaceregions, nbregions, [xyzcut...] * gridscale;
-                             primepoints = primepoints, Tp = Tp, Tf = Tf)
+    return extract_visible_bfaces3D(
+        coord, bfacenodes, bfaceregions, nbregions, [xyzcut...] * gridscale;
+        primepoints = primepoints, Tp = Tp, Tf = Tf
+    )
 end
 
 """
@@ -51,26 +59,30 @@ end
 Extract isosurfaces and plane interpolation for function on 3D tetrahedral mesh.
 See [`marching_tetrahedra(coord,cellnodes,func,planes,flevels;tol, primepoints, primevalues, Tv, Tp, Tf)`](@ref)
 """
-function GridVisualizeTools.marching_tetrahedra(grid::ExtendableGrid, func, planes, flevels; gridscale = 1.0,
-                                                kwargs...)
+function GridVisualizeTools.marching_tetrahedra(
+        grid::ExtendableGrid, func, planes, flevels; gridscale = 1.0,
+        kwargs...
+    )
     coord = grid[Coordinates] * gridscale
     cellnodes = grid[CellNodes]
-    marching_tetrahedra(coord, cellnodes, func, planes, flevels; kwargs...)
+    return marching_tetrahedra(coord, cellnodes, func, planes, flevels; kwargs...)
 end
 
-function GridVisualizeTools.marching_tetrahedra(grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, planes, flevels;
-                                                gridscale = 1.0,
-                                                kwargs...) where {Tv, Ti}
+function GridVisualizeTools.marching_tetrahedra(
+        grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, planes, flevels;
+        gridscale = 1.0,
+        kwargs...
+    ) where {Tv, Ti}
     coord = [grid[Coordinates] * gridscale for grid in grids]
     cellnodes = [grid[CellNodes] for grid in grids]
-    marching_tetrahedra(coord, cellnodes, funcs, planes, flevels; kwargs...)
+    return marching_tetrahedra(coord, cellnodes, funcs, planes, flevels; kwargs...)
 end
 
 ########################################################################################
 """
     $(SIGNATURES)
 
-Collect isoline snippets on triangles ready for linesegments!
+Deprecated
 """
 function GridVisualizeTools.marching_triangles(grid::ExtendableGrid, func, levels; gridscale = 1.0)
     ls=LinearSimplices(grid,func;gridscale)
@@ -85,18 +97,18 @@ end
 
 ##############################################
 # Create meshes from grid data
-function regionmesh(grid, gridscale, iregion)
+function regionmesh(grid, gridscale, iregion; cellcoloring = :cellregions)
     coord = grid[Coordinates]
     cn = grid[CellNodes]
-    cr = grid[CellRegions]
-    @views points = [Point2f(coord[:, i] * gridscale) for i = 1:size(coord, 2)]
+    cr = cellcolors(grid, cellcoloring)
+    @views points = [Point2f(coord[:, i] * gridscale) for i in 1:size(coord, 2)]
     faces = Vector{GLTriangleFace}(undef, 0)
-    for i = 1:length(cr)
+    for i in 1:length(cr)
         if cr[i] == iregion
             @views push!(faces, cn[:, i])
         end
     end
-    Mesh(points, faces)
+    return Mesh(points, faces)
 end
 
 function bfacesegments(grid, gridscale, ibreg)
@@ -105,15 +117,19 @@ function bfacesegments(grid, gridscale, ibreg)
     bfacenodes = grid[BFaceNodes]
     bfaceregions = grid[BFaceRegions]
     points = Vector{Point2f}(undef, 0)
-    for ibface = 1:nbfaces
+    for ibface in 1:nbfaces
         if bfaceregions[ibface] == ibreg
-            push!(points,
-                  Point2f(coord[1, bfacenodes[1, ibface]] * gridscale, coord[2, bfacenodes[1, ibface]] * gridscale))
-            push!(points,
-                  Point2f(coord[1, bfacenodes[2, ibface]] * gridscale, coord[2, bfacenodes[2, ibface]] * gridscale))
+            push!(
+                points,
+                Point2f(coord[1, bfacenodes[1, ibface]] * gridscale, coord[2, bfacenodes[1, ibface]] * gridscale)
+            )
+            push!(
+                points,
+                Point2f(coord[1, bfacenodes[2, ibface]] * gridscale, coord[2, bfacenodes[2, ibface]] * gridscale)
+            )
         end
     end
-    points
+    return points
 end
 
 function bfacesegments3(grid, gridscale, ibreg)
@@ -122,17 +138,25 @@ function bfacesegments3(grid, gridscale, ibreg)
     bfacenodes = grid[BFaceNodes]
     bfaceregions = grid[BFaceRegions]
     points = Vector{Point3f}(undef, 0)
-    for ibface = 1:nbfaces
+    for ibface in 1:nbfaces
         if bfaceregions[ibface] == ibreg
-            push!(points,
-                  Point3f(coord[1, bfacenodes[1, ibface]] * gridscale, coord[2, bfacenodes[1, ibface]] * gridscale,
-                          0.0))
-            push!(points,
-                  Point3f(coord[1, bfacenodes[2, ibface]] * gridscale, coord[2, bfacenodes[2, ibface]] * gridscale,
-                          0.0))
+            push!(
+                points,
+                Point3f(
+                    coord[1, bfacenodes[1, ibface]] * gridscale, coord[2, bfacenodes[1, ibface]] * gridscale,
+                    0.0
+                )
+            )
+            push!(
+                points,
+                Point3f(
+                    coord[1, bfacenodes[2, ibface]] * gridscale, coord[2, bfacenodes[2, ibface]] * gridscale,
+                    0.0
+                )
+            )
         end
     end
-    points
+    return points
 end
 
 """
@@ -158,14 +182,16 @@ streamlines.
     
 The code is 3D ready.
 """
-function vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
-                      offset = :default,
-                      rasterpoints = 32,
-                      reltol = 1.0e-10,
-                      gridscale = 1.0,
-                      xlimits = (1, -1),
-                      ylimits = (1, -1),
-                      zlimits = (1, -1)) where {Tv, Ti}
+function vectorsample(
+        grid::ExtendableGrid{Tv, Ti}, v;
+        offset = :default,
+        rasterpoints = 32,
+        reltol = 1.0e-10,
+        gridscale = 1.0,
+        xlimits = (1, -1),
+        ylimits = (1, -1),
+        zlimits = (1, -1)
+    ) where {Tv, Ti}
     coord = grid[Coordinates] * gridscale
     cn = grid[CellNodes]
     ncells::Int = num_cells(grid)
@@ -202,34 +228,38 @@ function vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
         cminmax[3] = zlimits[:]
     end
     if offset == :default
-        offset = [cminmax[i][1] for i = 1:dim]
+        offset = [cminmax[i][1] for i in 1:dim]
     else
         offset = offset * gridscale
     end
 
     # extent  of domain
-    extent = maximum([cminmax[i][2] - cminmax[i][1] for i = 1:dim])
+    extent = maximum([cminmax[i][2] - cminmax[i][1] for i in 1:dim])
 
     # scale tolerance
     tol = reltol * extent
 
     # point spacing
-    spacing = [extent / rasterpoints for i = 1:dim]
+    spacing = [extent / rasterpoints for i in 1:dim]
 
     # index range
     ijkmax = ones(Int, 3)
-    for idim = 1:dim
+    for idim in 1:dim
         ijkmax[idim] = ceil(Int64, (cminmax[idim][2] - offset[idim]) / spacing[idim]) + 1
     end
 
     # The ijk raster corresponds to a  tensorproduct grid
     # spanned by x,y and z coordinate vectors. Here, we build them
     # in order to avoid to calculate them from the raster indices
-    rastercoord = [zeros(Float32, ijkmax[idim]) for idim = 1:dim]
+    rastercoord = [zeros(Float32, ijkmax[idim]) for idim in 1:dim]
 
-    for idim = 1:dim
-        rastercoord[idim] = collect(range(offset[idim]; step = spacing[idim],
-                                          length = ijkmax[idim]))
+    for idim in 1:dim
+        rastercoord[idim] = collect(
+            range(
+                offset[idim]; step = spacing[idim],
+                length = ijkmax[idim]
+            )
+        )
     end
 
     # Memory for flux vectors on ijk grid
@@ -255,23 +285,23 @@ function vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
     Imin = ones(Int, 3)
     Imax = ones(Int, 3)
 
-    for icell::Int = 1:ncells
+    for icell::Int in 1:ncells
         update_trafo!(L2G, icell) # 1 alloc: the only one left in this cell loop
 
         # Cell coordinate window
         inode = cn[1, icell]
         @views tmin .= coord[:, inode]
         @views tmax .= coord[:, inode]
-        for i = 2:(dim + 1)
+        for i in 2:(dim + 1)
             inode = cn[i, icell]
-            for idim = 1:dim
+            for idim in 1:dim
                 tmin[idim] = min(tmin[idim], coord[idim, inode])
                 tmax[idim] = max(tmax[idim], coord[idim, inode])
             end
         end
 
         # min and max of raster indices falling into cell coordinate window
-        for idim = 1:dim
+        for idim in 1:dim
             Imin[idim] = floor(Int64, (tmin[idim] - O[idim]) / S[idim]) + 1
             Imax[idim] = ceil(Int64, (tmax[idim] - O[idim]) / S[idim]) + 1
         end
@@ -280,21 +310,21 @@ function vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
         # check if raster points are in the cell
         # If so, obtain P1 interpolated raster data and
         # assign them to rasterflux
-        for I[1] ∈ Imin[1]:Imax[1] # 0 alloc
+        for I[1] in Imin[1]:Imax[1] # 0 alloc
             if I[1] <= 0 || I[1] > length(rastercoord[1])
                 continue
             end
-            for I[2] ∈ Imin[2]:Imax[2]
+            for I[2] in Imin[2]:Imax[2]
                 if I[2] <= 0 || I[2] > length(rastercoord[2])
                     continue
                 end
-                for I[3] ∈ Imin[3]:Imax[3]
+                for I[3] in Imin[3]:Imax[3]
                     if dim == 3 && (I[3] <= 0 || I[3] > length(rastercoord[3]))
                         continue
                     end
 
                     # Fill raster point to be tested
-                    for idim = 1:dim
+                    for idim in 1:dim
                         X[idim] = rastercoord[idim][I[idim]]
                     end
 
@@ -303,7 +333,7 @@ function vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
 
                     # Check positivity of bc coordinates with some slack for
                     # round-off errors. Therefore a point may be found in two
-                    # neigboring triangles. Constraining points to the raster ensures
+                    # neighboring triangles. Constraining points to the raster ensures
                     # that only the last of them is taken.
                     if all(x -> x > -tol, λ)
                         # Interpolate vector value
@@ -311,14 +341,14 @@ function vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
                             v(V, λ, icell)
                         else
                             fill!(V, 0.0)
-                            for inode = 1:(dim + 1)
-                                for idim = 1:dim
+                            for inode in 1:(dim + 1)
+                                for idim in 1:dim
                                     V[idim] += λ[inode] * v[idim, cn[inode, icell]]
                                 end
                             end
                         end
 
-                        for idim = 1:dim
+                        for idim in 1:dim
                             rasterflux[idim, I[1], I[2], I[3]] = V[idim]
                         end
                     end
@@ -326,15 +356,17 @@ function vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
             end
         end
     end
-    rastercoord, rasterflux
+    return rastercoord, rasterflux
 end
 
 # Calculate isolevel values and function limits
 function isolevels(ctx, funcs)
-    makeisolevels(funcs,
-                  ctx[:levels],
-                  ctx[:limits] == :auto ? (1, -1) : ctx[:limits],
-                  ctx[:colorbarticks] == :default ? nothing : ctx[:colorbarticks])
+    return makeisolevels(
+        funcs,
+        ctx[:levels],
+        ctx[:limits] == :auto ? (1, -1) : ctx[:limits],
+        ctx[:colorbarticks] == :default ? nothing : ctx[:colorbarticks]
+    )
 end
 
 """
@@ -355,11 +387,13 @@ is scaled by vscale
 Result data are meant to  be ready for being passed to calls to `quiver` with various plotting backends.
 
 """
-function quiverdata(rastercoord,
-                    rasterflux;
-                    vscale = 1.0,
-                    vnormalize = true,
-                    vconstant = false)
+function quiverdata(
+        rastercoord,
+        rasterflux;
+        vscale = 1.0,
+        vnormalize = true,
+        vconstant = false
+    )
     dim = length(rastercoord)
 
     imax = length(rastercoord[1])
@@ -379,10 +413,10 @@ function quiverdata(rastercoord,
     qvvalues = Vector{SVector{dim, Float32}}(undef, 0)
 
     I = ones(Int, 3)
-    for I[1] = 1:imax # 0 allocs besides of push
-        for I[2] = 1:jmax
-            for I[3] = 1:kmax
-                for idim = 1:dim
+    for I[1] in 1:imax # 0 allocs besides of push
+        for I[2] in 1:jmax
+            for I[3] in 1:kmax
+                for idim in 1:dim
                     V[idim] = rasterflux[idim, I[1], I[2], I[3]]
                     X[idim] = rastercoord[idim][I[idim]]
                 end
@@ -400,27 +434,77 @@ function quiverdata(rastercoord,
 
     # Normalize vectors to raster point spacing
     if vconstant
-        for j = 1:size(qv, 2)
+        for j in 1:size(qv, 2)
             view(qv, :, j) ./= norm(view(qv, :, j))
         end
     elseif vnormalize
-        @views vmax = maximum(norm, (qv[:, i] for i = 1:length(qvvalues)))
+        @views vmax = maximum(norm, (qv[:, i] for i in 1:length(qvvalues)))
         vscale = vscale * min(spacing...) / vmax
     end
 
     # Scale vectors with user input
     qv .*= vscale
-    qc, qv
+    return qc, qv
 end
 
 function bary!(λ, invA, L2G, x)
     mapderiv!(invA, L2G, nothing)
     fill!(λ, 0)
-    for j = 1:length(x)
+    for j in 1:length(x)
         dj = x[j] - L2G.b[j]
-        for k = 1:length(x)
+        for k in 1:length(x)
             λ[k] += invA[j, k] * dj
         end
     end
     ExtendableGrids.postprocess_xreftest!(λ, Triangle2D)
+    return nothing
 end
+
+function cellcolors(grid, coloring)
+    xr = grid[CellRegions]
+    if coloring == :partitions
+        xr = similar(xr)
+        for icol in pcolors(grid)
+            for ipart in pcolor_partitions(grid, icol)
+                for icell in partition_cells(grid, ipart)
+                    xr[icell] = ipart
+                end
+            end
+        end
+    elseif coloring == :pcolors
+        xr = similar(xr)
+        for icol in pcolors(grid)
+            for ipart in pcolor_partitions(grid, icol)
+                for icell in partition_cells(grid, ipart)
+                    xr[icell] = icol
+                end
+            end
+        end
+    end
+    return xr
+end
+
+function num_cellcolors(grid, coloring)
+    if coloring == :partitions
+        return num_partitions(grid)
+    elseif coloring == :pcolors
+        return num_pcolors(grid)
+    else
+        return num_cellregions(grid)
+    end
+end
+
+
+const leglocs = Dict(
+    :none => "",
+    :best => "best",
+    :lt => "upper left",
+    :ct => "upper center",
+    :rt => "upper right",
+    :lc => "center left",
+    :cc => "center center",
+    :rc => "center right",
+    :lb => "lower left",
+    :cb => "lower center",
+    :rb => "lower right"
+)
