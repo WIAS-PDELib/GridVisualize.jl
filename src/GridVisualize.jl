@@ -16,7 +16,11 @@ using Colors
 using ColorSchemes
 using GeometryBasics
 using GridVisualizeTools
+using ChunkSplitters
 using ExtendableGrids
+
+include("griditerator.jl")
+export LinearSimplices
 
 include("dispatch.jl")
 include("common.jl")
