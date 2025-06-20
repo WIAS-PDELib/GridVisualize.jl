@@ -79,12 +79,18 @@ end
     t = [0, 1]
     @test GridVisualize.compute_2d_rotation_matrix(t) ≈ I
 
-    # random test
-    t = [0.3543579344795591, 0.21250427156069385]
-    R = GridVisualize.compute_2d_rotation_matrix(t)
-
-    # test rotation property
-    @test R't ≈ [0, 1]
+    # random tests
+    for t in [
+            [0.3543579344795591, 0.21250427156069385],
+            [1.0, 1.0],
+            [1.0, -1.0],
+            [-1.0, 1.0],
+            [-1.0, -1.0],
+        ]
+        R = GridVisualize.compute_2d_rotation_matrix(t)
+        # test rotation property
+        @test R't ≈ [0, 1]
+    end
 end
 
 
