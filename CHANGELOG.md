@@ -1,4 +1,11 @@
 # Changelog
+
+## [1.15.1] - 2025-06-25
+
+### Fixed
+
+  - fixed a corner case in `compute_2d_rotation_matrix` leading to wrong coordinate transformation in 1D slice plots
+
 ## [1.15.0] - 2025-06-17
 - Removed automatic overrides of user-supplied keywords `clear` , `show`, and `reveal` in `scalarplot!`, `vectorplot!`, `streamplot!`, and `customplot!`.
 - Included `CHANGELOG.md` in docs.
