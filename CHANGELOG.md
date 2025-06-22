@@ -1,4 +1,8 @@
 # Changelog
+
+## [1.15.1] - 2025-06-22
+- Allow for Makie 0.24 and Triangulate 3.0
+
 ## [1.15.0] - 2025-06-17
 - Removed automatic overrides of user-supplied keywords `clear` , `show`, and `reveal` in `scalarplot!`, `vectorplot!`, `streamplot!`, and `customplot!`.
 - Included `CHANGELOG.md` in docs.
