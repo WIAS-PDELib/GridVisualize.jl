@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.15.2] - 2025-06-24
+- fixed a corner case in `compute_2d_rotation_matrix` leading to wrong coordinate transformation in 1D slice plots
+
 ## [1.15.1] - 2025-06-22
 - Allow for Makie 0.24 and Triangulate 3.0
 
