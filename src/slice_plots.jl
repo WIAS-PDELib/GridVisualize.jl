@@ -199,11 +199,11 @@ end
     Else, for a generic plane, the new coordinate system has non-negative values and start at [0,0].
 
     ctx:     Plotting context
-    grid:    3D ExtendableGrid
+    grid_3d: 3D ExtendableGrid
     values:  value vector corresponding to the grid nodes
     plane:   Vector [a,b,c,d], s.t., ax + by + cz + d = 0 defines the plane that slices the 3D grid
 """
-function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
+function slice_plot!(ctx, ::Type{Val{3}}, grid_3d::ExtendableGrid{Tc, Ti}, values) where {Tc, Ti}
 
     plane = zeros(4)
     eval_slice_expr!(plane, ctx[:slice])
@@ -212,12 +212,12 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
     ctx[:slice] = nothing
 
     # get new data from marching_tetrahedra
-    new_coords, new_triangles, new_values = GridVisualize.marching_tetrahedra(grid, values, [plane], [])
+    new_coords, new_triangles, new_values, parents = GridVisualize.marching_tetrahedra(grid_3d, values, [plane], []; return_parent_cells = true)
 
     # construct new 2D grid
-    grid_2d = ExtendableGrid{Float64, Int32}()
+    grid_2d = ExtendableGrid{Tc, Ti}()
 
-    a::Float64, b::Float64, c::Float64, _ = plane
+    a::Tc, b::Tc, c::Tc, _ = plane
 
     # transformation matrix
     if (a, b, c) == (1.0, 0.0, 0.0)
@@ -242,7 +242,7 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
         rotation_matrix = compute_3d_z_rotation_matrix([a, b, c])
     end
 
-    grid_2d[Coordinates] = Matrix{Float64}(undef, 2, length(new_coords))
+    grid_2d[Coordinates] = Matrix{Tc}(undef, 2, length(new_coords))
     for (ip, p) in enumerate(new_coords)
         # to obtain the projected coordinates, we can simply use the transpose of the rotation matrix
         @views grid_2d[Coordinates][:, ip] .= (rotation_matrix'p)[1:2]
@@ -254,10 +254,12 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
         @views grid_2d[Coordinates][2, :] .-= minimum(grid_2d[Coordinates][2, :])
     end
 
-    grid_2d[CellNodes] = Matrix{Int32}(undef, 3, length(new_triangles))
+    grid_2d[CellNodes] = Matrix{Ti}(undef, 3, length(new_triangles))
     for (it, t) in enumerate(new_triangles)
         @views grid_2d[CellNodes][:, it] .= t
     end
+
+    grid_2d[CellRegions] = grid_3d[CellRegions][parents]
 
     return scalarplot!(ctx, grid_2d, new_values)
 end
@@ -281,7 +283,7 @@ end
     values:  value vector corresponding to the grid nodes
     line:    Vector [a,b,c], s.t., ax + by + d = 0 defines the line that slices the 2D grid
 """
-function slice_plot!(ctx, ::Type{Val{2}}, grid, values)
+function slice_plot!(ctx, ::Type{Val{2}}, grid::ExtendableGrid{Tc, Ti}, values) where {Tc, Ti}
 
     line = zeros(3)
     eval_slice_expr!(line, ctx[:slice])
@@ -290,12 +292,12 @@ function slice_plot!(ctx, ::Type{Val{2}}, grid, values)
     ctx[:slice] = nothing
 
     # get new data from marching_triangles
-    new_coords, new_adjecencies, new_values = GridVisualize.marching_triangles(grid, values, [line], [])
+    new_coords, new_adjecencies, new_values, parents = GridVisualize.marching_triangles(grid, values, [line], []; return_parent_cells = true)
 
     # construct new 1D grid
-    grid_1d = ExtendableGrid{Float64, Int32}()
+    grid_1d = ExtendableGrid{Tc, Ti}()
 
-    a::Float64, b::Float64, _ = line
+    a::Tc, b::Tc, _ = line
 
     if (a, b) == (1.0, 0.0)
         rotation_matrix = @SArray [
@@ -314,7 +316,7 @@ function slice_plot!(ctx, ::Type{Val{2}}, grid, values)
     # rotated coordinates (drop second component)
     rot_coords = [ (rotation_matrix'p)[1] for p in new_coords ]
 
-    grid_1d[Coordinates] = Matrix{Float64}(undef, 1, length(rot_coords))
+    grid_1d[Coordinates] = Matrix{Tc}(undef, 1, length(rot_coords))
     for ip in eachindex(rot_coords)
         # to obtain the projected coordinates, we can simply use the transpose of the rotation matrix
         grid_1d[Coordinates][1, ip] = rot_coords[ip]
@@ -325,15 +327,19 @@ function slice_plot!(ctx, ::Type{Val{2}}, grid, values)
         grid_1d[Coordinates] .-= minimum(grid_1d[Coordinates])
     end
 
-    grid_1d[CellNodes] = Matrix{Int32}(undef, 2, length(new_adjecencies))
+    grid_1d[CellNodes] = Matrix{Ti}(undef, 2, length(new_adjecencies))
     for (it, t) in enumerate(new_adjecencies)
         @views grid_1d[CellNodes][:, it] .= t
     end
+
+    grid_1d[CellRegions] = grid[CellRegions][parents]
 
     # sort the coordinates: this is currently required by the Makie backend
     p = @views sortperm(grid_1d[Coordinates][:])
     grid_1d[Coordinates] = @views grid_1d[Coordinates][:, p]
     new_values = new_values[p]
+    grid_1d[CellRegions] = grid_1d[CellRegions][p]
+
 
     return scalarplot!(ctx, grid_1d, new_values)
 end

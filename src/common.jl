@@ -60,22 +60,23 @@ Extract isosurfaces and plane interpolation for function on 3D tetrahedral mesh.
 See [`marching_tetrahedra(coord,cellnodes,func,planes,flevels;tol, primepoints, primevalues, Tv, Tp, Tf)`](@ref)
 """
 function GridVisualizeTools.marching_tetrahedra(
-        grid::ExtendableGrid, func, planes, flevels; gridscale = 1.0,
+        grid::ExtendableGrid, func, planes, flevels; return_parent_cells = false, gridscale = 1.0,
         kwargs...
     )
     coord = grid[Coordinates] * gridscale
     cellnodes = grid[CellNodes]
-    return marching_tetrahedra(coord, cellnodes, func, planes, flevels; kwargs...)
+    return marching_tetrahedra(coord, cellnodes, func, planes, flevels; return_parent_cells, kwargs...)
 end
 
 function GridVisualizeTools.marching_tetrahedra(
         grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, planes, flevels;
+        return_parent_cells = false,
         gridscale = 1.0,
         kwargs...
     ) where {Tv, Ti}
     coord = [grid[Coordinates] * gridscale for grid in grids]
     cellnodes = [grid[CellNodes] for grid in grids]
-    return marching_tetrahedra(coord, cellnodes, funcs, planes, flevels; kwargs...)
+    return marching_tetrahedra(coord, cellnodes, funcs, planes, flevels; return_parent_cells, kwargs...)
 end
 
 ########################################################################################
@@ -96,16 +97,16 @@ end
 
 Collect isoline snippets and/or intersection points with lines and values ready for linesegments!
 """
-function GridVisualizeTools.marching_triangles(grid::ExtendableGrid, func, lines, levels; gridscale = 1.0)
+function GridVisualizeTools.marching_triangles(grid::ExtendableGrid, func, lines, levels; return_parent_cells = false, gridscale = 1.0)
     coord::Matrix{Float64} = grid[Coordinates] * gridscale
     cellnodes::Matrix{Int32} = grid[CellNodes]
-    return marching_triangles(coord, cellnodes, func, lines, levels)
+    return marching_triangles(coord, cellnodes, func, lines, levels; return_parent_cells)
 end
 
-function GridVisualizeTools.marching_triangles(grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, lines, levels; gridscale = 1.0) where {Tv, Ti}
+function GridVisualizeTools.marching_triangles(grids::Vector{ExtendableGrid{Tv, Ti}}, funcs, lines, levels; return_parent_cells = false, gridscale = 1.0) where {Tv, Ti}
     coords = [grid[Coordinates] * gridscale for grid in grids]
     cellnodes = [grid[CellNodes] for grid in grids]
-    return marching_triangles(coords, cellnodes, funcs, lines, levels)
+    return marching_triangles(coords, cellnodes, funcs, lines, levels; return_parent_cells)
 end
 
 ##############################################
