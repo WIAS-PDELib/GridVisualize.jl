@@ -4,6 +4,9 @@ import CairoMakie, PyPlot, PlutoVista
 
 CairoMakie.activate!(; type = "svg", visible = false)
 
+
+include("griditerators.jl")
+
 plotting = joinpath(@__DIR__, "..", "examples", "plotting.jl")
 include(plotting)
 
