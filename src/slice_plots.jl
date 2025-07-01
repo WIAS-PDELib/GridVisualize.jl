@@ -173,6 +173,11 @@ function compute_2d_rotation_matrix(target_vector)
     # solve non-linear system for α
     α = asin(t[1])
 
+    # check second condition and rotate in the other direction if necessary
+    if !(cos(α) ≈ t[2])
+        α = π - α
+    end
+
     return R(α)
 end
 
