@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.15.3] - 2025-06-24
+- Fixed bug with GLMakie based animated plots from the REPL
+- Added examples for animated plots from the REPL
+
 ## [1.15.2] - 2025-06-24
 - fixed a corner case in `compute_2d_rotation_matrix` leading to wrong coordinate transformation in 1D slice plots
 
