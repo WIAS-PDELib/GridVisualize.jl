@@ -1446,6 +1446,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
                 y = ctx[:iyplanes],
                 z = ctx[:izplanes],
                 l = ctx[:levels],
+                c = ctx[:colorbarticks],
                 t = ctx[:title],
             )
         end
@@ -1460,6 +1461,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
             y = ctx[:iyplanes],
             z = ctx[:izplanes],
             l = ctx[:levels],
+            c = ctx[:colorbarticks],
             t = ctx[:title],
         )
     end
