@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Public API · GridVisualize.jl</title><meta name="title" content="Public API · GridVisualize.jl"/><meta property="og:title" content="Public API · GridVisualize.jl"/><meta property="twitter:title" content="Public API · GridVisualize.jl"/><meta name="description" content="Documentation for GridVisualize.jl."/><meta property="og:description" content="Documentation for GridVisualize.jl."/><meta property="twitter:description" content="Documentation for GridVisualize.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">GridVisualize.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../changes/">Changelog</a></li><li class="is-active"><a class="tocitem" href>Public API</a><ul class="internal"><li><a class="tocitem" href="#Visualizer"><span>Visualizer</span></a></li><li><a class="tocitem" href="#Plotters"><span>Plotters</span></a></li><li><a class="tocitem" href="#Plotting-grids"><span>Plotting grids</span></a></li><li><a class="tocitem" href="#Plotting-scalar-data"><span>Plotting scalar data</span></a></li><li><a class="tocitem" href="#Plotting-vector-data"><span>Plotting vector data</span></a></li><li><a class="tocitem" href="#Custom-plots"><span>Custom plots</span></a></li><li><a class="tocitem" href="#Plotting-TriangulateIO"><span>Plotting TriangulateIO</span></a></li><li><a class="tocitem" href="#Keyword-Arguments"><span>Keyword Arguments</span></a></li><li><a class="tocitem" href="#Supporting-methods"><span>Supporting methods</span></a></li><li><a class="tocitem" href="#Creating-movies"><span>Creating movies</span></a></li></ul></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../script_examples/plotting/">Plotting Examples</a></li></ul></li><li><span class="tocitem">Pluto notebooks</span><ul><li><a class="tocitem" href="../pluto_examples/plutovista/">plutovista</a></li></ul></li><li><a class="tocitem" href="../privapi/">Private API</a></li><li><a class="tocitem" href="../contributing/">Contributing</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Public API</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Public API</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/WIAS-PDELib/GridVisualize.jl" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Public-API"><a class="docs-heading-anchor" href="#Public-API">Public API</a><a id="Public-API-1"></a><a class="docs-heading-anchor-permalink" href="#Public-API" title="Permalink"></a></h1><h2 id="Visualizer"><a class="docs-heading-anchor" href="#Visualizer">Visualizer</a><a id="Visualizer-1"></a><a class="docs-heading-anchor-permalink" href="#Visualizer" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.GridVisualizer" href="#GridVisualize.GridVisualizer"><code>GridVisualize.GridVisualizer</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">struct GridVisualizer</code></pre><p>GridVisualizer struct</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.GridVisualizer-Tuple{}" href="#GridVisualize.GridVisualizer-Tuple{}"><code>GridVisualize.GridVisualizer</code></a> — <span class="docstring-category">Method</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">GridVisualizer(; Plotter, kwargs...) -&gt; GridVisualizer
+</code></pre><p>Create a  grid visualizer</p><p>Plotter: defaults to <code>default_plotter()</code> and can be <code>PyPlot</code>, <code>Plots</code>, <code>VTKView</code>, <code>Makie</code> or `PlutoVista´. This pattern allows  to pass the backend as a module to a plot function without heavy default package dependencies.</p><p>Depending on the <code>layout</code> keyword argument, a 2D grid of subplots is created. Further <code>...plot!</code> commands then plot into one of these subplots:</p><pre><code class="language-julia hljs">vis=GridVisualizer(Plotter=PyPlot, layout=(2,2)
+...plot!(vis[1,2], ...)</code></pre><p>A <code>...plot</code>  command just implicitly creates a plot context:</p><pre><code class="language-julia hljs">gridplot(grid, Plotter=PyPlot) </code></pre><p>is equivalent to</p><pre><code class="language-julia hljs">vis=GridVisualizer(Plotter=PyPlot, layout=(1,1))
+gridplot!(vis,grid) 
+reveal(vis)</code></pre><p>Please note that the return values of all plot commands are specific to the Plotter.</p><p>An interactive mode switch key   for GLMakie (<code>,</code>)  and  VTKView (<code>*</code>) allows to toggle between &quot;gallery view&quot; showing all plots at once and &quot;focused view&quot; showing only one plot.</p><p>Keyword arguments: see <a href="#GridVisualize.available_kwargs"><code>available_kwargs</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.SubVisualizer" href="#GridVisualize.SubVisualizer"><code>GridVisualize.SubVisualizer</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><p>A SubVisualizer is just a dictionary which contains plotting information, including the type of the plotter and its position in the plot.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.reveal" href="#GridVisualize.reveal"><code>GridVisualize.reveal</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">reveal(visualizer::GridVisualizer) -&gt; Any
+</code></pre><p>Finish and show plot. Same as setting <code>:reveal=true</code> or <code>:show=true</code> in last plot statement for a context.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.save" href="#GridVisualize.save"><code>GridVisualize.save</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">save(fname::String, visualizer::GridVisualizer) -&gt; Any
+</code></pre><p>Save last plotted figure from visualizer to disk.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">save(fname::String, scene; Plotter) -&gt; Any
+</code></pre><p>Save scene returned from <a href="#GridVisualize.reveal"><code>reveal</code></a>, <a href="#GridVisualize.scalarplot"><code>scalarplot</code></a> or <a href="#GridVisualize.gridplot"><code>gridplot</code></a>  to disk.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Plotters"><a class="docs-heading-anchor" href="#Plotters">Plotters</a><a id="Plotters-1"></a><a class="docs-heading-anchor-permalink" href="#Plotters" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.default_plotter" href="#GridVisualize.default_plotter"><code>GridVisualize.default_plotter</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">default_plotter()</code></pre><p>Return default plotter backend. By default, this is set to one of <code>PlutoVista</code>,<code>GLMakie</code>,<code>PyPlot</code> and <code>Plots</code> if one of these packages is imported.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.default_plotter!" href="#GridVisualize.default_plotter!"><code>GridVisualize.default_plotter!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">default_plotter!(Module)</code></pre><p>Set plotter module or <code>nothing</code> as the default plotter backend.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.plottertype" href="#GridVisualize.plottertype"><code>GridVisualize.plottertype</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">plottertype(Plotter)
+</code></pre><p>Heuristically detect type of plotter, returns the corresponding abstract type for plotting.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">plottertype(p)
+</code></pre><p>Return the type of a plotter.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.PyPlotType" href="#GridVisualize.PyPlotType"><code>GridVisualize.PyPlotType</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">abstract type PyPlotType &lt;: GridVisualize.AbstractPlotterType</code></pre><p>Abstract type for dispatching on plotter</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.MakieType" href="#GridVisualize.MakieType"><code>GridVisualize.MakieType</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">abstract type MakieType &lt;: GridVisualize.AbstractPlotterType</code></pre><p>Abstract type for dispatching on plotter</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.PlotsType" href="#GridVisualize.PlotsType"><code>GridVisualize.PlotsType</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">abstract type PlotsType &lt;: GridVisualize.AbstractPlotterType</code></pre><p>Abstract type for dispatching on plotter</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.PlutoVistaType" href="#GridVisualize.PlutoVistaType"><code>GridVisualize.PlutoVistaType</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">abstract type PlutoVistaType &lt;: GridVisualize.AbstractPlotterType</code></pre><p>Abstract type for dispatching on plotter</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.VTKViewType" href="#GridVisualize.VTKViewType"><code>GridVisualize.VTKViewType</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">abstract type VTKViewType &lt;: GridVisualize.AbstractPlotterType</code></pre><p>Abstract type for dispatching on plotter. Experimental.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.MeshCatType" href="#GridVisualize.MeshCatType"><code>GridVisualize.MeshCatType</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">abstract type MeshCatType &lt;: GridVisualize.AbstractPlotterType</code></pre><p>Abstract type for dispatching on plotter. Experimental.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Plotting-grids"><a class="docs-heading-anchor" href="#Plotting-grids">Plotting grids</a><a id="Plotting-grids-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-grids" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.gridplot" href="#GridVisualize.gridplot"><code>GridVisualize.gridplot</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">gridplot(grid::ExtendableGrid; Plotter, kwargs...) -&gt; Any
+</code></pre><p>Create grid visualizer and plot grid</p><p>Keyword arguments: see <a href="#GridVisualize.available_kwargs"><code>available_kwargs</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot(X::AbstractVector; kwargs...) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot(
+    X::AbstractVector,
+    Y::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot(
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot(
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.gridplot!" href="#GridVisualize.gridplot!"><code>GridVisualize.gridplot!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">gridplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    grid::ExtendableGrid;
+    kwargs...
+)
+</code></pre><p>Plot grid into subplot in the visualizer. If <code>[i,j]</code> is omitted, <code>[1,1]</code> is assumed.</p><p>Keyword arguments: see <a href="#GridVisualize.available_kwargs"><code>available_kwargs</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot!(
+    p::GridVisualizer,
+    grid::ExtendableGrid;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot!(
+    vis::Union{Nothing, Dict{Symbol, Any}, GridVisualizer},
+    X::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot!(
+    vis::Union{Nothing, Dict{Symbol, Any}, GridVisualizer},
+    X::AbstractVector,
+    Y::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot!(
+    vis::Union{Nothing, Dict{Symbol, Any}, GridVisualizer},
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">gridplot!(
+    vis::Union{Nothing, Dict{Symbol, Any}, GridVisualizer},
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Plotting-scalar-data"><a class="docs-heading-anchor" href="#Plotting-scalar-data">Plotting scalar data</a><a id="Plotting-scalar-data-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-scalar-data" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.scalarplot" href="#GridVisualize.scalarplot"><code>GridVisualize.scalarplot</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">scalarplot(
+    grid::ExtendableGrid,
+    func;
+    Plotter,
+    kwargs...
+) -&gt; Any
+</code></pre><p>Plot node vector on grid as P1 FEM function on the triangulation.</p><p>If instead of the node vector,  a function is given, it will be evaluated on the grid.</p><p>If instead of the grid,  vectors for coordinates are given, a grid is created automatically.</p><p>For keyword arguments, see <a href="#GridVisualize.available_kwargs"><code>available_kwargs</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot(func::AbstractVector; kwargs...) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot(
+    X::AbstractArray{T&lt;:Number, 1},
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot(
+    X::AbstractVector,
+    Y::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot(
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot(
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.scalarplot!" href="#GridVisualize.scalarplot!"><code>GridVisualize.scalarplot!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    grid::ExtendableGrid,
+    func;
+    kwargs...
+)
+</code></pre><p>Plot node vector on grid as P1 FEM function on the triangulation into subplot in the visualizer. If <code>[i,j]</code> is omitted, <code>[1,1]</code> is assumed.</p><p>If instead of the node vector,  a function is given, it will be evaluated on the grid.</p><p>If instead of the grid, coordinate vectors are given, a temporary grid is created.</p><p>Keyword arguments: see <a href="#GridVisualize.available_kwargs"><code>available_kwargs</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    grids::Array{ExtendableGrid{Tv, Ti}, 1},
+    parentgrid::ExtendableGrid{Tv, Ti},
+    funcs::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre><p>Plot node vectors on subgrids of parent grid as P1 FEM function on the triangulation into subplot in the visualizer. If <code>[i,j]</code> is omitted, <code>[1,1]</code> is assumed. Keyword arguments: see <a href="#GridVisualize.available_kwargs"><code>available_kwargs</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    p::GridVisualizer,
+    grid::ExtendableGrid,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    grid::ExtendableGrid,
+    func::Function;
+    kwargs...
+)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    p::GridVisualizer,
+    grids::Array{ExtendableGrid{Tv, Ti}, 1},
+    parentgrid::ExtendableGrid{Tv, Ti},
+    funcs::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    func::AbstractVector;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    X::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::GridVisualizer,
+    X::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::GridVisualizer,
+    X::AbstractVector,
+    Y::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::GridVisualizer,
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">scalarplot!(
+    ctx::GridVisualizer,
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Plotting-vector-data"><a class="docs-heading-anchor" href="#Plotting-vector-data">Plotting vector data</a><a id="Plotting-vector-data-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-vector-data" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.vectorplot" href="#GridVisualize.vectorplot"><code>GridVisualize.vectorplot</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">vectorplot(
+    grid::ExtendableGrid,
+    func;
+    Plotter,
+    kwargs...
+) -&gt; Any
+</code></pre><p>Plot piecewise linear vector field  as quiver plot.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">vectorplot(
+    X::AbstractVector,
+    Y::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">vectorplot(
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">vectorplot(
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.vectorplot!" href="#GridVisualize.vectorplot!"><code>GridVisualize.vectorplot!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">vectorplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    grid::ExtendableGrid,
+    func;
+    kwargs...
+)
+</code></pre><p>Plot piecewise linear vector field  as quiver plot.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">vectorplot!(
+    p::GridVisualizer,
+    grid::ExtendableGrid,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">vectorplot!(
+    ctx::GridVisualizer,
+    X::AbstractVector,
+    Y::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">vectorplot!(
+    ctx::GridVisualizer,
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">vectorplot!(
+    ctx::GridVisualizer,
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.streamplot" href="#GridVisualize.streamplot"><code>GridVisualize.streamplot</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">streamplot(
+    grid::ExtendableGrid,
+    func;
+    Plotter,
+    kwargs...
+) -&gt; Any
+</code></pre><p>Plot piecewise linear vector field  as stream plot. (2D pyplot only)</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">streamplot(
+    X::AbstractVector,
+    Y::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">streamplot(
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">streamplot(
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.streamplot!" href="#GridVisualize.streamplot!"><code>GridVisualize.streamplot!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">streamplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    grid::ExtendableGrid,
+    func;
+    kwargs...
+)
+</code></pre><p>Plot piecewise linear vector field  as stream plot. (2D pyplot only)</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">streamplot!(
+    p::GridVisualizer,
+    grid::ExtendableGrid,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">streamplot!(
+    ctx::GridVisualizer,
+    X::AbstractVector,
+    Y::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">streamplot!(
+    ctx::GridVisualizer,
+    X::AbstractVector,
+    Y::AbstractVector,
+    Z::AbstractVector,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">streamplot!(
+    ctx::GridVisualizer,
+    coord::AbstractMatrix,
+    cellnodes::AbstractMatrix,
+    func;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Custom-plots"><a class="docs-heading-anchor" href="#Custom-plots">Custom plots</a><a id="Custom-plots-1"></a><a class="docs-heading-anchor-permalink" href="#Custom-plots" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.customplot" href="#GridVisualize.customplot"><code>GridVisualize.customplot</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">customplot(func; Plotter, kwargs...) -&gt; Any
+</code></pre><p>Custom user plot.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.customplot!" href="#GridVisualize.customplot!"><code>GridVisualize.customplot!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">customplot!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    func;
+    kwargs...
+)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">customplot!(
+    func,
+    ctx::Union{Nothing, Dict{Symbol, Any}};
+    kwargs...
+)
+</code></pre><p>Variant for do block syntax.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">customplot!(p::GridVisualizer, func; kwargs...)
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">customplot!(func, p::GridVisualizer; kwargs...)
+</code></pre><p>Variant for do block syntax.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Plotting-TriangulateIO"><a class="docs-heading-anchor" href="#Plotting-TriangulateIO">Plotting TriangulateIO</a><a id="Plotting-TriangulateIO-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-TriangulateIO" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.plot_triangulateio" href="#GridVisualize.plot_triangulateio"><code>GridVisualize.plot_triangulateio</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">plot_triangulateio(;Plotter, 
+                   triangulateio; 
+                   voronoi=nothing, 
+                   circumcircles = false, 
+                   kwargs...)</code></pre><p>Plot TriangulateIO struct exported by Triangulate.jl. </p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.plot_triangulateio!" href="#GridVisualize.plot_triangulateio!"><code>GridVisualize.plot_triangulateio!</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">plot_triangulateio!(
+    ctx::Union{Nothing, Dict{Symbol, Any}},
+    triangulateio;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section><section><div><pre><code class="language-julia hljs">plot_triangulateio!(
+    p::GridVisualizer,
+    triangulateio;
+    kwargs...
+) -&gt; Any
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Keyword-Arguments"><a class="docs-heading-anchor" href="#Keyword-Arguments">Keyword Arguments</a><a id="Keyword-Arguments-1"></a><a class="docs-heading-anchor-permalink" href="#Keyword-Arguments" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.available_kwargs" href="#GridVisualize.available_kwargs"><code>GridVisualize.available_kwargs</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">available_kwargs()
+</code></pre><p>Available kwargs for all methods of this package.</p><ul><li><p><code>show</code>: Show plot immediately. Default: <code>false</code></p></li><li><p><code>reveal</code>: Show plot immediately (same as :show). Default: <code>false</code></p></li><li><p><code>clear</code>: Clear plot before adding new content. Default: <code>true</code></p></li><li><p><code>layout</code>: Layout of plots in window. Default: <code>(1, 1)</code></p></li><li><p><code>size</code>: Plot window resolution. Default: <code>(500, 500)</code></p></li><li><p><code>legend</code>: Legend (position): one of [:none, :best, :lt, :ct, :rt, :lc, :rc, :lb, :cb, :rb]. Default: <code>none</code></p></li><li><p><code>title</code>: Plot title. Default: ``</p></li><li><p><code>xlabel</code>: x axis label. Default: <code>x</code></p></li><li><p><code>ylabel</code>: y axis label. Default: <code>y</code></p></li><li><p><code>zlabel</code>: z axis label. Default: <code>z</code></p></li><li><p><code>xlimits</code>: x axis limits. Default: <code>(1, -1)</code></p></li><li><p><code>ylimits</code>: y axis limits. Default: <code>(1, -1)</code></p></li><li><p><code>zlimits</code>: z axis limits. Default: <code>(1, -1)</code></p></li><li><p><code>limits</code>: function limits. Default: <code>(1, -1)</code></p></li><li><p><code>xscale</code>: x axis  scale: one of [:log, :identity]. Default: <code>identity</code></p></li><li><p><code>yscale</code>: y axis  scale: one of [:log, :identity]. Default: <code>identity</code></p></li><li><p><code>aspect</code>: XY Aspect ratio modification. Default: <code>1.0</code></p></li><li><p><code>fontsize</code>: Fontsize of titles. All others are relative to it. Default: <code>20</code></p></li><li><p><code>linewidth</code>: linewidth for isolines or 1D plots. Default: <code>2</code></p></li><li><p><code>linestyle</code>: 1D Plot linestyle: one of [:solid, :dash, :dot, :dashdot, :dashdotdot]. Default: <code>solid</code></p></li><li><p><code>markevery</code>: 1D plot marker stride. Default: <code>5</code></p></li><li><p><code>markersize</code>: 1D plot marker size. Default: <code>5</code></p></li><li><p><code>markershape</code>: 1D plot marker shape: one of [:none, :circle, :star5, :diamond, :hexagon, :cross, :xcross, :utriangle, :dtriangle, :rtriangle, :ltriangle, :pentagon, :+, :x]. Default: <code>none</code></p></li><li><p><code>color</code>: 1D plot line color. Default: <code>RGB{Float64}(0.0, 0.0, 0.0)</code></p></li><li><p><code>cellwise</code>: 1D plots cellwise; unmaintained and can be slow). Default: <code>false</code></p></li><li><p><code>label</code>: 1D plot label. Default: ``</p></li><li><p><code>levels</code>: array of isolevels or number of isolevels for contour plots. Default: <code>7</code></p></li><li><p><code>elevation</code>: 2D plot height factor for elevation. Default: <code>0.0</code></p></li><li><p><code>colorlevels</code>: 2D/3D contour plot: number of color levels. Default: <code>51</code></p></li><li><p><code>colormap</code>: 2D/3D contour plot color map (any from <a href="https://juliagraphics.github.io/ColorSchemes.jl/stable/basics/#Pre-defined-schemes">ColorSchemes.jl</a>). Default: <code>viridis</code></p></li><li><p><code>colorbar</code>: 2D/3D plot colorbar. One of [:none, :vertical, :horizontal]. Default: <code>vertical</code></p></li><li><p><code>colorbarticks</code>: number of ticks in colorbar (:default sets it equal to levels). Default: <code>default</code></p></li><li><p><code>outlinealpha</code>: 3D outline surface alpha value. Default: <code>0.05</code></p></li><li><p><code>levelalpha</code>: 3D isolevel alpha. Default: <code>0.25</code></p></li><li><p><code>planealpha</code>: 3D plane section alpha. Default: <code>0.25</code></p></li><li><p><code>tetxplane_tol</code>: tolerance for tet-plane intersection in 3D. Default: <code>0.0</code></p></li><li><p><code>rasterpoints</code>: Number of quiver points resp. half number of streamplot interpolation points in the maximum extent direction. . Default: <code>16</code></p></li><li><p><code>offset</code>: Offset of quiver grid. Default: <code>default</code></p></li><li><p><code>vscale</code>: Vector field scale for quiver grid. Default: <code>1.0</code></p></li><li><p><code>vconstant</code>: Set all arrow length constant in vector plot. Default: <code>false</code></p></li><li><p><code>vnormalize</code>: Normalize vector field before scaling. Default: <code>true</code></p></li><li><p><code>interior</code>: 3D plot interior of grid. Default: <code>true</code></p></li><li><p><code>xplanes</code>: 3D x plane positions or number thereof. Default: <code>[1.7976931348623157e308]</code></p></li><li><p><code>yplanes</code>: 3D y plane positions or number thereof. Default: <code>[1.7976931348623157e308]</code></p></li><li><p><code>zplanes</code>: 3D z plane positions or number thereof. Default: <code>[1.7976931348623157e308]</code></p></li><li><p><code>zoom</code>: Zoom level. Default: <code>1.0</code></p></li><li><p><code>gridscale</code>: Grid scale factor. Will be applied also to planes, spacing. Default: <code>1</code></p></li><li><p><code>cellcoloring</code>: Coloring of cells: one of [:cellregions, :pcolors, :partitions]. Default: <code>cellregions</code></p></li><li><p><code>azim</code>: 3D azimuth angle  (in degrees). Default: <code>-60</code></p></li><li><p><code>elev</code>: 3D elevation angle  (in degrees). Default: <code>30</code></p></li><li><p><code>perspectiveness</code>: 3D perspective A number between 0 and 1, where 0 is orthographic, and 1 full perspective. Default: <code>0.25</code></p></li><li><p><code>scene3d</code>: 3D plot type of Makie scene. Alternative to <code>:Axis3</code> is <code>:LScene</code>. Default: <code>Axis3</code></p></li><li><p><code>viewmode</code>: Axis3d viewmode for Makie plots. Possible values :fit or :free. Default: <code>fit</code></p></li><li><p><code>fignumber</code>: Figure number (PyPlot). Default: <code>1</code></p></li><li><p><code>framepos</code>: Subplot position in frame (VTKView). Default: <code>1</code></p></li><li><p><code>subplot</code>: Private: Actual subplot. Default: <code>(1, 1)</code></p></li><li><p><code>backend</code>: Backend for PlutoVista plot. Default: <code>default</code></p></li><li><p><code>dim</code>: Data dimension for PlutoVista plot. Default: <code>1</code></p></li><li><p><code>regions</code>: List of regions to plot. Default: <code>all</code></p></li><li><p><code>species</code>: Number of species to plot or number of species in regions. Default: <code>1</code></p></li><li><p><code>spacing</code>: Removed from API. Default: <code>nothing</code></p></li><li><p><code>show_colorbar</code>: Show color bar next to plots. Default: <code>true</code></p></li><li><p><code>slice</code>: Plot a dim-1 slice along a hyperplane expression :(αx ± βy [± γz] ± δ)) or a fixed axis pair, e.g., :x =&gt; 3. Default: <code>nothing</code></p></li></ul></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Supporting-methods"><a class="docs-heading-anchor" href="#Supporting-methods">Supporting methods</a><a id="Supporting-methods-1"></a><a class="docs-heading-anchor-permalink" href="#Supporting-methods" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.vectorsample" href="#GridVisualize.vectorsample"><code>GridVisualize.vectorsample</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">      vectorsample(grid::ExtendableGrid{Tv, Ti}, v;
+                  offset = :default,
+                  rasterpoints = 15,
+                  reltol = 1.0e-10,
+                  gridscale = 1.0,
+                  xlimits = (1, -1),
+                  ylimits = (1, -1),
+                  zlimits = (1, -1)) where {Tv, Ti}</code></pre><p>Extract values of given vector field (either nodal values of a piecewise linear vector field or a callback function providing evaluation of the vector field for given generalized barycentric coordinates). at all sampling points on  <code>offset+ i*spacing</code> for i in Z^d  defined by the tuples offset and spacing. Returned values can be fed into <a href="#GridVisualize.quiverdata"><code>quiverdata</code></a></p><p>By default, offset is at the minimum of grid coordinates, and spacing is defined the largest grid extend divided by 10.</p><p>The intermediate <code>rasterflux</code> in future versions can be used to calculate streamlines.</p><p>The code is 3D ready.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.quiverdata" href="#GridVisualize.quiverdata"><code>GridVisualize.quiverdata</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs"> function quiverdata(rastercoord,
+                     rasterflux;
+                     vscale = 1.0,
+                     vnormalize = true,
+                     vconstant = false)</code></pre><p>Extract  nonzero fluxes for quiver plots from rastergrid obtained by <a href="#GridVisualize.vectorsample"><code>vectorsample</code></a>.</p><p>Returns qc, qv -  <code>d x nquiver</code> matrices.</p><p>If vnormalize is true, the vector field is normalized to vscale*min(spacing), otherwise, it is scaled by vscale Result data are meant to  be ready for being passed to calls to <code>quiver</code> with various plotting backends.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article><h2 id="Creating-movies"><a class="docs-heading-anchor" href="#Creating-movies">Creating movies</a><a id="Creating-movies-1"></a><a class="docs-heading-anchor-permalink" href="#Creating-movies" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="GridVisualize.movie" href="#GridVisualize.movie"><code>GridVisualize.movie</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">movie( func, vis::GridVisualizer; file = nothing, format = &quot;gif&quot;, kwargs... )</code></pre><p>Record a movie with GLMakie backend. MP4 files and gifs can be created.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/WIAS-PDELib/GridVisualize.jl">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../changes/">« Changelog</a><a class="docs-footer-nextpage" href="../script_examples/plotting/">Plotting Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.13.0 on <span class="colophon-date" title="Tuesday 1 July 2025 15:12">Tuesday 1 July 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
