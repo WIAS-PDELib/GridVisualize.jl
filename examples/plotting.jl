@@ -19,6 +19,7 @@ using Triangulate: Triangulate, TriangulateIO, triangulate
 using Printf
 
 # ### 1D grids
+# See [`GridVisualize.gridplot`](@@ref).
 function grid1d(; n = 50)
     X = collect(0:(1 / n):1)
     return g = simplexgrid(X)
@@ -30,6 +31,7 @@ end
 # ![](plotting_grid1d.png)
 
 # ### 2D grids
+# See [`GridVisualize.gridplot`](@@ref).
 
 function grid2d(; n = 20)
     X = collect(0:(1 / n):1)
@@ -42,6 +44,7 @@ end
 # ![](plotting_grid2d.png)
 
 # ### 3D grids
+# See [`GridVisualize.gridplot`](@@ref).
 # The kwargs `xplane`, `yplane` and `zplane` which allow to control
 # cutplanes which peel off some elements from the grid in 3d and allow to
 # explore the inner triangulation.
@@ -61,6 +64,8 @@ end
 # ## Function plots
 
 # ### Function on 1D grid
+# See [`GridVisualize.scalarplot`](@@ref).
+
 function func1d(; n = 50)
     g = grid1d(; n = n)
     return g, map(x -> sinpi(2 * x[1]), g)
@@ -72,7 +77,9 @@ function plotting_func1d(; Plotter = default_plotter(), kwargs...)
 end
 # ![](plotting_func1d.png)
 
+
 # ### Function on 2D grid
+# See [`GridVisualize.scalarplot`](@@ref).
 function func2d(; n = 30)
     g = grid2d(; n = n)
     return g, map((x, y) -> sinpi(2 * x) * sinpi(3.5 * y), g)
@@ -84,9 +91,10 @@ function plotting_func2d(; Plotter = default_plotter(), kwargs...)
 end
 # ![](plotting_func2d.png)
 
+
 # ### Function on 3D grid
+# See [`GridVisualize.scalarplot`](@@ref).
 #
-# Plotting a function then goes as follows:
 # `xplane`, `yplane` and `zplane` now define cut planes where
 # the function projection is plotted as a heatmap.
 # The additional `flevel` keyword argument allows
@@ -114,6 +122,7 @@ end
 
 # ## d-1 dim slice in d-dim data
 # ### 2D slice of a 3D grid
+# See [`GridVisualize.scalarplot`](@@ref).
 #
 # You can plot a 2D slice of a function defined on a
 # 3D grid by providing a `slice` key word argument which
@@ -136,6 +145,7 @@ end
 
 # ### 1D line of a 2D grid
 #
+# See [`GridVisualize.scalarplot`](@@ref).
 # You can plot a 1D line of a function defined on a
 # 2D grid by providing a `slice` key word argument which
 # describes a line equation of a fixed value to one axis.
@@ -155,18 +165,9 @@ end
 # ![](plotting_line2d.png)
 
 
-#
-# Plotting a function then goes as follows:
-# `xplane`, `yplane` and `zplane` now define cut planes where
-# the function projection is plotted as a heatmap.
-# The additional `flevel` keyword argument allows
-# to control an isolevel.
-#
-# For Makie and VTKView, the cutplane values and the flevel can be controlled interactively.
-
-
 # ## Vector and stream plots
 # ### 2D vector
+# See [`GridVisualize.vectorplot`](@@ref).
 function vec2d(; n = 20)
     g = grid2d(; n = n)
     return g,
@@ -183,6 +184,7 @@ end
 # ![](plotting_vec2d.png)
 
 # ### 2D stream
+# See [`GridVisualize.streamplot`](@@ref).
 # Stream plots are currently only available with PyPlot and Makie
 function plotting_stream2d(; Plotter = default_plotter(), n = 50, kwargs...)
     g, f = vec2d(; n = n)
@@ -190,8 +192,62 @@ function plotting_stream2d(; Plotter = default_plotter(), n = 50, kwargs...)
 end
 # ![](plotting_stream2d.png)
 
-# ### Movie
+# ## Animation
+# Animation examples work in the REPL. They are useful for in-situ visualization
+# of evolving calculation data. For the creation of videos/movies, see the [Movie](@@ref) example.
+
+# ### Animation of function on 1D grid
+function anim_func1d(; Plotter = default_plotter(), kwargs...)
+    step = 0.01
+    if ismakie(Plotter)
+        step = 0.0001
+    end
+    g = grid1d(; n = 50)
+    vis = GridVisualizer(; Plotter, kwargs...)
+    for t in 0:step:1
+        f = map(x -> sinpi(3 * (x[1] - t)), g)
+        scalarplot!(vis, g, f, title = "t=$(t)", show = true)
+    end
+    return nothing
+end
+
+# ### Animation of function on 2D grid
+function anim_func2d(; Plotter = default_plotter(), kwargs...)
+    step = 0.05
+    if ismakie(Plotter)
+        step = 0.005
+    end
+    g = grid2d(; n = 30)
+    vis = GridVisualizer(; Plotter, kwargs...)
+    for t in 0:step:1
+        f = map(x -> sinpi(3 * (x[1] - t) * (2 * x[2] - 2t)), g)
+        scalarplot!(vis, g, f, title = "t=$(t)", show = true)
+    end
+    return nothing
+end
+
+# ### Animation of function on 3D grid
+function anim_func3d(; Plotter = default_plotter(), kwargs...)
+    step = 0.05
+    if ismakie(Plotter)
+        step = 0.005
+    end
+    g = grid3d(; n = 15)
+    vis = GridVisualizer(; Plotter, kwargs...)
+    for t in 0:step:1
+        f = map(x -> sinpi(3 * (x[1] - t)) * sinpi(2 * x[2] - 2t) * cospi(x[3] - t / 2), g)
+        scalarplot!(vis, g, f, title = "t=$(t)", show = true)
+    end
+    return nothing
+end
+
+
+# ## Movie
 # Movies can contain  any of the previous plots.
+# Best created with GLMakie or CairoMakie. File formats are gif and mp4.
+# See [`GridVisualize.movie`](@@ref)
+# See the  [Animation](@@ref) examples
+# for in-situ visualization of calculation results in the REPL.
 function plotting_movie(; filename = "plotting_video.gif", Plotter = default_plotter())
     vis = GridVisualizer(; Plotter = Plotter, size = (600, 200), layout = (1, 2))
     X = 0:0.2:10
@@ -385,6 +441,7 @@ end
 # ![](plotting_jfunc3d.png)
 
 # ## Custom plots
+# See [`GridVisualize.customplot!`](@@ref)
 function plotting_custom(; Plotter = default_plotter(), kwargs...)
     vis = GridVisualizer(; Plotter = Plotter)
     grid = grid2d()
@@ -401,7 +458,7 @@ end
 
 # ## TriangulateIO
 #
-# GridVisualize comes with [`GridVisualize.plot_triangulateio`](@ref), a method to plot the input/output
+# GridVisualize comes with [`GridVisualize.plot_triangulateio`](@@ref), a method to plot the input/output
 # struct of the Triangle mesh generator, provided by the [Triangulate.jl](https://github.com/JuliaGeometry/Triangulate.jl) wrapper.
 # Supported are PyPlot and Makie backends.
 #
