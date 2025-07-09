@@ -408,9 +408,6 @@ $(_myprint(default_plot_kwargs()))
 available_kwargs() = println(_myprint(default_plot_kwargs()))
 
 ###################################################################################
-function gridplot!(ctx, ::Type{T}, ::Type{Val{D}}, grid) where {T <: AbstractPlotterType, D}
-    error("Missing implementation of gridplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grid)")
-end
 
 """
 $(TYPEDSIGNATURES)
@@ -511,10 +508,6 @@ function gridplot(
 end
 
 ###################################################################################
-function scalarplot!(ctx, ::Type{T}, ::Type{Val{D}}, grids, parentgrid, funcs) where {T <: AbstractPlotterType, D}
-    error("Missing implementation of scalarplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grids, parentgrid, funcs)")
-end
-
 
 """
 $(TYPEDSIGNATURES)
@@ -712,10 +705,6 @@ function scalarplot(
 end
 
 ###################################################################################
-function vectorplot!(ctx, ::Type{T}, ::Type{Val{D}}, grid, func) where {T <: AbstractPlotterType, D}
-    error("Missing implementation of vectorplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grids, grid,func)")
-end
-
 
 """
 $(TYPEDSIGNATURES)
@@ -730,10 +719,10 @@ function vectorplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
     return vectorplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid, func)
 end
 
-function vectorplot!(ctx, ptype, ::Type{Val{1}}, grid, func::Matrix)
+function vectorplot!(ctx, ptype::Type{T}, ::Type{Val{1}}, grid, func::Matrix) where {T <: AbstractPlotterType}
     return scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func[1, :]])
 end
-function vectorplot!(ctx, ptype, ::Type{Val{1}}, grid, func::Vector)
+function vectorplot!(ctx, ptype::Type{T}, ::Type{Val{1}}, grid, func::Vector) where {T <: AbstractPlotterType}
     return scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func])
 end
 
@@ -807,10 +796,6 @@ function vectorplot(
 end
 
 ###################################################################################
-function streamplot!(ctx, ::Type{T}, ::Type{Val{D}}, grid, func) where {T <: AbstractPlotterType, D}
-    error("Missing implementation of streamplot!(ctx,::Type{$(T)},  ::Type{Val{$D}}, grids, grid,func)")
-end
-
 
 """
 $(TYPEDSIGNATURES)
