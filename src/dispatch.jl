@@ -719,11 +719,11 @@ function vectorplot!(ctx::SubVisualizer, grid::ExtendableGrid, func; kwargs...)
     return vectorplot!(ctx, plottertype(ctx[:Plotter]), Val{dim_space(grid)}, grid, func)
 end
 
-function vectorplot!(ctx, ptype::Type{T}, ::Type{Val{1}}, grid, func::Matrix) where {T <: AbstractPlotterType}
-    return scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func[1, :]])
+function vectorplot!(ctx, plotter_type::Type{T}, ::Type{Val{1}}, grid, func::Matrix) where {T <: AbstractPlotterType}
+    return scalarplot!(ctx, plotter_type, Val{1}, [grid], grid, [func[1, :]])
 end
-function vectorplot!(ctx, ptype::Type{T}, ::Type{Val{1}}, grid, func::Vector) where {T <: AbstractPlotterType}
-    return scalarplot!(ctx, ptype, Val{1}, [grid], grid, [func])
+function vectorplot!(ctx, plotter_type::Type{T}, ::Type{Val{1}}, grid, func::Vector) where {T <: AbstractPlotterType}
+    return scalarplot!(ctx, plotter_type, Val{1}, [grid], grid, [func])
 end
 
 "$(TYPEDSIGNATURES)"
