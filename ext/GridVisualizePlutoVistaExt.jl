@@ -152,7 +152,7 @@ function gridplot!(ctx, TP::Type{PlutoVistaType}, ::Type{Val{1}}, grid)
 
     for icell in 1:num_cells(grid)
         ireg = cellregions[icell]
-        label = crflag[ireg] ? "c$(ireg)" : ""
+        label = crflag[ireg] ? "c $(ireg)" : ""
         crflag[ireg] = false
 
         x1 = coord[1, cellnodes[1, icell]]
@@ -189,7 +189,7 @@ function gridplot!(ctx, TP::Type{PlutoVistaType}, ::Type{Val{1}}, grid)
     for ibface in 1:num_bfaces(grid)
         ireg = bfaceregions[ibface]
         if ireg > 0
-            label = brflag[ireg] ? "b$(ireg)" : ""
+            label = brflag[ireg] ? "b $(ireg)" : ""
             brflag[ireg] = false
             x1 = coord[1, bfacenodes[1, ibface]]
             PlutoVista.plot!(

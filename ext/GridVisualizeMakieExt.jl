@@ -327,7 +327,7 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grid)
                 map(g -> bregionmesh1d(g, gridscale, i), ctx[:grid]);
                 color = bcmap[i],
                 linewidth = 4,
-                label = "b$(i)",
+                label = "b $(i)",
             )
         end
 
