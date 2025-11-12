@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-added-large-files
     args: [--maxkb=8192]
@@ -12,11 +12,11 @@ repos:
   - id: no-commit-to-branch
     args: [--branch, main]
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.24.2
+  rev: v8.29.0
   hooks:
   - id: gitleaks
 - repo: https://github.com/fredrikekre/runic-pre-commit
-  rev: v1.0.0
+  rev: v2.0.1
   hooks:
   - id: runic
 - repo: https://github.com/codespell-project/codespell
