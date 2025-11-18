@@ -9,7 +9,7 @@ GridVisualize
 Plotting companion module for [ExtendableGrids.jl](https://github.com/WIAS-PDELib/ExtendableGrids.jl)
 Provides plotting of grids,  scalar piecewise linear functions and vectors (2D only) for various plotting backends
 on simplicial grids in one, two or three space dimensions. The main supported backends
-are CairoMakie, GLMakie, PyPlot,  and PlutoVista. Plots is only partially supported (1D and 2D rectangular grids).
+are CairoMakie, GLMakie, PythonPlot, PyPlot,  and PlutoVista. Plots is only partially supported (1D and 2D rectangular grids).
 
 ## Disclaimer
 The code is rather complex and many codepaths are hard to test. Please be prepared to help
@@ -43,7 +43,7 @@ Plot appearance can be tweaked by a number of
 [keyword arguments](https://WIAS-PDELib.github.io/GridVisualize.jl/dev/api/#GridVisualize.available_kwargs).
 
 ### Plotters
-Plotters can be e.g. Plots, PyPlot, GLMakie, CairoMakie PlutoVista - we pass the module exported
+Plotters can be e.g. Plots, PythonPlot, PyPlot, GLMakie, CairoMakie PlutoVista - we pass the module exported
 by the package. Different plotters can be used at the same time.
 
 ### Multiple plots in one plotting window
@@ -69,7 +69,7 @@ end
 ### Movies
 Currently, these can be recorded with GLMakie, CairoMakie and Plots backends both from
 the REPL and Pluto notebooks. MP4 files and gifs can be created.
-PyPlot possibly will follow.
+PyPlot/PythonPlot possibly will follow.
 
 This shows the animated graphic in the REPL (essentially the same as above)
 and creates an embedded video in a Pluto notebook:
@@ -131,26 +131,26 @@ and all plotting functions will do nothing.
 - 'p':  planned (no schedule though)
 - 'n': probably not, also in the future
 
-|                | PyPlot | Makie | PlutoVista | Plots | VTKView |
-|----------------|--------|-------|------------|-------|---------|
-| scalarplot, 1D | y      | y     | y,i        | y     | y       |
-| vectorplot, 1D | y      | y     | y          | y     | y       |
-| gridplot, 1D   | y      | y     | y          | y     |         |
-| scalarplot, 2D | y      | y     | y          | (y)   | y,i     |
-| vectorplot, 2D | y      | y     | y          | y     |         |
-| streamplot, 2D | y      | y     | p          | n     |         |
-| gridplot, 2D   | y      | y,i   | y          | (y)   | y,i     |
-| scalarplot, 3D | y      | y,i   | y,i        | n     | y,i     |
-| gridplot, 3D   | y      | y,i   | y,i        | n     | y,i     |
-| vectorplot, 3D | p      | p     | p          | n     |         |
-| streamplot, 3D |        | p     | p          | n     |         |
-| movie          | n      | y     | n          | y     |         |
-| triangulateio  | y      | y     | n          | n     | n       |
+|                | PyPlot/PythonPlot  | Makie | PlutoVista | Plots | VTKView |
+|----------------|--------------------|-------|------------|-------|---------|
+| scalarplot, 1D | y                  | y     | y,i        | y     | y       |
+| vectorplot, 1D | y                  | y     | y          | y     | y       |
+| gridplot, 1D   | y                  | y     | y          | y     |         |
+| scalarplot, 2D | y                  | y     | y          | (y)   | y,i     |
+| vectorplot, 2D | y                  | y     | y          | y     |         |
+| streamplot, 2D | y                  | y     | p          | n     |         |
+| gridplot, 2D   | y                  | y,i   | y          | (y)   | y,i     |
+| scalarplot, 3D | y                  | y,i   | y,i        | n     | y,i     |
+| gridplot, 3D   | y                  | y,i   | y,i        | n     | y,i     |
+| vectorplot, 3D | p                  | p     | p          | n     |         |
+| streamplot, 3D |                    | p     | p          | n     |         |
+| movie          | n                  | y     | n          | y     |         |
+| triangulateio  | y                  | y     | n          | n     | n       |
 
 ## Sample output
 
 
-### [PyPlot](https://github.com/JuliaPy/PyPlot.jl):
+### [PyPlot/PythonPlot](https://github.com/JuliaPy/PyPlot.jl):
 ![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_pyplot.png?raw=true)
 
 
@@ -175,7 +175,7 @@ gridplot!(vis,grid,clear=true,show=true)
 ## Notebooks
 
 ###  Pluto
-Plotting in Pluto notebooks for CairoMakie, PyPlot, Plots, GLMakie is working, WGLMakie probably works in combination with JSServe.
+Plotting in Pluto notebooks for CairoMakie, PyPlot, PythonPlot, Plots, GLMakie is working, WGLMakie probably works in combination with JSServe.
 
 Plotting in Pluto notebooks can use [PlutoVista.jl](https://github.com/j-fu/PlutoVista.jl)
 based on [plotly.js](https://plotly.com/javascript/) (1D) and [vtk.js](https://kitware.github.io/vtk-js/index.html) (2/3D).

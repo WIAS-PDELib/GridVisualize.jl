@@ -78,21 +78,21 @@ Abstract type for dispatching on plotter
 abstract type AbstractPlotterType end
 
 
-abstract type PyCommonType <: AbstractPlotterType end
+abstract type AbstractPythonPlotterType <: AbstractPlotterType end
 
 """
 $(TYPEDEF)
 
 Abstract type for dispatching on plotter
 """
-abstract type PyPlotType <: PyCommonType end
+abstract type PyPlotType <: AbstractPythonPlotterType end
 
 """
 $(TYPEDEF)
 
 Abstract type for dispatching on plotter
 """
-abstract type PythonPlotType <: PyCommonType end
+abstract type PythonPlotType <: AbstractPythonPlotterType end
 
 """
 $(TYPEDEF)

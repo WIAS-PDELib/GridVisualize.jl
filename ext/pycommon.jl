@@ -2,17 +2,14 @@ using Colors
 using ColorSchemes
 using DocStringExtensions
 import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!, plot_triangulateio!
-using GridVisualize: PyCommonType, GridVisualizer, SubVisualizer, ispyplot, ispythonplot
+using GridVisualize: AbstractPythonPlotterType, GridVisualizer, SubVisualizer, ispyplot, ispythonplot
 using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, leglocs
 using ExtendableGrids
 using GridVisualizeTools
 
 
-function initialize!(p, ::Type{T}) where {T <: PyCommonType}
+function initialize!(p, ::Type{T}) where {T <: AbstractPythonPlotterType}
     PyPlotter = p.context[:Plotter]
-    if ispyplot(PyPlotter)
-        PyPlotter.PyObject(PyPlotter.axes3D) # see https://github.com/JuliaPy/PyPlot.jl/issues/351
-    end
     PyPlotter.rc("font"; size = p.context[:fontsize])
     if !haskey(p.context, :figure)
         res = p.context[:size]
@@ -33,19 +30,17 @@ function initialize!(p, ::Type{T}) where {T <: PyCommonType}
     return nothing
 end
 
-function save(fname, p, ::Type{T}) where {T <: PyCommonType}
+function save(fname, p, ::Type{T}) where {T <: AbstractPythonPlotterType}
     return p.context[:figure].savefig(fname)
 end
 
-function save(fname, scene, PyPlotter, ::Type{T}) where {T <: PyCommonType}
+function save(fname, scene, PyPlotter, ::Type{T}) where {T <: AbstractPythonPlotterType}
     return isnothing(scene) ? nothing : scene.savefig(fname)
 end
 
-function reveal(p::GridVisualizer, ::Type{T}) where {T <: PyCommonType}
+function reveal(p::GridVisualizer, ::Type{T}) where {T <: AbstractPythonPlotterType}
     p.context[:revealed] = true
-    if ispyplot(p.Plotter)
-        p.Plotter.tight_layout()
-    end
+    p.Plotter.tight_layout()
     if !(isdefined(Main, :PlutoRunner)) && isinteractive()
         p.Plotter.pause(1.0e-10)
         p.Plotter.draw()
@@ -54,14 +49,12 @@ function reveal(p::GridVisualizer, ::Type{T}) where {T <: PyCommonType}
     return p.context[:figure]
 end
 
-function reveal(ctx::SubVisualizer, TP::Type{T}) where {T <: PyCommonType}
+function reveal(ctx::SubVisualizer, TP::Type{T}) where {T <: AbstractPythonPlotterType}
     yield()
     if ctx[:show] || ctx[:reveal]
         reveal(ctx[:GridVisualizer], TP)
     end
-    return if ispyplot(ctx[:GridVisualizer].Plotter)
-        ctx[:GridVisualizer].Plotter.tight_layout()
-    end
+    return ctx[:GridVisualizer].Plotter.tight_layout()
 end
 
 #translate Julia attribute symbols to pyplot-speak
@@ -132,7 +125,7 @@ end
 plaincolormap(ctx) = colorschemes[ctx[:colormap]].colors
 
 ### 1D grid
-function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: PyCommonType}
+function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
 
     if !haskey(ctx, :ax)
@@ -160,7 +153,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: PyCommonT
     h = (xmax - xmin) / 20.0
     #    ax.set_aspect(ctx[:aspect])
     ax.grid(true)
-    ax.get_yaxis().set_ticks([])
+    ax.get_yaxis().set_ticks(Float64[])
     ax.set_ylim(-5 * h, xmax - xmin)
     cmap = region_cmap(max(ncellregions, 5))
     gridscale = ctx[:gridscale]
@@ -206,7 +199,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: PyCommonT
 end
 
 ### 2D grid
-function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: PyCommonType}
+function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -299,14 +292,8 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: PyCommonT
         c1 = [coord[:, bfacenodes[1, i]] for i in 1:num_sources(bfacenodes)] * gridscale
         c2 = [coord[:, bfacenodes[2, i]] for i in 1:num_sources(bfacenodes)] * gridscale
         rgb = [rgbtuple(cmap[bfaceregions[i]]) for i in 1:length(bfaceregions)]
-        if ispyplot(PyPlotter)
-            ax.add_collection(
-                PyPlotter.matplotlib.collections.LineCollection(
-                    collect(zip(c1, c2));
-                    colors = rgb,
-                    linewidth = 3,
-                )
-            )
+        for i in 1:length(rgb)
+            ax.plot([c1[i][1], c2[i][1]], [c1[i][2], c2[i][2]], color = rgb[i], linewidth = 3)
         end
         for i in 1:nbfaceregions
             ax.plot(coord[1, 1:1] * gridscale, coord[2, 1:1] * gridscale; label = "$(i)", color = rgbtuple(cmap[i]))
@@ -319,7 +306,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: PyCommonT
 end
 
 ### 3D Grid
-function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: PyCommonType}
+function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: AbstractPythonPlotterType}
     # See https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
 
     PyPlotter = ctx[:Plotter]
@@ -371,19 +358,17 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: PyCommonT
                 i in 1:nregions
         ]
 
-        if ispyplot(PyPlotter)
-            for ireg in 1:nregions
-                if size(regfacets[ireg], 2) > 0
-                    ax.plot_trisurf(
-                        regpoints[ireg][1, :],
-                        regpoints[ireg][2, :],
-                        transpose(regfacets[ireg] .- 1),
-                        regpoints[ireg][3, :];
-                        color = rgbtuple(cmap[ireg]),
-                        edgecolors = :black,
-                        linewidth = 0.5,
-                    )
-                end
+        for ireg in 1:nregions
+            if size(regfacets[ireg], 2) > 0
+                ax.plot_trisurf(
+                    regpoints[ireg][1, :],
+                    regpoints[ireg][2, :],
+                    transpose(regfacets[ireg] .- 1),
+                    regpoints[ireg][3, :];
+                    color = rgbtuple(cmap[ireg]),
+                    edgecolors = (0, 0, 0),
+                    linewidth = 0.5,
+                )
             end
         end
     end
@@ -400,19 +385,17 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: PyCommonT
         reshape(reinterpret(Float32, bregpoints0[i]), (3, length(bregpoints0[i]))) for
             i in 1:nbregions
     ]
-    if ispyplot(PyPlotter)
-        for ireg in 1:nbregions
-            if size(bregfacets[ireg], 2) > 0
-                ax.plot_trisurf(
-                    bregpoints[ireg][1, :],
-                    bregpoints[ireg][2, :],
-                    transpose(bregfacets[ireg] .- 1),
-                    bregpoints[ireg][3, :];
-                    color = rgbtuple(bcmap[ireg]),
-                    edgecolors = :black,
-                    linewidth = 0.5,
-                )
-            end
+    for ireg in 1:nbregions
+        if size(bregfacets[ireg], 2) > 0
+            ax.plot_trisurf(
+                bregpoints[ireg][1, :],
+                bregpoints[ireg][2, :],
+                transpose(bregfacets[ireg] .- 1),
+                bregpoints[ireg][3, :];
+                color = rgbtuple(bcmap[ireg]),
+                edgecolors = (0, 0, 0),
+                linewidth = 0.5,
+            )
         end
     end
 
@@ -423,7 +406,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: PyCommonT
 end
 
 ### 1D Function
-function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs) where {T <: PyCommonType}
+function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     nfuncs = length(funcs)
 
@@ -558,7 +541,7 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs)
 end
 
 ### 2D Function
-function scalarplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grids, parentgrid, funcs) where {T <: PyCommonType}
+function scalarplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grids, parentgrid, funcs) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -643,7 +626,7 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grids, parentgrid, funcs)
     return reveal(ctx, TP)
 end
 
-function scalarplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grids, parentgrid, funcs) where {T <: PyCommonType}
+function scalarplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grids, parentgrid, funcs) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot]; projection = "3d")
@@ -731,7 +714,7 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grids, parentgrid, funcs)
 end
 
 ### 2D Vector
-function vectorplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: PyCommonType}
+function vectorplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -775,7 +758,7 @@ function vectorplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: P
 end
 
 ### 2D stream
-function streamplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: PyCommonType}
+function streamplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -802,37 +785,19 @@ function streamplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: P
         ax.set_ylim(ylimits...)
     end
 
-    # thx https://discourse.julialang.org/t/meshgrid-function-in-julia/48679/4?u=j-fu
-    function meshgrid(rc)
-        nx = length(rc[1])
-        ny = length(rc[2])
-        xout = zeros(ny, nx)
-        yout = zeros(ny, nx)
-        for jx in 1:nx
-            for ix in 1:ny
-                xout[ix, jx] = rc[1][jx]
-                yout[ix, jx] = rc[2][ix]
-            end
-        end
-        return xout, yout
-    end
-
     rc, rv = vectorsample(
         grid, func; rasterpoints = 2 * ctx[:rasterpoints], offset = ctx[:offset], xlimits = ctx[:xlimits],
         ylimits = ctx[:ylimits], gridscale = ctx[:gridscale]
     )
 
-    X, Y = meshgrid(rc)
-    if ispyplot(PyPlotter)
-        ax.streamplot(X, Y, rv[1, :, :, 1]', rv[2, :, :, 1]'; color = rgbtuple(ctx[:color]), density = 1)
-    end
+    ax.streamplot(rc[1], rc[2], rv[1, :, :, 1]', rv[2, :, :, 1]'; color = rgbtuple(ctx[:color]), density = 1)
     ax.set_xlabel(ctx[:xlabel])
     ax.set_ylabel(ctx[:ylabel])
 
     return reveal(ctx, TP)
 end
 
-function customplot!(ctx, TP::Type{T}, func) where {T <: PyCommonType}
+function customplot!(ctx, TP::Type{T}, func) where {T <: AbstractPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -855,7 +820,7 @@ function plot_triangulateio!(
         voronoi = nothing,
         circumcircles = false,
         kwargs...
-    ) where {T <: PyCommonType}
+    ) where {T <: AbstractPythonPlotterType}
 
     function frgb(Plotter, i, max; pastel = false)
         x = Float64(i - 1) / Float64(max)
@@ -937,8 +902,8 @@ function plot_triangulateio!(
         end
 
         if size(triangulateio.segmentlist, 2) > 0
-            lines = Any[]
-            rgb = Any[]
+            lines = []
+            rgb = []
             markermax = maximum(triangulateio.segmentmarkerlist)
             # see https://gist.github.com/gizmaa/7214002
             for i in 1:size(triangulateio.segmentlist, 2)
@@ -946,18 +911,11 @@ function plot_triangulateio!(
                 y1 = triangulateio.pointlist[2, triangulateio.segmentlist[1, i]]
                 x2 = triangulateio.pointlist[1, triangulateio.segmentlist[2, i]]
                 y2 = triangulateio.pointlist[2, triangulateio.segmentlist[2, i]]
-                push!(lines, collect(zip([x1, x2], [y1, y2])))
+                push!(lines, [[x1, y1], [x2, y2]])
                 push!(rgb, frgb(PyPlotter, triangulateio.segmentmarkerlist[i], markermax))
+                ax.plot([x1, x2], [y1, y2], color = frgb(PyPlotter, triangulateio.segmentmarkerlist[i], markermax))
             end
-            ax.add_collection(
-                PyPlotter.matplotlib.collections.LineCollection(
-                    lines;
-                    colors = rgb,
-                    linewidth = 3
-                )
-            )
         end
-
         if size(triangulateio.trianglelist, 2) == 0 && size(triangulateio.holelist, 2) > 0
             x = triangulateio.holelist[1, :]
             y = triangulateio.holelist[2, :]
