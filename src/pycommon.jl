@@ -1,4 +1,3 @@
-
 function initialize!(p, ::Type{T}) where {T <: AbstractPythonPlotterType}
     PyPlotter = p.context[:Plotter]
     PyPlotter.rc("font"; size = p.context[:fontsize])
