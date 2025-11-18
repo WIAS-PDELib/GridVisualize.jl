@@ -30,7 +30,7 @@ export customplot, customplot!
 export quiverdata, vectorsample
 export plot_triangulateio, plot_triangulateio!
 export save, reveal
-export isplots, isvtkview, ispyplot, ismakie, isplutovista
+export isplots, isvtkview, ispyplot, ispythonplot, ismakie, isplutovista
 export GridVisualizer, SubVisualizer
 export plottertype, available_kwargs
 export default_plotter!, default_plotter

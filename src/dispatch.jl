@@ -141,8 +141,6 @@ function plottertype(Plotter::Union{Module, Nothing})
         return PlotsType
     elseif ispyplot(Plotter)
         return PyPlotType
-    elseif ispyplot(Plotter)
-        return PyPlotType
     elseif ispythonplot(Plotter)
         return PythonPlotType
     elseif isvtkview(Plotter)
@@ -215,7 +213,7 @@ $(TYPEDSIGNATURES)
 
 Create a  grid visualizer
 
-Plotter: defaults to `default_plotter()` and can be `PyPlot`, `PythonPlot`, `Plots`, `VTKView`, `Makie` or `PlutoVista´.
+Plotter: defaults to `default_plotter()` and can be `PyPlot`, `PythonPlot`, `Plots`, `VTKView`, `Makie` or `PlutoVista`.
 This pattern allows  to pass the backend as a module to a plot function without heavy default package dependencies.
 
 

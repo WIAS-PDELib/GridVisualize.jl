@@ -902,8 +902,6 @@ function plot_triangulateio!(
         end
 
         if size(triangulateio.segmentlist, 2) > 0
-            lines = []
-            rgb = []
             markermax = maximum(triangulateio.segmentmarkerlist)
             # see https://gist.github.com/gizmaa/7214002
             for i in 1:size(triangulateio.segmentlist, 2)
@@ -911,8 +909,6 @@ function plot_triangulateio!(
                 y1 = triangulateio.pointlist[2, triangulateio.segmentlist[1, i]]
                 x2 = triangulateio.pointlist[1, triangulateio.segmentlist[2, i]]
                 y2 = triangulateio.pointlist[2, triangulateio.segmentlist[2, i]]
-                push!(lines, [[x1, y1], [x2, y2]])
-                push!(rgb, frgb(PyPlotter, triangulateio.segmentmarkerlist[i], markermax))
                 ax.plot([x1, x2], [y1, y2], color = frgb(PyPlotter, triangulateio.segmentmarkerlist[i], markermax))
             end
         end
