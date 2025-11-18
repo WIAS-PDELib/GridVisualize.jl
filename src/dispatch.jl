@@ -313,48 +313,16 @@ plottertype(p::GridVisualizer) = plottertype(p.Plotter)
 #
 function default_plot_kwargs()
     return OrderedDict{Symbol, Pair{Any, String}}(
-        :show => Pair(false, "Show plot immediately"),
-        :reveal => Pair(false, "Show plot immediately (same as :show)"),
-        :clear => Pair(true, "Clear plot before adding new content"),
-        :layout => Pair((1, 1), "Layout of plots in window"),
-        :size => Pair((500, 500), "Plot window resolution"),
-        :legend => Pair(
-            :none,
-            "Legend (position): one of [:none, :best, :lt, :ct, :rt, :lc, :rc, :lb, :cb, :rb]"
-        ),
-        :title => Pair("", "Plot title"),
-        :xlabel => Pair("x", "x axis label"),
-        :ylabel => Pair("y", "y axis label"),
-        :zlabel => Pair("z", "z axis label"),
-        :xlimits => Pair((1, -1), "x axis limits"),
-        :ylimits => Pair((1, -1), "y axis limits"),
-        :zlimits => Pair((1, -1), "z axis limits"),
-        :limits => Pair((1, -1), "function limits"),
-        :xscale => Pair(:identity, "x axis  scale: one of [:log, :identity]"),
-        :yscale => Pair(:identity, "y axis  scale: one of [:log, :identity]"),
+        :azim => Pair(-60, "3D azimuth angle  (in degrees)"),
         :aspect => Pair(1.0, "XY Aspect ratio modification"),
-        :fontsize => Pair(20, "Fontsize of titles. All others are relative to it"),
-        :linewidth => Pair(2, "linewidth for isolines or 1D plots"),
-        :linestyle => Pair(
-            :solid,
-            "1D Plot linestyle: one of [:solid, :dash, :dot, :dashdot, :dashdotdot]"
+        :backend => Pair(:default, "Backend for PlutoVista plot"),
+        :cellcoloring => Pair(
+            :cellregions,
+            "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"
         ),
-        :markevery => Pair(5, "1D plot marker stride"),
-        :markersize => Pair(5, "1D plot marker size"),
-        :markershape => Pair(
-            :none,
-            "1D plot marker shape: one of [:none, :circle, :star5, :diamond, :hexagon, :cross, :xcross, :utriangle, :dtriangle, :rtriangle, :ltriangle, :pentagon, :+, :x]"
-        ),
-        :color => Pair(RGB(0.0, 0.0, 0.0), "1D plot line color"),
         :cellwise => Pair(false, "1D plots cellwise; unmaintained and can be slow)"),
-        :label => Pair("", "1D plot label"),
-        :levels => Pair(7, "array of isolevels or number of isolevels for contour plots"),
-        :elevation => Pair(0.0, "2D plot height factor for elevation"),
-        :colorlevels => Pair(51, "2D/3D contour plot: number of color levels"),
-        :colormap => Pair(
-            :viridis,
-            "2D/3D contour plot color map (any from [ColorSchemes.jl](https://juliagraphics.github.io/ColorSchemes.jl/stable/basics/#Pre-defined-schemes))"
-        ),
+        :clear => Pair(true, "Clear plot before adding new content"),
+        :color => Pair(RGB(0.0, 0.0, 0.0), "1D plot line color"),
         :colorbar => Pair(
             :vertical,
             "2D/3D plot colorbar. One of [:none, :vertical, :horizontal]"
@@ -363,49 +331,81 @@ function default_plot_kwargs()
             :default,
             "number of ticks in colorbar (:default sets it equal to levels)"
         ),
-        :outlinealpha => Pair(0.05, "3D outline surface alpha value"),
-        :levelalpha => Pair(0.25, "3D isolevel alpha"),
-        :planealpha => Pair(0.25, "3D plane section alpha"),
-        :tetxplane_tol => Pair(0.0, "tolerance for tet-plane intersection in 3D"),
-        :rasterpoints => Pair(
-            16,
-            "Number of quiver points resp. half number of streamplot interpolation points in the maximum extent direction. "
+        :colorlevels => Pair(51, "2D/3D contour plot: number of color levels"),
+        :colormap => Pair(
+            :viridis,
+            "2D/3D contour plot color map (any from [ColorSchemes.jl](https://juliagraphics.github.io/ColorSchemes.jl/stable/basics/#Pre-defined-schemes))"
         ),
-        :offset => Pair(:default, "Offset of quiver grid"),
-        :vscale => Pair(1.0, "Vector field scale for quiver grid"),
-        :vconstant => Pair(false, "Set all arrow length constant in vector plot"),
-        :vnormalize => Pair(true, "Normalize vector field before scaling"),
-        :interior => Pair(true, "3D plot interior of grid"),
-        :xplanes => Pair([prevfloat(Inf)], "3D x plane positions or number thereof"),
-        :yplanes => Pair([prevfloat(Inf)], "3D y plane positions or number thereof"),
-        :zplanes => Pair([prevfloat(Inf)], "3D z plane positions or number thereof"),
-        :zoom => Pair(1.0, "Zoom level"),
-        :gridscale => Pair(1, "Grid scale factor. Will be applied also to planes, spacing"),
-        :cellcoloring => Pair(
-            :cellregions,
-            "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"
-        ),
-        :azim => Pair(-60, "3D azimuth angle  (in degrees)"),
+        :dim => Pair(1, "Data dimension for PlutoVista plot"),
         :elev => Pair(30, "3D elevation angle  (in degrees)"),
+        :elevation => Pair(0.0, "2D plot height factor for elevation"),
+        :fignumber => Pair(1, "Figure number (PyPlot)"),
+        :fontsize => Pair(20, "Fontsize of titles. All others are relative to it"),
+        :framepos => Pair(1, "Subplot position in frame (VTKView)"),
+        :gridscale => Pair(1, "Grid scale factor. Will be applied also to planes, spacing"),
+        :interior => Pair(true, "3D plot interior of grid"),
+        :label => Pair("", "1D plot label"),
+        :layout => Pair((1, 1), "Layout of plots in window"),
+        :levelalpha => Pair(0.25, "3D isolevel alpha"),
+        :levels => Pair(7, "array of isolevels or number of isolevels for contour plots"),
+        :legend => Pair(
+            :none,
+            "Legend (position): one of [:none, :best, :lt, :ct, :rt, :lc, :rc, :lb, :cb, :rb]"
+        ),
+        :limits => Pair((1, -1), "function limits"),
+        :linestyle => Pair(
+            :solid,
+            "1D Plot linestyle: one of [:solid, :dash, :dot, :dashdot, :dashdotdot]"
+        ),
+        :linewidth => Pair(2, "linewidth for isolines or 1D plots"),
+        :markershape => Pair(
+            :none,
+            "1D plot marker shape: one of [:none, :circle, :star5, :diamond, :hexagon, :cross, :xcross, :utriangle, :dtriangle, :rtriangle, :ltriangle, :pentagon, :+, :x]"
+        ),
+        :markersize => Pair(5, "1D plot marker size"),
+        :markevery => Pair(5, "1D plot marker stride"),
+        :offset => Pair(:default, "Offset of quiver grid"),
+        :outlinealpha => Pair(0.05, "3D outline surface alpha value"),
         :perspectiveness => Pair(
             0.25,
             "3D perspective A number between 0 and 1, where 0 is orthographic, and 1 full perspective"
+        ),
+        :planealpha => Pair(0.25, "3D plane section alpha"),
+        :reveal => Pair(false, "Show plot immediately (same as :show)"),
+        :regions => Pair(:all, "List of regions to plot"),
+        :rasterpoints => Pair(
+            16,
+            "Number of quiver points resp. half number of streamplot interpolation points in the maximum extent direction."
         ),
         :scene3d => Pair(
             :Axis3,
             "3D plot type of Makie scene. Alternative to `:Axis3` is `:LScene`"
         ),
-        :viewmode => Pair(:fit, "Axis3d viewmode for Makie plots. Possible values :fit or :free"),
-        :fignumber => Pair(1, "Figure number (PyPlot)"),
-        :framepos => Pair(1, "Subplot position in frame (VTKView)"),
-        :subplot => Pair((1, 1), "Private: Actual subplot"),
-        :backend => Pair(:default, "Backend for PlutoVista plot"),
-        :dim => Pair(1, "Data dimension for PlutoVista plot"),
-        :regions => Pair(:all, "List of regions to plot"),
-        :species => Pair(1, "Number of species to plot or number of species in regions"),
-        :spacing => Pair(nothing, "Removed from API"),
+        :show => Pair(false, "Show plot immediately"),
         :show_colorbar => Pair(true, "Show color bar next to plots"),
-        :slice => Pair(nothing, "Plot a dim-1 slice along a hyperplane expression :(αx ± βy [± γz] ± δ)) or a fixed axis pair, e.g., :x => 3")
+        :slice => Pair(nothing, "Plot a dim-1 slice along a hyperplane expression :(αx ± βy [± γz] ± δ)) or a fixed axis pair, e.g., :x => 3"),
+        :size => Pair((500, 500), "Plot window resolution"),
+        :spacing => Pair(nothing, "Removed from API"),
+        :species => Pair(1, "Number of species to plot or number of species in regions"),
+        :subplot => Pair((1, 1), "Private: Actual subplot"),
+        :title => Pair("", "Plot title"),
+        :tetxplane_tol => Pair(0.0, "tolerance for tet-plane intersection in 3D"),
+        :vconstant => Pair(false, "Set all arrow length constant in vector plot"),
+        :vnormalize => Pair(true, "Normalize vector field before scaling"),
+        :vscale => Pair(1.0, "Vector field scale for quiver grid"),
+        :viewmode => Pair(:fit, "Axis3d viewmode for Makie plots. Possible values :fit or :free"),
+        :xlimits => Pair((1, -1), "x axis limits"),
+        :xplanes => Pair([prevfloat(Inf)], "3D x plane positions or number thereof"),
+        :xlabel => Pair("x", "x axis label"),
+        :xscale => Pair(:identity, "x axis  scale: one of [:log, :identity]"),
+        :ylimits => Pair((1, -1), "y axis limits"),
+        :ylabel => Pair("y", "y axis label"),
+        :yplanes => Pair([prevfloat(Inf)], "3D y plane positions or number thereof"),
+        :yscale => Pair(:identity, "y axis  scale: one of [:log, :identity]"),
+        :zlimits => Pair((1, -1), "z axis limits"),
+        :zplanes => Pair([prevfloat(Inf)], "3D z plane positions or number thereof"),
+        :zlabel => Pair("z", "z axis label"),
+        :zoom => Pair(1.0, "Zoom level")
     )
 end
 
