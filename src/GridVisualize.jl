@@ -20,6 +20,7 @@ using ExtendableGrids
 
 include("dispatch.jl")
 include("common.jl")
+include("pycommon.jl")
 include("slice_plots.jl")
 
 export scalarplot, scalarplot!

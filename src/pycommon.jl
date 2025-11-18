@@ -1,12 +1,3 @@
-using Colors
-using ColorSchemes
-using DocStringExtensions
-import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!, plot_triangulateio!
-using GridVisualize: AbstractPythonPlotterType, GridVisualizer, SubVisualizer, ispyplot, ispythonplot
-using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, leglocs
-using ExtendableGrids
-using GridVisualizeTools
-
 
 function initialize!(p, ::Type{T}) where {T <: AbstractPythonPlotterType}
     PyPlotter = p.context[:Plotter]
