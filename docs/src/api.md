@@ -14,6 +14,7 @@ save
 default_plotter
 default_plotter!
 plottertype
+PythonPlotType
 PyPlotType
 MakieType
 PlotsType

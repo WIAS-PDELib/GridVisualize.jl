@@ -11,6 +11,7 @@ Pages = ["dispatch.jl","common.jl","slice_plots.jl"]
 
 ```@docs
 ispyplot
+ispythonplot
 isplutovista
 isplots
 ismakie
