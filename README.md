@@ -150,7 +150,7 @@ and all plotting functions will do nothing.
 ## Sample output
 
 
-### [PyPlot](https://github.com/JuliaPy/PyPlot.jl),  [PythonPlot](https://github.com/stevengj/PyPlot.jl):
+### [PyPlot](https://github.com/JuliaPy/PyPlot.jl),  [PythonPlot](https://github.com/JuliaPy/PythonPlot.jl):
 ![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_pyplot.png?raw=true)
 
 
