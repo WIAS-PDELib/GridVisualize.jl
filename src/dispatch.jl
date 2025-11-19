@@ -33,7 +33,14 @@ $(SIGNATURES)
 
 Heuristically check if Plotter is PyPlot
 """
-ispyplot(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :Gcf)
+ispyplot(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :Gcf)  && !isdefined(Plotter, :plotshow)
+
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is PythonPlot
+"""
+ispythonplot(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :Gcf) && isdefined(Plotter, :plotshow)
 
 """
 $(SIGNATURES)
@@ -70,12 +77,22 @@ Abstract type for dispatching on plotter
 """
 abstract type AbstractPlotterType end
 
+
+abstract type AbstractPythonPlotterType <: AbstractPlotterType end
+
 """
 $(TYPEDEF)
 
 Abstract type for dispatching on plotter
 """
-abstract type PyPlotType <: AbstractPlotterType end
+abstract type PyPlotType <: AbstractPythonPlotterType end
+
+"""
+$(TYPEDEF)
+
+Abstract type for dispatching on plotter
+"""
+abstract type PythonPlotType <: AbstractPythonPlotterType end
 
 """
 $(TYPEDEF)
@@ -124,6 +141,8 @@ function plottertype(Plotter::Union{Module, Nothing})
         return PlotsType
     elseif ispyplot(Plotter)
         return PyPlotType
+    elseif ispythonplot(Plotter)
+        return PythonPlotType
     elseif isvtkview(Plotter)
         return VTKViewType
     elseif ismeshcat(Plotter)
@@ -137,6 +156,7 @@ end
 plottername(::Type{MakieType}) = "Makie"
 plottername(::Type{PlotsType}) = "Plots"
 plottername(::Type{PyPlotType}) = "PyPlot"
+plottername(::Type{PythonPlotType}) = "PythonPlot"
 plottername(::Type{PlutoVistaType}) = "PlutoVista"
 plottername(::Type{VTKViewType}) = "VTKView"
 plottername(::Type{MeshCatType}) = "MeshCat"
@@ -193,7 +213,7 @@ $(TYPEDSIGNATURES)
 
 Create a  grid visualizer
 
-Plotter: defaults to `default_plotter()` and can be `PyPlot`, `Plots`, `VTKView`, `Makie` or `PlutoVista´.
+Plotter: defaults to `default_plotter()` and can be `PyPlot`, `PythonPlot`, `Plots`, `VTKView`, `Makie` or `PlutoVista`.
 This pattern allows  to pass the backend as a module to a plot function without heavy default package dependencies.
 
 

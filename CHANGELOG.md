@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.16.0] - 2025-11-18
+- Add PythonPlot to the backends
+
 ## [1.15.3] - 2025-06-24
 - Fixed bug with GLMakie based animated plots from the REPL
 - Added examples for animated plots from the REPL

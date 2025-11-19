@@ -15,16 +15,21 @@ GridVisualizeMeshCatExt = Base.get_extension(GridVisualize, :GridVisualizeMeshCa
 GridVisualizeVTKViewExt = Base.get_extension(GridVisualize, :GridVisualizeVTKViewExt)
 
 
-function mkdocs()
+function mkdocs(; with_examples = true)
     cleanexamples()
     example_dir = joinpath(@__DIR__, "..", "examples")
     notebook_dir = joinpath(@__DIR__, "..", "examples")
-    generated_examples = @docscripts(
-        example_dir, [
-            "Plotting Examples" => "plotting.jl",
-        ], Plotter = CairoMakie
-    )
-    notebook_examples = @docplutonotebooks(notebook_dir, ["plutovista.jl"], iframe = true, iframe_height = "2000px")
+    notebook_examples = []
+    generated_examples = []
+    if with_examples
+        generated_examples = @docscripts(
+            example_dir, [
+                "Plotting Examples" => "plotting.jl",
+            ], Plotter = CairoMakie
+        )
+        notebook_examples = @docplutonotebooks(notebook_dir, ["plutovista.jl"], iframe = true, iframe_height = "2000px")
+    end
+
     makedocs(;
         sitename = "GridVisualize.jl",
         modules = [
@@ -54,6 +59,10 @@ function mkdocs()
 
 end
 
-mkdocs()
+if isinteractive()
+    mkdocs(; with_examples = false)
+else
+    mkdocs(; with_examples = true)
+end
 
 deploydocs(; repo = "github.com/WIAS-PDELib/GridVisualize.jl.git", devbranch = "main")

@@ -11,6 +11,7 @@ Pages = ["dispatch.jl","common.jl","slice_plots.jl"]
 
 ```@docs
 ispyplot
+ispythonplot
 isplutovista
 isplots
 ismakie
@@ -40,10 +41,10 @@ GridVisualizeMakieExt.FlippableLayout.flayoutscene
 GridVisualizePlutoVistaExt
 ```
 
-## PyPlot
+## PyPlot/PythonPlot
 ```@docs
 GridVisualizePyPlotExt
-GridVisualizePyPlotExt.tridata
+GridVisualize.tridata
 ```
 ## Plots
 ```@docs
