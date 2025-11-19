@@ -41,10 +41,10 @@ GridVisualizeMakieExt.FlippableLayout.flayoutscene
 GridVisualizePlutoVistaExt
 ```
 
-## PyPlot
+## PyPlot/PythonPlot
 ```@docs
 GridVisualizePyPlotExt
-GridVisualizePyPlotExt.tridata
+GridVisualize.tridata
 ```
 ## Plots
 ```@docs
