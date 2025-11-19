@@ -7,8 +7,8 @@ function initialize!(p, ::Type{T}) where {T <: AbstractPythonPlotterType}
             p.context[:figure] = PyPlotter.figure(p.context[:fignumber]; dpi = 50, figsize = res ./ 50)
         else
             p.context[:figure] = PyPlotter.figure(p.context[:fignumber]; dpi = 100, figsize = res ./ 100)
+            p.context[:figure].set_size_inches(res[1] / 100, res[2] / 100, forward = true)
         end
-        #p.context[:figure].set_size_inches(res[1] / 100, res[2] / 100, forward = true)
         for ctx in p.subplots
             ctx[:figure] = p.context[:figure]
         end
@@ -36,7 +36,7 @@ function reveal(p::GridVisualizer, ::Type{T}) where {T <: AbstractPythonPlotterT
         p.Plotter.draw()
         sleep(1.0e-3)
     end
-    return p.context[:figure]
+    return p.Plotter.gcf()
 end
 
 function reveal(ctx::SubVisualizer, TP::Type{T}) where {T <: AbstractPythonPlotterType}
@@ -44,7 +44,8 @@ function reveal(ctx::SubVisualizer, TP::Type{T}) where {T <: AbstractPythonPlott
     if ctx[:show] || ctx[:reveal]
         reveal(ctx[:GridVisualizer], TP)
     end
-    return ctx[:GridVisualizer].Plotter.tight_layout()
+    ctx[:GridVisualizer].Plotter.tight_layout()
+    return ctx[:GridVisualizer].Plotter.gcf()
 end
 
 #translate Julia attribute symbols to pyplot-speak
