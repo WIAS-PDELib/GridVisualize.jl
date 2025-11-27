@@ -228,12 +228,13 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
         :none => :none,
         :best => :best,
         :lt => :topleft,
-        :ct => :topcenter,
+        :ct => :top,
         :rt => :topright,
-        :lc => :centerleft,
-        :rc => :centerright,
+        :lc => :left,
+        :cc => :inside,
+        :rc => :right,
         :lb => :bottomleft,
-        :cb => :bottomcenter,
+        :cb => :bottom,
         :rb => :bottomright
     )
 
