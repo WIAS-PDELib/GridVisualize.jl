@@ -348,7 +348,7 @@ function default_plot_kwargs()
         :levels => Pair(7, "array of isolevels or number of isolevels for contour plots"),
         :legend => Pair(
             :none,
-            "Legend (position): one of [:none, :best, :lt, :ct, :rt, :lc, :rc, :lb, :cb, :rb]"
+            "Legend (position): one of [:none, :best, :cc, :lt, :ct, :rt, :lc, :rc, :lb, :cb, :rb]"
         ),
         :limits => Pair((1, -1), "function limits"),
         :linestyle => Pair(
