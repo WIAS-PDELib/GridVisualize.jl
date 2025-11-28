@@ -714,6 +714,21 @@ end
 function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grids, parentgrid, funcs)
     XMakie = ctx[:Plotter]
     gridscale = ctx[:gridscale]
+    regions = ctx[:regions]
+
+    # set limits according to extrema of funcs on the specified grid regions
+    if ctx[:limits] == :fit && regions != :all
+        f_min, f_max = (Inf64, -Inf64)
+        for (func, grid) in zip(funcs, grids)
+            for icell in 1:num_cells(grid)
+                if grid[CellRegions][icell] in regions
+                    @views f_min = min(f_min, func[grid[CellNodes][:, icell]]...)
+                    @views f_max = max(f_max, func[grid[CellNodes][:, icell]]...)
+                end
+            end
+        end
+        ctx[:limits] = (f_min, f_max)
+    end
 
     # Create GeometryBasics.mesh from grid data.
     function make_mesh(grids, funcs, elevation)
@@ -722,6 +737,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grids, parentgrid
         npoints = [num_nodes(grid) for grid in grids]
         cellnodes = [grid[CellNodes] for grid in grids]
         ncells = [num_cells(grid) for grid in grids]
+        cellregions = [grid[CellRegions] for grid in grids]
         offsets = zeros(Int, ngrids)
         for i in 2:ngrids
             offsets[i] = offsets[i - 1] + npoints[i - 1]
@@ -749,16 +765,19 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grids, parentgrid
                 end
             end
         end
-        faces = Vector{TriangleFace{Int64}}(undef, sum(ncells))
-        k = 1
+        faces = Vector{TriangleFace{Int64}}(undef, 0)
         for j in 1:ngrids
             for i in 1:ncells[j]
-                faces[k] = TriangleFace(
-                    cellnodes[j][1, i] + offsets[j],
-                    cellnodes[j][2, i] + offsets[j],
-                    cellnodes[j][3, i] + offsets[j]
-                )
-                k = k + 1
+                if regions == :all || (cellregions[j][i] in regions)
+                    push!(
+                        faces,
+                        TriangleFace(
+                            cellnodes[j][1, i] + offsets[j],
+                            cellnodes[j][2, i] + offsets[j],
+                            cellnodes[j][3, i] + offsets[j]
+                        )
+                    )
+                end
             end
         end
         return Mesh(points, faces)
