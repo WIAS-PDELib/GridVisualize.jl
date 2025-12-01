@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.16.1] - 2025-12-01
+- `Plots.jl`: fixed missing plots in VSCode by using `display` instead of `Plots.gui`
+
 ## [1.16.0] - 2025-11-18
 - Add PythonPlot to the backends
 

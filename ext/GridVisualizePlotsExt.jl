@@ -46,7 +46,7 @@ function reveal(p::GridVisualizer, ::Type{PlotsType})
     if haskey(p.context, :videostream)
         return Plots.frame(p.context[:videostream], plt)
     else
-        Plots.gui(plt)
+        display(plt)
         return plt
     end
 end
