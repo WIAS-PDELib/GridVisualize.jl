@@ -36,7 +36,10 @@ function reveal(p::GridVisualizer, ::Type{T}) where {T <: AbstractPythonPlotterT
         p.Plotter.draw()
         sleep(1.0e-3)
     end
-    return p.Plotter.gcf()
+    current_figure = p.Plotter.gcf()
+    display(current_figure)
+
+    return current_figure
 end
 
 function reveal(ctx::SubVisualizer, TP::Type{T}) where {T <: AbstractPythonPlotterType}
