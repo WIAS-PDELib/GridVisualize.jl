@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.16.2] - 2025-12-04
+- `leglocs[:cc]`: correct "center center" to "center"
+
 ## [1.16.1] - 2025-12-01
 - `Plots.jl` and `PyPlot.jl`: fixed missing plots in VSCode by using `display` in `reveal`
 
