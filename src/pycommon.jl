@@ -127,6 +127,8 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: AbstractP
     end
     if ctx[:clear]
         ctx[:ax].cla()
+        ctx[:ax].set_title(ctx[:title])
+        ctx[:ax].set_xlabel(ctx[:xlabel])
     end
     ax = ctx[:ax]
     fig = ctx[:figure]
