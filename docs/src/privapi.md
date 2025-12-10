@@ -16,6 +16,8 @@ isplutovista
 isplots
 ismakie
 isvtkview
+ismeshcat
+isunicodeplots
 ```
 
 ## Makie

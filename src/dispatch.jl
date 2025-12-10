@@ -22,161 +22,168 @@ function default_plotter!(Plotter)
 end
 
 """
-$(SIGNATURES)
-
-Heuristically check if Plotter is VTKView
-"""
-isvtkview(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :StaticFrame)
-
-"""
-$(SIGNATURES)
-
-Heuristically check if Plotter is PyPlot
-"""
-ispyplot(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :Gcf)  && !isdefined(Plotter, :plotshow)
-
-"""
-$(SIGNATURES)
-
-Heuristically check if Plotter is PythonPlot
-"""
-ispythonplot(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :Gcf) && isdefined(Plotter, :plotshow)
-
-"""
-$(SIGNATURES)
-
-Heuristically check if  Plotter is Plots
-"""
-isplots(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :gr)
-
-"""
-$(SIGNATURES)
-
-Heuristically check if Plotter is Makie/WGLMakie
-"""
-ismakie(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :Makie)
-
-"""
-$(SIGNATURES)
-
-Heuristically check if Plotter is MeshCat
-"""
-ismeshcat(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :Visualizer)
-
-"""
-$(SIGNATURES)
-
-Heuristically check if Plotter is PlutoVista
-"""
-isplutovista(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :PlutoVistaPlot)
-
-"""
-$(SIGNATURES)
-
-Heuristically check if Plotter is UnicodePlots
-"""
-isunicodeplots(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :BrailleCanvas)
-
-"""
 $(TYPEDEF)
 
 Abstract type for dispatching on plotter
 """
 abstract type AbstractPlotterType end
 
+"""
+$(TYPEDEF)
 
-abstract type AbstractPythonPlotterType <: AbstractPlotterType end
+Singleton type for dispatching on plotter
+"""
+struct PlotterType{T} <: AbstractPlotterType end
+
+"""
+    const PyPlotType = PlotterType{:PyPlot}
+
+Shorthand for PyPlot PlotterType Singleton.
+"""
+const PyPlotType = PlotterType{:PyPlot}
+
+"""
+    const PythonPlotType = PlotterType{:PythonPlot}
+
+Shorthand for PythonPlot PlotterType Singleton.
+"""
+const PythonPlotType = PlotterType{:PythonPlot}
+
+"""
+    const PlotsType = PlotterType{:Plots}
+
+Shorthand for Plots PlotterType Singleton.
+"""
+const PlotsType = PlotterType{:Plots}
+
+"""
+    const PlutoVistaType = PlotterType{:PlutoVista}
+
+Shorthand for PlutoVista PlotterType Singleton.
+"""
+const PlutoVistaType = PlotterType{:PlutoVista}
+
+"""
+    const VTKViewType = PlotterType{:VTKView}
+
+Shorthand for VTKView PlotterType Singleton. Experimental
+"""
+const VTKViewType = PlotterType{:VTKView}
+
+"""
+    const MeshCatType = PlotterType{:MeshCat}
+
+Shorthand for MeshCat PlotterType Singleton. Experimental
+"""
+const MeshCatType = PlotterType{:MeshCat}
+
+"""
+    const UnionPythonPlotterType = Union{PyPlotType,PythonPlotType}
+
+Parent type for dispatch on Python plotters.
+"""
+const UnionPythonPlotterType = Union{PyPlotType, PythonPlotType}
+
+"""
+    const UnionMakieType = Union{PlotterType{:CairoMakie},PlotterType{:WGLMakie},PlotterType{:RPRMakie}}
+
+Parent type for dispatch on Makie plotters.
+"""
+const UnionMakieType = Union{PlotterType{:CairoMakie}, PlotterType{:WGLMakie}, PlotterType{:RPRMakie}}
 
 """
 $(TYPEDEF)
 
-Abstract type for dispatching on plotter
+Shorthand for dispatch on UnicodePlots
 """
-abstract type PyPlotType <: AbstractPythonPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter
-"""
-abstract type PythonPlotType <: AbstractPythonPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter
-"""
-abstract type MakieType <: AbstractPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter
-"""
-abstract type PlotsType <: AbstractPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter. Experimental.
-"""
-abstract type VTKViewType <: AbstractPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter. Experimental.
-"""
-abstract type MeshCatType <: AbstractPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter
-"""
-abstract type PlutoVistaType <: AbstractPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter
-"""
-abstract type UnicodePlotsType <: AbstractPlotterType end
+const UnicodePlotsType = PlotterType{:UnicodePlots}
 
 """
 $(SIGNATURES)
-    
-Heuristically detect type of plotter, returns the corresponding abstract type for plotting.
+
+Obtain Singleton type of given Plotter.
 """
-function plottertype(Plotter::Union{Module, Nothing})
-    if ismakie(Plotter)
-        return MakieType
-    elseif isplots(Plotter)
-        return PlotsType
-    elseif ispyplot(Plotter)
-        return PyPlotType
-    elseif ispythonplot(Plotter)
-        return PythonPlotType
-    elseif isvtkview(Plotter)
-        return VTKViewType
-    elseif ismeshcat(Plotter)
-        return MeshCatType
-    elseif isplutovista(Plotter)
-        return PlutoVistaType
-    elseif isunicodeplots(Plotter)
-        return UnicodePlotsType
-    end
-    return Nothing
+plottertype(Plotter::Module) = PlotterType{nameof(Plotter)}
+plottertype(::Nothing) = Type{Nothing}
+
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is VTKView
+"""
+function isvtkview(Plotter)
+    return plottertype(Plotter) <: VTKViewType
 end
 
-plottername(::Type{MakieType}) = "Makie"
-plottername(::Type{PlotsType}) = "Plots"
-plottername(::Type{PyPlotType}) = "PyPlot"
-plottername(::Type{PythonPlotType}) = "PythonPlot"
-plottername(::Type{PlutoVistaType}) = "PlutoVista"
-plottername(::Type{UnicodePlotsType}) = "UnicodePlots"
-plottername(::Type{VTKViewType}) = "VTKView"
-plottername(::Type{MeshCatType}) = "MeshCat"
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is PyPlot
+"""
+function ispyplot(Plotter)
+    return plottertype(Plotter) <: PyPlotType
+end
+
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is PythonPlot
+"""
+function ispythonplot(Plotter)
+    return plottertype(Plotter) <: PythonPlotType
+end
+
+"""
+$(SIGNATURES)
+
+Heuristically check if  Plotter is Plots
+"""
+function isplots(Plotter)
+    return plottertype(Plotter) <: PlotsType
+end
+
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is Makie/WGLMakie
+"""
+function ismakie(Plotter)
+    return plottertype(Plotter) <: UnionMakieType
+end
+
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is MeshCat
+"""
+function ismeshcat(Plotter)
+    return plottertype(Plotter) <: MeshCatType
+end
+
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is PlutoVista
+"""
+function isplutovista(Plotter)
+    return plottertype(Plotter) <: PlutoVistaType
+end
+
+"""
+$(SIGNATURES)
+
+Heuristically check if Plotter is UnicodePlots
+"""
+function isunicodeplots(Plotter)
+    return plottertype(Plotter) <: UnicodePlotsType
+end
+
+"""
+$(SIGNATURES)
+
+Obtain name of PlotterType
+"""
+plottername(::PlotterType{T}) where {T} = String(T)
 plottername(::Type{Nothing}) = "nothing"
 plottername(p::Union{Module, Nothing}) = plottertype(p) |> plottername
 
@@ -293,7 +300,7 @@ function initialize!(p, ::Type{T}) where {T <: AbstractPlotterType}
 end
 
 function Base.show(io::IO, mime::MIME"text/html", p::GridVisualizer)
-    if isplutovista(p.Plotter)
+    if plottertype(p.Plotter) <: PlutoVistaType
         show(io, mime, p.subplots[1][:figure])
     else
         output = """<code>GridVisualizer(Plotter=$(p.Plotter))</code>"""
