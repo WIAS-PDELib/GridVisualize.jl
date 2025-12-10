@@ -35,7 +35,7 @@ export isplots, isvtkview, ispyplot, ispythonplot, ismakie, isplutovista
 export GridVisualizer, SubVisualizer
 export plottertype, available_kwargs
 export default_plotter!, default_plotter
-export PyPlotType, PythonPlotType, MakieType, PlotsType, VTKViewType, PlutoVistaType, MeshCatType
+export PlotterType, PyPlotType, PythonPlotType, AbstractPythonPlotterType, AbstractMakieType, PlotsType, VTKViewType, PlutoVistaType, MeshCatType
 export movie
 
 end

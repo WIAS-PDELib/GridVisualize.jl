@@ -14,9 +14,11 @@ save
 default_plotter
 default_plotter!
 plottertype
+PlotterType
 PythonPlotType
 PyPlotType
-MakieType
+AbstractPythonPlotterType
+AbstractMakieType
 PlotsType
 PlutoVistaType
 VTKViewType

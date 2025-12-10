@@ -15,7 +15,7 @@ using Interpolations: linear_interpolation
 using IntervalSets
 
 import GridVisualize: initialize!, save, reveal, gridplot!, scalarplot!, vectorplot!, streamplot!, customplot!, movie, plot_triangulateio!
-using GridVisualize: MakieType, GridVisualizer, SubVisualizer
+using GridVisualize: AbstractMakieType, GridVisualizer, SubVisualizer
 using GridVisualize: isolevels, cellcolors, num_cellcolors, vectorsample, quiverdata, regionmesh, bfacesegments
 
 using ExtendableGrids
@@ -24,7 +24,7 @@ using Observables
 
 include("flippablelayout.jl")
 
-function initialize!(p::GridVisualizer, ::Type{MakieType})
+function initialize!(p::GridVisualizer, ::Type{MakieType}) where {MakieType <: AbstractMakieType}
     XMakie = p.context[:Plotter]
 
     # Prepare flippable layout
@@ -57,7 +57,7 @@ end
 add_scene!(ctx, ax) = ctx[:flayout][ctx[:subplot]...] = ax
 
 # Revealing the  visualizer just returns the figure
-function reveal(p::GridVisualizer, ::Type{MakieType})
+function reveal(p::GridVisualizer, ::Type{MakieType}) where {MakieType <: AbstractMakieType}
     XMakie = p.context[:Plotter]
     layout = p.context[:layout]
     # For 1D plots the legend should be rendered only once,
@@ -84,7 +84,7 @@ function reveal(p::GridVisualizer, ::Type{MakieType})
     end
 end
 
-function reveal(ctx::SubVisualizer, TP::Type{MakieType})
+function reveal(ctx::SubVisualizer, TP::Type{MakieType}) where {MakieType <: AbstractMakieType}
     FlippableLayout.yieldwait(ctx[:flayout])
     if ctx[:show] || ctx[:reveal]
         return reveal(ctx[:GridVisualizer], TP)
@@ -92,10 +92,10 @@ function reveal(ctx::SubVisualizer, TP::Type{MakieType})
     return nothing
 end
 
-function save(fname, p::GridVisualizer, ::Type{MakieType})
+function save(fname, p::GridVisualizer, ::Type{MakieType}) where {MakieType <: AbstractMakieType}
     return p.context[:Plotter].save(fname, p.context[:figure])
 end
-function save(fname, scene, XMakie, ::Type{MakieType})
+function save(fname, scene, XMakie, ::Type{MakieType}) where {MakieType <: AbstractMakieType}
     return isnothing(scene) ? nothing : XMakie.save(fname, scene)
 end
 
@@ -107,7 +107,7 @@ function movie(
         file = nothing,
         format = "gif",
         kwargs...,
-    )
+    ) where {MakieType <: AbstractMakieType}
     Plotter = vis.context[:Plotter]
     if !isnothing(file)
         format = lstrip(splitext(file)[2], '.')
@@ -275,7 +275,7 @@ function scenecorners1d(grid, gridscale)
     return [Point2f(xmin * gridscale, -5 * h), Point2f(xmax * gridscale, 5 * h)]
 end
 
-function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grid)
+function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grid) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
     nregions = num_cellregions(grid)
     nbregions = num_bfaceregions(grid)
@@ -352,7 +352,7 @@ end
 ########################################################################
 # 1D function
 
-function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid, funcs)
+function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid, funcs) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
 
     nfuncs = length(funcs)
@@ -598,7 +598,7 @@ function set_plot_data!(ctx, key, data)
     return haskey(ctx, key) ? ctx[key][] = data : ctx[key] = Observable(data)
 end
 
-function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid)
+function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
 
     nregions = num_cellcolors(grid, ctx[:cellcoloring])
@@ -711,7 +711,7 @@ function makescene2d(ctx, key)
 end
 
 # 2D function
-function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grids, parentgrid, funcs)
+function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grids, parentgrid, funcs) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
     gridscale = ctx[:gridscale]
 
@@ -849,7 +849,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grids, parentgrid
 end
 
 # 2D vector
-function vectorplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid, func)
+function vectorplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid, func) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
 
     rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ctx[:rasterpoints], offset = ctx[:offset])
@@ -894,7 +894,7 @@ function vectorplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid, func)
     return reveal(ctx, TP)
 end
 
-function streamplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid, func)
+function streamplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid, func) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
 
     rc, rv = vectorsample(
@@ -1060,7 +1060,7 @@ pgup/pgdown: coarse control control value
           h: print this message
 """
 
-function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grid)
+function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grid) where {MakieType <: AbstractMakieType}
     function make_mesh(pts, fcs)
         if pkgversion(GeometryBasics) < v"0.5"
             return GeometryBasics.Mesh(meta(pts; normals = normals(pts, fcs)), fcs)
@@ -1253,7 +1253,7 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grid)
 end
 
 # 3d function
-function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid, funcs)
+function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid, funcs) where {MakieType <: AbstractMakieType}
     levels, crange, colorbarticks = isolevels(ctx, funcs)
     ctx[:crange] = crange
     ctx[:colorbarticks] = colorbarticks
@@ -1494,7 +1494,7 @@ end
 # Thanks!  lines(x, y, axis = (targetlimits = lims,))  indeed makes the limits update.^
 # I found that autolimits!(axis) gave good results, even better than me manually computing limits!
 
-function customplot!(ctx, TP::Type{MakieType}, func)
+function customplot!(ctx, TP::Type{MakieType}, func) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
     if !haskey(ctx, :scene)
         ctx[:scene] = XMakie.Axis(
@@ -1519,7 +1519,7 @@ function plot_triangulateio!(
         voronoi = nothing,
         circumcircles = false,
         kwargs...
-    )
+    ) where {MakieType <: AbstractMakieType}
     XMakie = ctx[:Plotter]
 
     function frgb(Plotter, i, max; pastel = false)

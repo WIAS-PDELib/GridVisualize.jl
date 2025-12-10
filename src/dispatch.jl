@@ -77,89 +77,79 @@ Abstract type for dispatching on plotter
 """
 abstract type AbstractPlotterType end
 
-
-abstract type AbstractPythonPlotterType <: AbstractPlotterType end
-
 """
 $(TYPEDEF)
 
-Abstract type for dispatching on plotter
+Singleton type for dispatching on plotter
 """
-abstract type PyPlotType <: AbstractPythonPlotterType end
+struct PlotterType{T} <: AbstractPlotterType end
 
 """
-$(TYPEDEF)
+    const PyPlotType = PlotterType{:PyPlot}
 
-Abstract type for dispatching on plotter
+Shorthand for PyPlot PlotterType Singleton.
 """
-abstract type PythonPlotType <: AbstractPythonPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter
-"""
-abstract type MakieType <: AbstractPlotterType end
+const PyPlotType = PlotterType{:PyPlot}
 
 """
-$(TYPEDEF)
+    const PythonPlotType = PlotterType{:PythonPlot}
 
-Abstract type for dispatching on plotter
+Shorthand for PythonPlot PlotterType Singleton.
 """
-abstract type PlotsType <: AbstractPlotterType end
-
-"""
-$(TYPEDEF)
-
-Abstract type for dispatching on plotter. Experimental.
-"""
-abstract type VTKViewType <: AbstractPlotterType end
+const PythonPlotType = PlotterType{:PythonPlot}
 
 """
-$(TYPEDEF)
+    const PlotsType = PlotterType{:Plots}
 
-Abstract type for dispatching on plotter. Experimental.
+Shorthand for Plots PlotterType Singleton.
 """
-abstract type MeshCatType <: AbstractPlotterType end
+const PlotsType = PlotterType{:Plots}
 
 """
-$(TYPEDEF)
+    const PlutoVistaType = PlotterType{:PlutoVista}
 
-Abstract type for dispatching on plotter
+Shorthand for PlutoVista PlotterType Singleton.
 """
-abstract type PlutoVistaType <: AbstractPlotterType end
+const PlutoVistaType = PlotterType{:PlutoVista}
+
+"""
+    const VTKViewType = PlotterType{:VTKView}
+
+Shorthand for VTKView PlotterType Singleton. Experimental
+"""
+const VTKViewType = PlotterType{:VTKView}
+
+"""
+    const MeshCatType = PlotterType{:MeshCat}
+
+Shorthand for MeshCat PlotterType Singleton. Experimental
+"""
+const MeshCatType = PlotterType{:MeshCat}
+
+"""
+    const AbstractPythonPlotterType = Union{PyPlotType,PythonPlotType}
+
+Parent type for dispatch on Python plotters.
+"""
+const AbstractPythonPlotterType = Union{PyPlotType, PythonPlotType}
+
+"""
+    const AbstractMakieType = Union{PlotterType{:CairoMakie},PlotterType{:WGLMakie},PlotterType{:RPRMakie}}
+
+Parent type for dispatch on Makie plotters.
+"""
+const AbstractMakieType = Union{PlotterType{:CairoMakie}, PlotterType{:WGLMakie}, PlotterType{:RPRMakie}}
 
 """
 $(SIGNATURES)
-    
-Heuristically detect type of plotter, returns the corresponding abstract type for plotting.
-"""
-function plottertype(Plotter::Union{Module, Nothing})
-    if ismakie(Plotter)
-        return MakieType
-    elseif isplots(Plotter)
-        return PlotsType
-    elseif ispyplot(Plotter)
-        return PyPlotType
-    elseif ispythonplot(Plotter)
-        return PythonPlotType
-    elseif isvtkview(Plotter)
-        return VTKViewType
-    elseif ismeshcat(Plotter)
-        return MeshCatType
-    elseif isplutovista(Plotter)
-        return PlutoVistaType
-    end
-    return Nothing
-end
 
-plottername(::Type{MakieType}) = "Makie"
-plottername(::Type{PlotsType}) = "Plots"
-plottername(::Type{PyPlotType}) = "PyPlot"
-plottername(::Type{PythonPlotType}) = "PythonPlot"
-plottername(::Type{PlutoVistaType}) = "PlutoVista"
-plottername(::Type{VTKViewType}) = "VTKView"
-plottername(::Type{MeshCatType}) = "MeshCat"
+Obtain Singleton type of given Plotter.
+"""
+plottertype(Plotter::Module) = PlotterType{nameof(Plotter)}
+plottertype(::Nothing) = Type{Nothing}
+
+
+plottername(::PlotterType{T}) where {T} = String(T)
 plottername(::Type{Nothing}) = "nothing"
 plottername(p::Union{Module, Nothing}) = plottertype(p) |> plottername
 
