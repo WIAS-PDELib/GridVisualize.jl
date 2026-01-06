@@ -621,6 +621,8 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid)
             ctx[:scene] = XMakie.Axis(
                 ctx[:figure];
                 title = ctx[:title],
+                xlabel = ctx[:xlabel],
+                ylabel = ctx[:ylabel],
                 aspect = aspect,
                 autolimitaspect = autolimitaspect,
                 scenekwargs(ctx)...,

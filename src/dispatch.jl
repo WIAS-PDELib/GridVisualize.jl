@@ -221,7 +221,7 @@ Depending on the `layout` keyword argument, a 2D grid of subplots is created.
 Further `...plot!` commands then plot into one of these subplots:
 
 ```julia
-vis=GridVisualizer(Plotter=PyPlot, layout=(2,2)
+vis=GridVisualizer(Plotter=PyPlot, layout=(2,2))
 ...plot!(vis[1,2], ...)
 ```
 

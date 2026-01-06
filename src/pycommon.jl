@@ -215,6 +215,9 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractP
         end
     end
     ax = ctx[:ax]
+    ax.set_title(ctx[:title])
+    ax.set_xlabel(ctx[:xlabel])
+    ax.set_ylabel(ctx[:ylabel])
     fig = ctx[:figure]
     cellregions = cellcolors(grid, ctx[:cellcoloring])
     ncellregions = num_cellcolors(grid, ctx[:cellcoloring])
