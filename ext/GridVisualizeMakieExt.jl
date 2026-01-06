@@ -275,6 +275,7 @@ function scenecorners1d(grid, gridscale)
     return [Point2f(xmin * gridscale, -5 * h), Point2f(xmax * gridscale, 5 * h)]
 end
 
+# 1D version
 function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grid)
     XMakie = ctx[:Plotter]
     nregions = num_cellregions(grid)
@@ -286,6 +287,7 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grid)
             yticklabelsvisible = false,
             yticksvisible = false,
             title = ctx[:title],
+            xlabel = ctx[:xlabel],
             scenekwargs(ctx)...,
         )
 

@@ -149,6 +149,9 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: AbstractP
     ax.grid(true)
     ax.get_yaxis().set_ticks(Float64[])
     ax.set_ylim(-5 * h, xmax - xmin)
+    ax.set_title(ctx[:title])
+    ax.set_xlabel(ctx[:xlabel])
+
     cmap = region_cmap(max(ncellregions, 5))
     gridscale = ctx[:gridscale]
 
