@@ -1,10 +1,8 @@
 # Changelog
 
 ## [1.16.3] - 2026-01-07
-- Add `xlabel` to 1D `gridplot!` with `GLMakie`
-- Add `title` and `xlabel` to 1D `gridplot!` with `Py[thon]Plot`
-- Add `xlabel` and `ylabel` to 2D `gridplot!` with `GLMakie`
-- Add `title`, `xlabel` and `ylabel` to 2D `gridplot!` with `Py[thon]Plot`
+- Add `title`, `xlabel`, and `ylabel` to 1D and 2D `gridplot!` with `GLMakie`
+- Add `title`, `xlabel`, and `ylabel` to 1D and 2D `gridplot!` with `Py[thon]Plot`
 
 ## [1.16.2] - 2025-12-04
 - `leglocs[:cc]`: correct "center center" to "center"
