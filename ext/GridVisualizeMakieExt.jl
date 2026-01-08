@@ -474,12 +474,28 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
     if !haskey(ctx, :scene)
         ctx[:xtitle] = Observable(ctx[:title])
 
+        if ctx[:xscale] == :log
+            xscale = log10
+        elseif ctx[:xscale] == :symlog
+            xscale = XMakie.Makie.pseudolog10
+        else
+            xscale = identity
+        end
+
+        if ctx[:yscale] == :log
+            yscale = log10
+        elseif ctx[:yscale] == :symlog
+            yscale = XMakie.Makie.pseudolog10
+        else
+            yscale = identity
+        end
+
         # Axis
         ctx[:scene] = XMakie.Axis(
             ctx[:figure];
             title = map(a -> a, ctx[:xtitle]),
-            xscale = ctx[:xscale] == :log ? log10 : identity,
-            yscale = ctx[:yscale] == :log ? log10 : identity,
+            xscale,
+            yscale,
             xlabel = ctx[:xlabel],
             ylabel = ctx[:ylabel],
             scenekwargs(ctx)...,
