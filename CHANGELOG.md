@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.17.0]
+- Add `:symlog` axis scaling for symmetric logarithmic axis scaling, see, e.g. [matplotlib symlog](https://matplotlib.org/stable/gallery/scales/symlog_demo.html)
+
 ## [1.16.3] - 2026-01-07
 - Add `title`, `xlabel`, and `ylabel` to 1D and 2D `gridplot!` with `GLMakie`
 - Add `title`, `xlabel`, and `ylabel` to 1D and 2D `gridplot!` with `Py[thon]Plot`
