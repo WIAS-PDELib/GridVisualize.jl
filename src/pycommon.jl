@@ -436,21 +436,14 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs)
     ax = ctx[:ax]
     fig = ctx[:figure]
 
+    # activate log scaling
+    ctx[:xscale] == :log && ax.set_xscale("log")
+    ctx[:xscale] == :symlog && ax.set_xscale("symlog", linthresh = ctx[:symlog_threshold])
+    ctx[:yscale] == :log && ax.set_yscale("log")
+    ctx[:yscale] == :symlog && ax.set_yscale("symlog", linthresh = ctx[:symlog_threshold])
+
     pplot = ax.plot
-    if ctx[:xscale] == :log
-        if ctx[:yscale] == :log
-            pplot = ax.loglog
-        else
-            pplot = ax.semilogx
-        end
-    end
-    if ctx[:yscale] == :log
-        if ctx[:xscale] == :log
-            pplot = ax.loglog
-        else
-            pplot = ax.semilogy
-        end
-    end
+
     gridscale = ctx[:gridscale]
     if ctx[:cellwise] # not checked,  outdated
         for icell in 1:num_cells(grid)

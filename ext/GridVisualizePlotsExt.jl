@@ -260,6 +260,13 @@ function scalarplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grids, parentgrid
         ymax = ylimits[2]
     end
 
+    for key in (:xscale, :yscale)
+        if ctx[key] == :symlog
+            @warn "Plots.jl does not support symlog axis scaling for $key."
+            ctx[key] = :identity
+        end
+    end
+
     ctx[:xscale] == :log ? ctx[:xscale] = :log10 : nothing
     ctx[:yscale] == :log ? ctx[:yscale] = :log10 : nothing
 

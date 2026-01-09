@@ -221,6 +221,13 @@ function scalarplot!(
     PlutoVista = ctx[:Plotter]
     PlutoVista.backend!(ctx[:figure]; backend = ctx[:backend], datadim = 1)
 
+    for key in (:xscale, :yscale)
+        if ctx[key] == :symlog
+            @warn "Plutovista.jl does not support symlog axis scaling for $key."
+            ctx[key] = :identity
+        end
+    end
+
     for ifunc in 1:nfuncs
         func = funcs[ifunc]
         grid = grids[ifunc]
