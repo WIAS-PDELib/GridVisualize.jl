@@ -386,6 +386,7 @@ function default_plot_kwargs()
         :spacing => Pair(nothing, "Removed from API"),
         :species => Pair(1, "Number of species to plot or number of species in regions"),
         :subplot => Pair((1, 1), "Private: Actual subplot"),
+        :symlog_threshold => Pair(10.0, ":symlog threshold for switching from linear to log scaling. Only relevant for :symlog axis scaling."),
         :title => Pair("", "Plot title"),
         :tetxplane_tol => Pair(0.0, "tolerance for tet-plane intersection in 3D"),
         :vconstant => Pair(false, "Set all arrow length constant in vector plot"),

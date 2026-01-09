@@ -477,7 +477,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
         if ctx[:xscale] == :log
             xscale = log10
         elseif ctx[:xscale] == :symlog
-            xscale = XMakie.Makie.pseudolog10
+            xscale = XMakie.Makie.Makie.Symlog10(ctx[:symlog_threshold])
         else
             xscale = identity
         end
@@ -485,7 +485,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{1}}, grids, parentgrid
         if ctx[:yscale] == :log
             yscale = log10
         elseif ctx[:yscale] == :symlog
-            yscale = XMakie.Makie.pseudolog10
+            yscale = XMakie.Makie.Makie.Symlog10(ctx[:symlog_threshold])
         else
             yscale = identity
         end

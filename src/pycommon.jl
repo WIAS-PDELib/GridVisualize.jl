@@ -438,9 +438,9 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs)
 
     # activate log scaling
     ctx[:xscale] == :log && ax.set_xscale("log")
-    ctx[:xscale] == :symlog && ax.set_xscale("symlog")
+    ctx[:xscale] == :symlog && ax.set_xscale("symlog", linthresh = ctx[:symlog_threshold])
     ctx[:yscale] == :log && ax.set_yscale("log")
-    ctx[:yscale] == :symlog && ax.set_yscale("symlog")
+    ctx[:yscale] == :symlog && ax.set_yscale("symlog", linthresh = ctx[:symlog_threshold])
 
     pplot = ax.plot
 
