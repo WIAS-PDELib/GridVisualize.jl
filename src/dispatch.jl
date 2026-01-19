@@ -318,6 +318,14 @@ function default_plot_kwargs()
             :cellregions,
             "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"
         ),
+        :cellregioncolormap => Pair(
+            region_cmap,
+            "Function returning the colormap for cell regions in `gridplot`: takes `nregions` and returns a suitable colormap"
+        ),
+        :bregioncolormap => Pair(
+            bregion_cmap,
+            "Function returning the colormap for boundary regions in `gridplot`: takes `nbregions` and returns a suitable colormap"
+        ),
         :cellwise => Pair(false, "1D plots cellwise; unmaintained and can be slow)"),
         :clear => Pair(true, "Clear plot before adding new content"),
         :color => Pair(RGB(0.0, 0.0, 0.0), "1D plot line color"),

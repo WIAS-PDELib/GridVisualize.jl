@@ -152,7 +152,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: AbstractP
     ax.set_title(ctx[:title])
     ax.set_xlabel(ctx[:xlabel])
 
-    cmap = region_cmap(max(ncellregions, 5))
+    cmap = ctx[:cellregioncolormap](max(ncellregions, 5))
     gridscale = ctx[:gridscale]
 
     for icell in 1:num_cells(grid)
@@ -173,7 +173,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: AbstractP
         ax.plot([x2, x2], [-h, h]; linewidth = ctx[:linewidth], color = "k", label = "")
     end
 
-    cmap = bregion_cmap(max(nbfaceregions, 5))
+    cmap = ctx[:bregioncolormap](max(nbfaceregions, 5))
     for ibface in 1:num_bfaces(grid)
         ireg = bfaceregions[ibface]
         if ireg > 0
@@ -233,8 +233,8 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractP
     ax.set_aspect(ctx[:aspect])
     tridat = tridata(grid, ctx[:gridscale])
     # PyPlotter.ColorMap cannot handle n ≤ 1, TODO: use single color instead of a color map
-    cmap = region_cmap(max(2, ncellregions))
-    bcmap = bregion_cmap(max(2, nbfaceregions))
+    cmap = ctx[:cellregioncolormap](max(2, ncellregions))
+    bcmap = ctx[:bregioncolormap](max(2, nbfaceregions))
 
     cell_colors = cellcolors(grid, ctx[:cellcoloring])
 
@@ -287,7 +287,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractP
     if nbfaceregions > 0
         gridscale = ctx[:gridscale]
         coord = grid[Coordinates]
-        cmap = bregion_cmap(max(nbfaceregions, 5))
+        cmap = ctx[:bregioncolormap](max(nbfaceregions, 5))
         # see https://gist.github.com/gizmaa/7214002
         c1 = [coord[:, bfacenodes[1, i]] for i in 1:num_sources(bfacenodes)] * gridscale
         c2 = [coord[:, bfacenodes[2, i]] for i in 1:num_sources(bfacenodes)] * gridscale
@@ -338,8 +338,8 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: AbstractP
     ax.set_zlim3d(xyzmin[3], xyzmax[3])
     ax.view_init(ctx[:elev], ctx[:azim])
 
-    cmap = region_cmap(max(nregions, 5))
-    bcmap = bregion_cmap(max(nbregions, 5))
+    cmap = ctx[:cellregioncolormap](max(nregions, 5))
+    bcmap = ctx[:bregioncolormap](max(nbregions, 5))
 
     xyzcut = [ctx[:xplanes][1], ctx[:yplanes][1], ctx[:zplanes][1]]
 
