@@ -258,6 +258,15 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractP
         vmax = length(bcmap) + 0.5,
     )
 
+    # dummy plot to get a correct color bar for the cell data
+    cdata = ax.tripcolor(
+        dummy_coords_x, dummy_coords_y, dummy_triangle; # use the dummy triangle
+        facecolors = cell_colors[1:1],                  # only one triangle!
+        cmap = PyPlotter.ColorMap(cmap, length(cmap)),
+        vmin = 0.5,
+        vmax = length(cmap) + 0.5,
+    )
+
     ax.tripcolor(
         tridat...;
         facecolors = cell_colors,
@@ -266,22 +275,41 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractP
 
     if ctx[:show_colorbar]
         if ctx[:colorbar] == :horizontal
-            cbar = fig.colorbar(
+
+            fig.colorbar(
                 bcdata;
                 ax = ax,
                 ticks = collect(1:length(bcmap)),
                 orientation = "horizontal",
-                label = "boundary regions",
+                label = "boundary regions"
             )
+
+            fig.colorbar(
+                cdata;
+                ax = ax,
+                ticks = collect(1:length(cmap)),
+                orientation = "horizontal",
+                label = "cell regions"
+            )
+
         end
 
         if ctx[:colorbar] == :vertical
-            cbar = fig.colorbar(
+
+            fig.colorbar(
                 bcdata;
                 ax = ax,
                 ticks = collect(1:length(bcmap)),
                 orientation = "vertical",
-                label = "boundary regions",
+                label = "boundary regions"
+            )
+
+            fig.colorbar(
+                cdata;
+                ax = ax,
+                ticks = collect(1:length(cmap)),
+                orientation = "vertical",
+                label = "cell regions"
             )
         end
     end
