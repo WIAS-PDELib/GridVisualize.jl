@@ -337,7 +337,7 @@ function default_plot_kwargs()
         :dim => Pair(1, "Data dimension for PlutoVista plot"),
         :elev => Pair(30, "3D elevation angle  (in degrees)"),
         :elevation => Pair(0.0, "2D plot height factor for elevation"),
-        :fignumber => Pair(1, "Figure number (PyPlot)"),
+        :fignumber => Pair(nothing, "Figure number (PyPlot)"),
         :fontsize => Pair(20, "Fontsize of titles. All others are relative to it"),
         :framepos => Pair(1, "Subplot position in frame (VTKView)"),
         :gridscale => Pair(1, "Grid scale factor. Will be applied also to planes, spacing"),
