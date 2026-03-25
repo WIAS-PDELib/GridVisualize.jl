@@ -3,6 +3,10 @@ function initialize!(p, ::Type{T}) where {T <: AbstractPythonPlotterType}
     PyPlotter.rc("font"; size = p.context[:fontsize])
     if !haskey(p.context, :figure)
         res = p.context[:size]
+        if isnothing(p.context[:fignumber])
+            # assign next available figure number if nothing is defined
+            p.context[:fignumber] = isempty(PyPlotter.get_fignums()) ? 1 : maximum(PyPlotter.get_fignums()) + 1
+        end
         if !isdefined(Main, :PlutoRunner)
             p.context[:figure] = PyPlotter.figure(p.context[:fignumber]; dpi = 50, figsize = res ./ 50)
         else

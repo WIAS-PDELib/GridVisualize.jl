@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.17.1] - 2026-03-25
+- `PyPlot/PythonPlot`: assign increasing `fignumber`s to each new context (user can see multiple plotting windows)
+
 ## [1.17.0] - 2026-01-09
 - Add `:symlog` axis scaling for symmetric logarithmic axis scaling, see, e.g. [matplotlib symlog](https://matplotlib.org/stable/gallery/scales/symlog_demo.html)
 - Add `:symlog_threshold` (default = 10.0) to determine when to switch from linear to log scaling in case of `:symlog` scaling
