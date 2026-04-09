@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.18.0] - 2026-04-15
+- new UnicodePlots.jl extension that at the moment supports gridplot and scalarplot in 1D and 2D
+
 ## [1.17.1] - 2026-03-25
 - `PyPlot/PythonPlot`: assign increasing `fignumber`s to each new context (user can see multiple plotting windows)
 
