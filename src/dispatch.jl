@@ -71,6 +71,13 @@ Heuristically check if Plotter is PlutoVista
 isplutovista(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :PlutoVistaPlot)
 
 """
+$(SIGNATURES)
+
+Heuristically check if Plotter is UnicodePlots
+"""
+isunicodeplots(Plotter) = (typeof(Plotter) == Module) && isdefined(Plotter, :BrailleCanvas)
+
+"""
 $(TYPEDEF)
 
 Abstract type for dispatching on plotter
@@ -130,6 +137,13 @@ Abstract type for dispatching on plotter
 abstract type PlutoVistaType <: AbstractPlotterType end
 
 """
+$(TYPEDEF)
+
+Abstract type for dispatching on plotter
+"""
+abstract type UnicodePlotsType <: AbstractPlotterType end
+
+"""
 $(SIGNATURES)
     
 Heuristically detect type of plotter, returns the corresponding abstract type for plotting.
@@ -149,6 +163,8 @@ function plottertype(Plotter::Union{Module, Nothing})
         return MeshCatType
     elseif isplutovista(Plotter)
         return PlutoVistaType
+    elseif isunicodeplots(Plotter)
+        return UnicodePlotsType
     end
     return Nothing
 end
@@ -158,6 +174,7 @@ plottername(::Type{PlotsType}) = "Plots"
 plottername(::Type{PyPlotType}) = "PyPlot"
 plottername(::Type{PythonPlotType}) = "PythonPlot"
 plottername(::Type{PlutoVistaType}) = "PlutoVista"
+plottername(::Type{UnicodePlotsType}) = "UnicodePlots"
 plottername(::Type{VTKViewType}) = "VTKView"
 plottername(::Type{MeshCatType}) = "MeshCat"
 plottername(::Type{Nothing}) = "nothing"
