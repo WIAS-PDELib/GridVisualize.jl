@@ -10,6 +10,7 @@ Plotting companion module for [ExtendableGrids.jl](https://github.com/WIAS-PDELi
 Provides plotting of grids,  scalar piecewise linear functions and vectors (2D only) for various plotting backends
 on simplicial grids in one, two or three space dimensions. The main supported backends
 are CairoMakie, GLMakie, PythonPlot, PyPlot,  and PlutoVista. Plots is only partially supported (1D and 2D rectangular grids).
+UnicodePlots for certain 1D and 2D plots is also supported. 
 
 ## Disclaimer
 The code is rather complex and many codepaths are hard to test. Please be prepared to help
@@ -43,7 +44,7 @@ Plot appearance can be tweaked by a number of
 [keyword arguments](https://WIAS-PDELib.github.io/GridVisualize.jl/dev/api/#GridVisualize.available_kwargs).
 
 ### Plotters
-Plotters can be e.g. Plots, PythonPlot, PyPlot, GLMakie, CairoMakie PlutoVista - we pass the module exported
+Plotters can be e.g. Plots, PythonPlot, PyPlot, GLMakie, CairoMakie, PlutoVista, UnicodePlots - we pass the module exported
 by the package. Different plotters can be used at the same time.
 
 ### Multiple plots in one plotting window
@@ -131,21 +132,21 @@ and all plotting functions will do nothing.
 - 'p':  planned (no schedule though)
 - 'n': probably not, also in the future
 
-|                | PyPlot/PythonPlot  | Makie | PlutoVista | Plots | VTKView |
-|----------------|--------------------|-------|------------|-------|---------|
-| scalarplot, 1D | y                  | y     | y,i        | y     | y       |
-| vectorplot, 1D | y                  | y     | y          | y     | y       |
-| gridplot, 1D   | y                  | y     | y          | y     |         |
-| scalarplot, 2D | y                  | y     | y          | (y)   | y,i     |
+|                | PyPlot/PythonPlot  | Makie | PlutoVista | Plots | VTKView | UnicodePlots |
+|----------------|--------------------|-------|------------|-------|---------|--------------|
+| scalarplot, 1D | y                  | y     | y,i        | y     | y       | y            |
+| vectorplot, 1D | y                  | y     | y          | y     | y       |              |
+| gridplot, 1D   | y                  | y     | y          | y     |         | y            |
+| scalarplot, 2D | y                  | y     | y          | (y)   | y,i     | y            |
 | vectorplot, 2D | y                  | y     | y          | y     |         |
 | streamplot, 2D | y                  | y     | p          | n     |         |
-| gridplot, 2D   | y                  | y,i   | y          | (y)   | y,i     |
-| scalarplot, 3D | y                  | y,i   | y,i        | n     | y,i     |
-| gridplot, 3D   | y                  | y,i   | y,i        | n     | y,i     |
-| vectorplot, 3D | p                  | p     | p          | n     |         |
-| streamplot, 3D |                    | p     | p          | n     |         |
-| movie          | n                  | y     | n          | y     |         |
-| triangulateio  | y                  | y     | n          | n     | n       |
+| gridplot, 2D   | y                  | y,i   | y          | (y)   | y,i     | y            |
+| scalarplot, 3D | y                  | y,i   | y,i        | n     | y,i     |              |
+| gridplot, 3D   | y                  | y,i   | y,i        | n     | y,i     |              |
+| vectorplot, 3D | p                  | p     | p          | n     |         |              |
+| streamplot, 3D |                    | p     | p          | n     |         |              |
+| movie          | n                  | y     | n          | y     |         |              |
+| triangulateio  | y                  | y     | n          | n     | n       |              |
 
 ## Sample output
 
