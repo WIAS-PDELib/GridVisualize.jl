@@ -358,7 +358,7 @@ function scalarplot!(
 
     func = funcs[1]
     layout = ctx[:layout]
-    resolution = @. Int(round(ctx[:size] ./ 10 ./ (layout[2], layout[1]))) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
@@ -370,6 +370,20 @@ function scalarplot!(
     coords = grids[1][Coordinates]
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
+
+    if (true) # auto scale feature, do we want this?
+        wx = ex[2] - ex[1]
+        wy = ey[2] - ey[1]
+        rescale = wx / wy * (resolution[1] / (resolution[2]))
+        if rescale > 1
+            resolution = (resolution[1], resolution[2] / rescale)
+        else
+            resolution = (resolution[1] / rescale, resolution[2])
+        end
+    end
+
+    # we need an integer resolution
+    resolution = @. Int(round(resolution))
 
     X = LinRange(ex[1], ex[2], resolution[1])
     Y = LinRange(ey[1], ey[2], resolution[2])
