@@ -17,7 +17,7 @@ jobs:
     if: false # <- disabled for now, see https://github.com/julia-actions/julia-invalidations/issues/19
     runs-on: ubuntu-latest
     steps:
-    - uses: julia-actions/setup-julia@v2
+    - uses: julia-actions/setup-julia@v3
       with:
         version: '1'
     - uses: actions/checkout@v6
