@@ -229,9 +229,9 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
         color = ctx[:color]
     end
 
-    # determine resolution (divided by 10, to reduce pixel count in the terminal)
+    # determine resolution (divided by 5, to reduce pixel count in the terminal)
     layout = ctx[:layout]
-    resolution = (Int(round(ctx[:size][1] / 10 / layout[2])), 5)
+    resolution = (Int(round(ctx[:size][1] / 5 / layout[2])), 5)
 
     # create UnicodePlots.Canvas
     legend_space = 5
@@ -322,7 +322,7 @@ function scalarplot!(
 
     nfuncs = length(funcs)
     layout = ctx[:layout]
-    resolution = @. Int(round(ctx[:size] ./ 10 ./ (layout[2], layout[1]))) # reduce pixel count in the terminal
+    resolution = @. Int(round(ctx[:size] ./ 5 ./ (layout[2], layout[1] * 2))) # reduce pixel count in the terminal (size is then compatible to other plots)
     ylim = ctx[:limits]
 
     if ylim[1] > ylim[2]
@@ -358,7 +358,7 @@ function scalarplot!(
 
     func = funcs[1]
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 6 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
@@ -403,6 +403,8 @@ function scalarplot!(
         yoffset = ey[1],
         title = ctx[:title],
         colormap = colormap,
+        height = resolution[2],
+        width = resolution[1]
     )
 
     return reveal(ctx, TP)
