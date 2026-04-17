@@ -5,8 +5,8 @@ Extension module for UnicodePlots.jl
 """
 module GridVisualizeUnicodePlotsExt
 
-import GridVisualize: initialize!, gridplot!, scalarplot!, bregion_cmap, region_cmap, reveal
-using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer
+import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal
+using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata
 using UnicodePlots: UnicodePlots
 using ExtendableGrids: Coordinates, simplexgrid, ON_CELLS, ON_FACES, ON_EDGES, CellNodes, FaceNodes, BFaceNodes, CellGeometries, CellRegions, BFaceRegions, num_cells, num_nodes, local_celledgenodes, num_bfaceregions, num_cellregions, num_targets, interpolate!
 using Colors: Colors, RGB, RGBA
@@ -410,6 +410,85 @@ function scalarplot!(
         height = resolution[2],
         width = resolution[1]
     )
+
+    return reveal(ctx, TP)
+end
+
+function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
+
+    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ctx[:rasterpoints], offset = ctx[:offset])
+    qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
+
+    layout = ctx[:layout]
+    resolution = ctx[:size] ./ 6 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+
+    coords = grid[Coordinates]
+    ex = extrema(view(coords, 1, :))
+    ey = extrema(view(coords, 2, :))
+
+    if (true) # auto scale feature, do we want this?
+        wx = ex[2] - ex[1]
+        wy = ey[2] - ey[1]
+        rescale = wx / wy * (resolution[1] / (resolution[2]))
+        if rescale > 1
+            resolution = (resolution[1], resolution[2] / rescale)
+        else
+            resolution = (resolution[1] / rescale, resolution[2])
+        end
+    end
+
+    # we need an integer resolution
+    resolution = @. Int(round(resolution))
+
+    # create UnicodePlots.Canvas
+    legend_space = 5
+    padding = 0.05 * (ex[2] - ex[1])
+    ex = (ex[1] - padding, ex[2] + padding)
+    CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
+    canvas = CanvasType(
+        resolution[2], resolution[1] + legend_space,               # number of rows and columns (characters)
+        origin_y = 0, origin_x = ex[1],             # position in virtual space
+        height = 1, width = ex[2] - ex[1]; blend = false
+    )
+
+    @info size(rv)
+
+    # plot arrows
+    color_arrow = (150, 150, 150)
+    color_head = (255, 255, 255)
+    scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
+    narrows = size(qv, 2)
+    for a in 1:narrows
+        # draw tail
+        UnicodePlots.annotate!(canvas, qc[1, a], qc[2, a], "+", UInt32(0), false)
+        # draw arrow
+        tx, ty = qc[1, a] + 0.8 * qv[1, a], qc[2, a] + 0.8 * qv[2, a]
+        UnicodePlots.lines!(
+            canvas,
+            qc[1, a], qc[2, a],
+            tx, ty;
+            color = color_arrow
+        )
+        # draw arrow head
+        n1 = scale * ([qv[2, a], -qv[1, a]] .- (qv[:, a])) ./ norm(qv[:, a])
+        n1[2] /= 2
+        UnicodePlots.lines!(
+            canvas,
+            tx, ty,
+            tx + n1[1], ty + n1[2];
+            color = color_head
+        )
+        n2 = scale * ([-qv[2, a], qv[1, a]] .- (qv[:, a])) ./ norm(qv[:, a])
+        n2[2] /= 2
+        UnicodePlots.lines!(
+            canvas,
+            tx, ty,
+            tx + n2[1], ty + n2[2];
+            color = color_head
+        )
+    end
+
+    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
 
     return reveal(ctx, TP)
 end
