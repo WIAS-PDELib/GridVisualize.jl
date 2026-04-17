@@ -1,7 +1,7 @@
 name = "GridVisualize"
 uuid = "5eed8a63-0fb0-45eb-886d-8d5a387d12b8"
+version = "1.19.0"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>", "Patrick Jaap <patrick.jaap@wias-berlin.de>"]
-version = "1.18.2"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
@@ -80,3 +80,4 @@ Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
 
 [targets]
 test = ["CairoMakie", "ExtendableGrids", "Pkg", "PlutoVista", "PyPlot", "Test", "Triangulate"]
+

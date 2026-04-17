@@ -15,13 +15,26 @@ initialize!(p, ::Type{UnicodePlotsType}) = nothing
 
 
 function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
-    return p.context[:figure]
+    layout = p.context[:layout]
+    subplots = @views p.subplots[:]
+
+    if layout == (1, 1)
+        display(subplots[1][:figure])
+    else
+        if !isdefined(Main, :Term)
+            @warn "A GridVisualizer with multiple UnicodePlots requires 'Term.jl' to be loaded: add Term.jl to your environment."
+        else
+            grid_plot = UnicodePlots.gridplot(map(subplot -> subplot[:figure], subplots), layout = p.context[:layout])
+            display(grid_plot)
+        end
+    end
+    return nothing
 end
 
 
 function reveal(ctx::SubVisualizer, TP::Type{UnicodePlotsType})
     if ctx[:show] || ctx[:reveal]
-        display(ctx[:figure])
+        return reveal(ctx[:GridVisualizer], TP)
     end
     return nothing
 end
@@ -65,7 +78,8 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     end
 
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
-    resolution = ctx[:size] ./ 10
+    layout = ctx[:layout]
+    resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1])
     legend_space = 4
     aspect = ctx[:aspect] * resolution[1] / (resolution[1] + legend_space)
 
@@ -216,7 +230,8 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     end
 
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
-    resolution = (Int(round(ctx[:size][1] / 10)), 5)
+    layout = ctx[:layout]
+    resolution = (Int(round(ctx[:size][1] / 10 / layout[2])), 5)
 
     # create UnicodePlots.Canvas
     legend_space = 5
@@ -306,7 +321,8 @@ function scalarplot!(
     )
 
     nfuncs = length(funcs)
-    resolution = @. Int(round(ctx[:size] ./ 10)) # reduce pixel count in the terminal
+    layout = ctx[:layout]
+    resolution = @. Int(round(ctx[:size] ./ 10 ./ (layout[2], layout[1]))) # reduce pixel count in the terminal
     ylim = ctx[:limits]
 
     if ylim[1] > ylim[2]
@@ -341,7 +357,8 @@ function scalarplot!(
     )
 
     func = funcs[1]
-    resolution = @. Int(round(ctx[:size] ./ 10)) # reduce pixel count in the terminal
+    layout = ctx[:layout]
+    resolution = @. Int(round(ctx[:size] ./ 10 ./ (layout[2], layout[1]))) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
