@@ -40,10 +40,10 @@ function reveal(ctx::SubVisualizer, TP::Type{UnicodePlotsType})
 end
 
 
-function region_legend!(canvas, title, x, y, colors)
+function region_legend!(canvas, title, x, y, colors, text_color)
     # legend by annotate!
     for (i, char) in enumerate(title)
-        UnicodePlots.char_point!(canvas, x + i - 1, y, char, UInt32(0), false)
+        UnicodePlots.char_point!(canvas, x + i - 1, y, char, text_color, false)
     end
     startx = x + length(title)
     for r in 1:length(colors)
@@ -194,16 +194,18 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
         )
     end
 
-    region_legend!(canvas, "cell regions: ", 2, 1, colors)
-    region_legend!(canvas, "bface regions:", 2, 2, bcolors)
+    text_color = UnicodePlots.ansi_color(:normal)
+
+    region_legend!(canvas, "cell regions: ", 2, 1, colors, text_color)
+    region_legend!(canvas, "bface regions:", 2, 2, bcolors, text_color)
 
     # corner coordinates
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
-    UnicodePlots.annotate!(canvas, ex[1], ey[1], "$(ex[1])", UInt32(0), false; valign = :top)
-    UnicodePlots.annotate!(canvas, ex[2], ey[1], "$(ex[2])", UInt32(0), false; valign = :top, halign = :right)
-    UnicodePlots.annotate!(canvas, ex[1] - 1.5 * padding, ey[1], "$(ey[1])", UInt32(0), false; halign = :left)
-    UnicodePlots.annotate!(canvas, ex[1] - 1.5 * padding, ey[2], "$(ey[2])", UInt32(0), false; halign = :left)
+    UnicodePlots.annotate!(canvas, ex[1], ey[1], "$(ex[1])", text_color, false; valign = :top)
+    UnicodePlots.annotate!(canvas, ex[2], ey[1], "$(ex[2])", text_color, false; valign = :top, halign = :right)
+    UnicodePlots.annotate!(canvas, ex[1] - 1.5 * padding, ey[1], "$(ey[1])", text_color, false; halign = :left)
+    UnicodePlots.annotate!(canvas, ex[1] - 1.5 * padding, ey[2], "$(ey[2])", text_color, false; halign = :left)
 
     # plot
     ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
@@ -213,6 +215,7 @@ end
 
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     UnicodePlots = ctx[:Plotter]
+    text_color = UnicodePlots.ansi_color(:normal)
 
     # find bounding box
     coords = grid[Coordinates]
@@ -273,7 +276,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
         end
     end
     for j in 1:nnodes
-        UnicodePlots.annotate!(canvas, coords[1, j], 0.4, "•", UInt32(0), false)
+        UnicodePlots.annotate!(canvas, coords[1, j], 0.4, "•", text_color, false)
     end
 
     # plot boundary nodes with bregion_cmap colors
@@ -296,13 +299,14 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
         UnicodePlots.annotate!(canvas, coords[1, bfacenodes[1, j]], 0.4, "•", UInt32(uint_color), false)
     end
 
-    region_legend!(canvas, "cell regions: ", 2, 1, colors)
-    region_legend!(canvas, "bface regions:", 2, 2, bcolors)
+
+    region_legend!(canvas, "cell regions: ", 2, 1, colors, text_color)
+    region_legend!(canvas, "bface regions:", 2, 2, bcolors, text_color)
 
 
     ex = extrema(view(coords, 1, :))
-    UnicodePlots.annotate!(canvas, 0, 0.1, "$(ex[1])", UInt32(0), false)
-    UnicodePlots.annotate!(canvas, ex[2], 0.1, "$(ex[2])", UInt32(0), false)
+    UnicodePlots.annotate!(canvas, 0, 0.1, "$(ex[1])", text_color, false)
+    UnicodePlots.annotate!(canvas, ex[2], 0.1, "$(ex[2])", text_color, false)
 
     # plot
     ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
