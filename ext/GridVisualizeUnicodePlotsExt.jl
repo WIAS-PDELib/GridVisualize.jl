@@ -420,20 +420,22 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
 
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 6 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
 
     coords = grid[Coordinates]
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
 
+    aspect = ctx[:aspect] * resolution[1] / resolution[1]
+
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
         wy = ey[2] - ey[1]
-        rescale = wx / wy * (resolution[1] / (resolution[2]))
+        rescale = wx / wy * (resolution[1] / (2 * resolution[2]))
         if rescale > 1
-            resolution = (resolution[1], resolution[2] / rescale)
+            resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
         else
-            resolution = (resolution[1] / rescale, resolution[2])
+            resolution = (Int(ceil(resolution[1] * aspect / rescale)), resolution[2])
         end
     end
 
@@ -451,41 +453,66 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
         height = 1, width = ex[2] - ex[1]; blend = false
     )
 
-    @info size(rv)
+
+    # color for arrows
+    if typeof(ctx[:color]) <: RGB
+        color = (
+            Int(round(ctx[:color].r * 255)),
+            Int(round(ctx[:color].g * 255)),
+            Int(round(ctx[:color].b * 255)),
+        )
+    else
+        color = ctx[:color]
+    end
+    if color == (0, 0, 0)
+        color = (255, 255, 255) # default arrow color if black is chosen for better visibility
+    end
 
     # plot arrows
-    color_arrow = (150, 150, 150)
-    color_head = (255, 255, 255)
     scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
     narrows = size(qv, 2)
+    #arrows =  ['🡗', '🡓', '🡖', '🡒', '🡕', '🡑', '🡔', '🡐']
+    arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+    maxnorm = maximum(sqrt.(sum(qv .^ 2, dims = 1)))
+    draw_stream = true
     for a in 1:narrows
-        # draw tail
-        UnicodePlots.annotate!(canvas, qc[1, a], qc[2, a], "+", UInt32(0), false)
-        # draw arrow
-        tx, ty = qc[1, a] + 0.8 * qv[1, a], qc[2, a] + 0.8 * qv[2, a]
-        UnicodePlots.lines!(
-            canvas,
-            qc[1, a], qc[2, a],
-            tx, ty;
-            color = color_arrow
-        )
-        # draw arrow head
-        n1 = scale * ([qv[2, a], -qv[1, a]] .- (qv[:, a])) ./ norm(qv[:, a])
-        n1[2] /= 2
-        UnicodePlots.lines!(
-            canvas,
-            tx, ty,
-            tx + n1[1], ty + n1[2];
-            color = color_head
-        )
-        n2 = scale * ([-qv[2, a], qv[1, a]] .- (qv[:, a])) ./ norm(qv[:, a])
-        n2[2] /= 2
-        UnicodePlots.lines!(
-            canvas,
-            tx, ty,
-            tx + n2[1], ty + n2[2];
-            color = color_head
-        )
+        # calculate angle of arrow
+        angle = atan(qv[2, a], qv[1, a])
+        anorm = sqrt(qv[1, a]^2 + qv[2, a]^2)
+        scale = anorm / maxnorm
+        red, green, blue = round.(UInt32, color .* scale)
+        uint_color = (red << 16) | (green << 8) | blue
+        if angle > -7 * π / 8 && angle <= -5 * π / 8
+            char = arrows[1]
+        elseif angle > -5 * π / 8 && angle <= -3 * π / 8
+            char = arrows[2]
+        elseif angle > -3 * π / 8 && angle <= -π / 8
+            char = arrows[3]
+        elseif angle > -π / 8 && angle <= π / 8
+            char = arrows[4]
+        elseif angle > π / 8 && angle <= 3 * π / 8
+            char = arrows[5]
+        elseif angle > 3 * π / 8 && angle <= 5 * π / 8
+            char = arrows[6]
+        elseif angle > 5 * π / 8 && angle <= 7 * π / 8
+            char = arrows[7]
+        else
+            char = arrows[8]
+        end
+        if scale < 1.0e-2
+            char = '•' # use a dot for very small vectors
+        end
+
+        UnicodePlots.annotate!(canvas, qc[1, a], qc[2, a], char, uint_color, false)
+        if draw_stream
+            tx, ty = qc[1, a] + 0.67 * qv[1, a], qc[2, a] + 0.67 * qv[2, a]
+            UnicodePlots.lines!(
+                canvas,
+                qc[1, a], qc[2, a],
+                tx, ty;
+                color = uint_color
+            )
+        end
     end
 
     ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
