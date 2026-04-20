@@ -362,7 +362,7 @@ function scalarplot!(
 
     func = funcs[1]
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 6 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 5 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
