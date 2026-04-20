@@ -9,7 +9,8 @@ import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_
 using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata
 using UnicodePlots: UnicodePlots
 using ExtendableGrids: Coordinates, simplexgrid, ON_CELLS, ON_FACES, ON_EDGES, CellNodes, FaceNodes, BFaceNodes, CellGeometries, CellRegions, BFaceRegions, num_cells, num_nodes, local_celledgenodes, num_bfaceregions, num_cellregions, num_targets, interpolate!
-using Colors: Colors, RGB, RGBA
+using Colors: Colors, RGB, RGBA, red, green, blue
+using ColorSchemes: colorschemes, color
 
 initialize!(p, ::Type{UnicodePlotsType}) = nothing
 
@@ -416,9 +417,6 @@ end
 
 function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
 
-    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ctx[:rasterpoints], offset = ctx[:offset])
-    qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
-
     layout = ctx[:layout]
     resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
 
@@ -441,6 +439,12 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
+
+
+    rasterpoints = round(sum(resolution) / 2) # ignores ctx[:rasterpoints]
+    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = rasterpoints, offset = ctx[:offset])
+    qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
+
 
     # create UnicodePlots.Canvas
     legend_space = 5
@@ -471,17 +475,18 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     # plot arrows
     scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
     narrows = size(qv, 2)
-    #arrows =  ['🡗', '🡓', '🡖', '🡒', '🡕', '🡑', '🡔', '🡐']
-    arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+    arrows = ['↗', '↑', '↖', '←', '↙', '↓', '↘', '→']
     maxnorm = maximum(sqrt.(sum(qv .^ 2, dims = 1)))
-    draw_stream = true
+    draw_stream = false
+    colormap = colorschemes[ctx[:colormap]]
     for a in 1:narrows
         # calculate angle of arrow
         angle = atan(qv[2, a], qv[1, a])
         anorm = sqrt(qv[1, a]^2 + qv[2, a]^2)
         scale = anorm / maxnorm
-        red, green, blue = round.(UInt32, color .* scale)
-        uint_color = (red << 16) | (green << 8) | blue
+        c = colormap[scale]
+        r, g, b = UInt32(round(red(c) * 255)), UInt32(round(green(c) * 255)), UInt32(round(blue(c) * 255))
+        uint_color = (r << 16) | (g << 8) | b
         if angle > -7 * π / 8 && angle <= -5 * π / 8
             char = arrows[1]
         elseif angle > -5 * π / 8 && angle <= -3 * π / 8
