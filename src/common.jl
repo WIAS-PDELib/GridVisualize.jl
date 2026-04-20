@@ -213,6 +213,10 @@ function vectorsample(
 
     eltype = dim == 2 ? Triangle2D : Tetrahedron3D
 
+    if typeof(rasterpoints) <: Integer
+        rasterpoints = (rasterpoints, rasterpoints)
+    end
+
     scaledgrid = grid
     if gridscale != 1.0
         scaledgrid = ExtendableGrid{coord_type(grid), index_type(grid)}()
@@ -253,7 +257,7 @@ function vectorsample(
     tol = reltol * extent
 
     # point spacing
-    spacing = [extent / rasterpoints for i in 1:dim]
+    spacing = [extent / rasterpoints[i] for i in 1:dim]
 
     # index range
     ijkmax = ones(Int, 3)

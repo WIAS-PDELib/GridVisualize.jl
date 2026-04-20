@@ -445,25 +445,14 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     # we need an integer resolution
     resolution = @. Int(round(resolution))
 
-
-    rasterpoints = round(sum(resolution) / 2) # ignores ctx[:rasterpoints]
-    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = rasterpoints, offset = ctx[:offset])
+    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ((resolution[1] - 1) / 2, 2 * (resolution[2] - 1)), offset = ctx[:offset])
     qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
 
-
-    # create UnicodePlots.Canvas
-    if ctx[:colorbar] !== :none
-        colorbar_width = 3
-    else
-        colorbar_width = 0
-    end
-    padding = 0.05 * (ex[2] - ex[1])
-    ex = (ex[1] - padding, ex[2] + padding)
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
     canvas = CanvasType(
-        resolution[2], resolution[1] + colorbar_width,               # number of rows and columns (characters)
-        origin_y = 0, origin_x = ex[1],             # position in virtual space
-        height = 1, width = (ex[2] - ex[1]) / (resolution[2] / (resolution[2] + colorbar_width)); blend = false
+        resolution[2], resolution[1],               # number of rows and columns (characters)
+        origin_y = ey[1], origin_x = ex[1],             # position in virtual space
+        height = (ey[2] - ey[1]), width = (ex[2] - ex[1]); blend = false
     )
 
 
@@ -484,9 +473,13 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     # plot arrows
     scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
     narrows = size(qv, 2)
-    arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+    arrows = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
+    #arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+    #arrows = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
+    #arrows = ['⬃', '⇩', '⬂', '⇨', '⬀', '⇧', '⬁', '⇦']
+    #arrows = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
+    #arrows = ['⬋','⬇','⬊','➡','⬈','⬆','⬉','⬅']
     maxnorm = maximum(sqrt.(sum(qv .^ 2, dims = 1)))
-    draw_stream = false
     colormap = colorschemes[ctx[:colormap]]
     for a in 1:narrows
         # calculate angle of arrow
@@ -516,29 +509,12 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
         end
 
         UnicodePlots.annotate!(canvas, qc[1, a], qc[2, a], char, uint_color, false)
-        if draw_stream
-            tx, ty = qc[1, a] + 0.67 * qv[1, a], qc[2, a] + 0.67 * qv[2, a]
-            UnicodePlots.lines!(
-                canvas,
-                qc[1, a], qc[2, a],
-                tx, ty;
-                color = uint_color
-            )
-        end
     end
 
-    ## colorbar
-    if ctx[:colorbar] !== :none
-        for j in 0:(2 * resolution[2] - 7)
-            scale = j / (2 * resolution[2] - 7)
-            uint_color = UnicodePlots.ansi_color(colormap[scale])
-            UnicodePlots.annotate!(canvas, ex[2] + 2 * (ex[2] - ex[1]) / resolution[2], (j + 4) * (ey[2] - ey[1]) / (2 * resolution[2]), "▒▒", uint_color, false)
-        end
-        ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
-        UnicodePlots.annotate!(ctx[:figure], ex[2] + 2 * (ex[2] - ex[1]) / resolution[2], ey[1], "0.0 ")
-        UnicodePlots.annotate!(ctx[:figure], ex[2] + 2 * (ex[2] - ex[1]) / resolution[2], ey[2], "$(Float16(maxnorm))")
-    end
-
+    plot = UnicodePlots.Plot(canvas; title = ctx[:title])
+    plot.cmap.bar = ctx[:colorbar] == :none ? false : true
+    plot.cmap.lim = (0, Float16(maxnorm))
+    ctx[:figure] = plot
 
     return reveal(ctx, TP)
 end
