@@ -484,9 +484,7 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
         angle = atan(qv[2, a], qv[1, a])
         anorm = sqrt(qv[1, a]^2 + qv[2, a]^2)
         scale = anorm / maxnorm
-        c = colormap[scale]
-        r, g, b = UInt32(round(red(c) * 255)), UInt32(round(green(c) * 255)), UInt32(round(blue(c) * 255))
-        uint_color = (r << 16) | (g << 8) | b
+        uint_color = UnicodePlots.ansi_color(colormap[scale])
         if angle > -7 * π / 8 && angle <= -5 * π / 8
             char = arrows[1]
         elseif angle > -5 * π / 8 && angle <= -3 * π / 8
