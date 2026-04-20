@@ -420,8 +420,6 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     layout = ctx[:layout]
     resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
 
-    resolution = (100, 50)
-
     coords = grid[Coordinates]
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
