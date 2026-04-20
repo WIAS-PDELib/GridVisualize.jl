@@ -420,6 +420,8 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     layout = ctx[:layout]
     resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
 
+    resolution = (100, 50)
+
     coords = grid[Coordinates]
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
@@ -447,14 +449,18 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
 
 
     # create UnicodePlots.Canvas
-    legend_space = 5
+    if ctx[:colorbar] !== :none
+        colorbar_width = 3
+    else
+        colorbar_width = 0
+    end
     padding = 0.05 * (ex[2] - ex[1])
     ex = (ex[1] - padding, ex[2] + padding)
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
     canvas = CanvasType(
-        resolution[2], resolution[1] + legend_space,               # number of rows and columns (characters)
+        resolution[2], resolution[1] + colorbar_width,               # number of rows and columns (characters)
         origin_y = 0, origin_x = ex[1],             # position in virtual space
-        height = 1, width = ex[2] - ex[1]; blend = false
+        height = 1, width = (ex[2] - ex[1]) / (resolution[2] / (resolution[2] + colorbar_width)); blend = false
     )
 
 
@@ -518,7 +524,18 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
         end
     end
 
-    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
+    ## colorbar
+    if ctx[:colorbar] !== :none
+        for j in 0:(2 * resolution[2] - 7)
+            scale = j / (2 * resolution[2] - 7)
+            uint_color = UnicodePlots.ansi_color(colormap[scale])
+            UnicodePlots.annotate!(canvas, ex[2] + 2 * (ex[2] - ex[1]) / resolution[2], (j + 4) * (ey[2] - ey[1]) / (2 * resolution[2]), "▒▒", uint_color, false)
+        end
+        ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
+        UnicodePlots.annotate!(ctx[:figure], ex[2] + 2 * (ex[2] - ex[1]) / resolution[2], ey[1], "0.0 ")
+        UnicodePlots.annotate!(ctx[:figure], ex[2] + 2 * (ex[2] - ex[1]) / resolution[2], ey[2], "$(Float16(maxnorm))")
+    end
+
 
     return reveal(ctx, TP)
 end
