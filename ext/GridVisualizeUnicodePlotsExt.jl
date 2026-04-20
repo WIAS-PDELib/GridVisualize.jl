@@ -475,7 +475,7 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     # plot arrows
     scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
     narrows = size(qv, 2)
-    arrows = ['↗', '↑', '↖', '←', '↙', '↓', '↘', '→']
+    arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
     maxnorm = maximum(sqrt.(sum(qv .^ 2, dims = 1)))
     draw_stream = false
     colormap = colorschemes[ctx[:colormap]]
