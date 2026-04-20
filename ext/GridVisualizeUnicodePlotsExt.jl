@@ -335,12 +335,17 @@ function scalarplot!(
         ylim = (minimum([minimum(func) for func in funcs]), maximum([maximum(func) for func in funcs]))
     end
 
-    plt = ctx[:clear] ? nothing : ctx[:figure]
+    if ctx[:clear] || !haskey(ctx, :figure)
+        plt = nothing
+    else
+        plt = ctx[:figure]
+    end
+
     for ifunc in 1:nfuncs
         func = funcs[ifunc]
         grid = grids[ifunc]
         coord = grid[Coordinates] * ctx[:gridscale]
-        if ifunc == 1
+        if isnothing(plt)
             plt = UnicodePlots.lineplot(coord[1, :], func; ylim, xlabel = "x", name = ctx[:label], height = resolution[2], width = resolution[1])
         else
             UnicodePlots.lineplot!(plt, coord[1, :], func; name = ctx[:label])
