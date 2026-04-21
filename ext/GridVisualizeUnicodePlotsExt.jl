@@ -81,7 +81,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1])
+    resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1])
     legend_space = 4
     aspect = ctx[:aspect] * resolution[1] / (resolution[1] + legend_space)
 
@@ -236,7 +236,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
 
     # determine resolution (divided by 5, to reduce pixel count in the terminal)
     layout = ctx[:layout]
-    resolution = (Int(round(ctx[:size][1] / 5 / layout[2])), 5)
+    resolution = (Int(round(ctx[:size][1] / 6 / layout[2])), 5)
 
     # create UnicodePlots.Canvas
     legend_space = 5
@@ -328,7 +328,7 @@ function scalarplot!(
 
     nfuncs = length(funcs)
     layout = ctx[:layout]
-    resolution = @. Int(round(ctx[:size] ./ 5 ./ (layout[2], layout[1] * 2))) # reduce pixel count in the terminal (size is then compatible to other plots)
+    resolution = @. Int(round(ctx[:size] ./ 6 ./ (layout[2], layout[1] * 2))) # reduce pixel count in the terminal (size is then compatible to other plots)
     ylim = ctx[:limits]
 
     if ylim[1] > ylim[2]
@@ -369,7 +369,7 @@ function scalarplot!(
 
     func = funcs[1]
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 5 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 6 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
@@ -424,7 +424,7 @@ end
 function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
 
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
 
     # find bounding box
     coords = grid[Coordinates]
