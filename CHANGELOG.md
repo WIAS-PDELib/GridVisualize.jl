@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.18.1] - 2026-04-21
+## [1.18.2] - 2026-04-21
 - Add colorbar for cell regions in 2D `gridplot!` with `Py[thon]Plot`
 
 ## [1.18.0] - 2026-04-15
