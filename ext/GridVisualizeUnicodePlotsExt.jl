@@ -17,7 +17,7 @@ initialize!(p, ::Type{UnicodePlotsType}) = nothing
 
 function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
     layout = p.context[:layout]
-    subplots = @views p.subplots[:]
+    subplots = @views permutedims(p.subplots)[:]
 
     if layout == (1, 1)
         display(subplots[1][:figure])
@@ -26,7 +26,7 @@ function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
             @warn "A GridVisualizer with multiple UnicodePlots requires 'Term.jl' to be loaded: add Term.jl to your environment."
         else
             figures = [subplot[:figure] for subplot in subplots if haskey(subplot, :figure)]
-            grid_plot = UnicodePlots.gridplot(figures, layout = p.context[:layout])
+            grid_plot = UnicodePlots.gridplot(figures, layout = p.context[:layout], show_placeholder = true)
             display(grid_plot)
         end
     end
