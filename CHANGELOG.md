@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.18.1] - 2026-04-21
+- Add colorbar for cell regions in 2D `gridplot!` with `Py[thon]Plot`
+
 ## [1.18.0] - 2026-04-15
 - new UnicodePlots.jl extension that at the moment supports gridplot and scalarplot in 1D and 2D
 
