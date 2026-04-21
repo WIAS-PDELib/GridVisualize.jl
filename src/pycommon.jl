@@ -274,41 +274,19 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractP
     )
 
     if ctx[:show_colorbar]
-        if ctx[:colorbar] == :horizontal
-
+        if ctx[:colorbar] in (:horizontal, :vertical)
             fig.colorbar(
                 bcdata;
                 ax = ax,
-                ticks = collect(1:length(bcmap)),
-                orientation = "horizontal",
+                ticks = 1:length(bcmap),
+                orientation = "$(ctx[:colorbar])",
                 label = "boundary regions"
             )
-
             fig.colorbar(
                 cdata;
                 ax = ax,
-                ticks = collect(1:length(cmap)),
-                orientation = "horizontal",
-                label = "cell regions"
-            )
-
-        end
-
-        if ctx[:colorbar] == :vertical
-
-            fig.colorbar(
-                bcdata;
-                ax = ax,
-                ticks = collect(1:length(bcmap)),
-                orientation = "vertical",
-                label = "boundary regions"
-            )
-
-            fig.colorbar(
-                cdata;
-                ax = ax,
-                ticks = collect(1:length(cmap)),
-                orientation = "vertical",
+                ticks = 1:length(cmap),
+                orientation = "$(ctx[:colorbar])",
                 label = "cell regions"
             )
         end
