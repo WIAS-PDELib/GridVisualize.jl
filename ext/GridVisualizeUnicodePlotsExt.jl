@@ -425,6 +425,7 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     layout = ctx[:layout]
     resolution = ctx[:size] ./ 10 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
 
+    # find bounding box
     coords = grid[Coordinates]
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
@@ -445,9 +446,11 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     # we need an integer resolution
     resolution = @. Int(round(resolution))
 
+    # query vector field raster points
     rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ((resolution[1] - 1) / 2, 2 * (resolution[2] - 1)), offset = ctx[:offset])
     qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
 
+    # construct canvas
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
     canvas = CanvasType(
         resolution[2], resolution[1],               # number of rows and columns (characters)
@@ -455,30 +458,19 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
         height = (ey[2] - ey[1]), width = (ex[2] - ex[1]); blend = false
     )
 
-
-    # color for arrows
-    if typeof(ctx[:color]) <: RGB
-        color = (
-            Int(round(ctx[:color].r * 255)),
-            Int(round(ctx[:color].g * 255)),
-            Int(round(ctx[:color].b * 255)),
-        )
-    else
-        color = ctx[:color]
-    end
-    if color == (0, 0, 0)
-        color = (255, 255, 255) # default arrow color if black is chosen for better visibility
-    end
-
     # plot arrows
     scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
     narrows = size(qv, 2)
-    arrows = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
-    #arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
-    #arrows = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
-    #arrows = ['⬃', '⇩', '⬂', '⇨', '⬀', '⇧', '⬁', '⇦']
-    #arrows = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
-    #arrows = ['⬋','⬇','⬊','➡','⬈','⬆','⬉','⬅']
+    vscale = ctx[:vscale] # vscale steers arrow thickness
+    if vscale <= 0.25
+        arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+    elseif vscale <= 0.5
+        arrows = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
+    elseif vscale <= 1
+        arrows = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
+    else
+        arrows = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
+    end
     maxnorm = maximum(sqrt.(sum(qv .^ 2, dims = 1)))
     colormap = colorschemes[ctx[:colormap]]
     for a in 1:narrows
@@ -511,9 +503,14 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
         UnicodePlots.annotate!(canvas, qc[1, a], qc[2, a], char, uint_color, false)
     end
 
+    # generate plot
     plot = UnicodePlots.Plot(canvas; title = ctx[:title])
+
+    # add colormap
     plot.cmap.bar = ctx[:colorbar] == :none ? false : true
     plot.cmap.lim = (0, Float16(maxnorm))
+    plot.cmap.callback = UnicodePlots.colormap_callback(ctx[:colormap])
+
     ctx[:figure] = plot
 
     return reveal(ctx, TP)
