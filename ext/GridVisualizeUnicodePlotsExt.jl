@@ -25,7 +25,8 @@ function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
         if !isdefined(Main, :Term)
             @warn "A GridVisualizer with multiple UnicodePlots requires 'Term.jl' to be loaded: add Term.jl to your environment."
         else
-            grid_plot = UnicodePlots.gridplot(map(subplot -> subplot[:figure], subplots), layout = p.context[:layout])
+            figures = [subplot[:figure] for subplot in subplots if haskey(subplot, :figure)]
+            grid_plot = UnicodePlots.gridplot(figures, layout = p.context[:layout])
             display(grid_plot)
         end
     end
