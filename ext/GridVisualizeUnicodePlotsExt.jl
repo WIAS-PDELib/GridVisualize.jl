@@ -346,10 +346,11 @@ function scalarplot!(
         func = funcs[ifunc]
         grid = grids[ifunc]
         coord = grid[Coordinates] * ctx[:gridscale]
+        name = name = isnothing(ctx[:label]) ? "" : ctx[:label]
         if isnothing(plt)
-            plt = UnicodePlots.lineplot(coord[1, :], func; ylim, xlabel = "x", name = ctx[:label], height = resolution[2], width = resolution[1])
+            plt = UnicodePlots.lineplot(coord[1, :], func; ylim, xlabel = String(ctx[:xlabel]), name, height = resolution[2], width = resolution[1], title = ctx[:title])
         else
-            UnicodePlots.lineplot!(plt, coord[1, :], func; name = ctx[:label])
+            UnicodePlots.lineplot!(plt, coord[1, :], func; name)
         end
     end
     ctx[:figure] = plt
