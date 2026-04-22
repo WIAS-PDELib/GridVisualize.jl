@@ -5,7 +5,7 @@ Extension module for UnicodePlots.jl
 """
 module GridVisualizeUnicodePlotsExt
 
-import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal
+import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal, streamplot!
 using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata
 using UnicodePlots: UnicodePlots
 using ExtendableGrids: Coordinates, simplexgrid, ON_CELLS, ON_FACES, ON_EDGES, CellNodes, FaceNodes, BFaceNodes, CellGeometries, CellRegions, BFaceRegions, num_cells, num_nodes, local_celledgenodes, num_bfaceregions, num_cellregions, num_targets, interpolate!
@@ -59,6 +59,8 @@ function region_legend!(canvas, title, x, y, colors, text_color)
     end
     return
 end
+
+gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid) = @warn "3D gridplots are not implemented for the UnicodePlots backend"
 
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     UnicodePlots = ctx[:Plotter]
@@ -350,9 +352,6 @@ function scalarplot!(
         xlim = (coord_min, coord_max)
     end
 
-    # xscale::Symbol = :identity: x-axis scale (:identity, :ln, :log2, :log10), or scale function e.g. x -> log10(x).
-    # xscale: x axis scale: one of [:log, :identity, :symlog]. Default: :identity
-
     xscale = ctx[:xscale]
     xscale == :log && (xscale = :log10)
     xscale == :symlog && (xscale = x -> sign(x) * (log10(1 + abs(x))))
@@ -370,7 +369,6 @@ function scalarplot!(
         name = name = isnothing(ctx[:label]) ? "" : ctx[:label]
 
         if isnothing(plt)
-            @show Symbol(ctx[:color])
             plt = UnicodePlots.lineplot(
                 coord[1, :],
                 func;
@@ -463,6 +461,8 @@ function scalarplot!(
 
     return reveal(ctx, TP)
 end
+
+scalarplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grids, parentgrid, funcs) = @warn "3D scalarplot is not implemented for the UnicodePlots backend"
 
 function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
 
@@ -559,5 +559,8 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
 
     return reveal(ctx, TP)
 end
+
+streamplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func) = @warn "2D streamplot is not implemented for the UnicodePlots backend"
+
 
 end # module
