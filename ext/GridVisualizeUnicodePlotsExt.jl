@@ -5,45 +5,56 @@ Extension module for UnicodePlots.jl
 """
 module GridVisualizeUnicodePlotsExt
 
-import GridVisualize: initialize!, gridplot!, scalarplot!, bregion_cmap, region_cmap, reveal
-using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer
+import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal, streamplot!
+using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata
 using UnicodePlots: UnicodePlots
 using ExtendableGrids: Coordinates, simplexgrid, ON_CELLS, ON_FACES, ON_EDGES, CellNodes, FaceNodes, BFaceNodes, CellGeometries, CellRegions, BFaceRegions, num_cells, num_nodes, local_celledgenodes, num_bfaceregions, num_cellregions, num_targets, interpolate!
-using Colors: Colors, RGB, RGBA
+using Colors: Colors, RGB, RGBA, red, green, blue
+using ColorSchemes: colorschemes, color
 
 initialize!(p, ::Type{UnicodePlotsType}) = nothing
 
 
 function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
-    return p.context[:figure]
-end
+    layout = p.context[:layout]
+    subplots = @views permutedims(p.subplots)[:]
 
-
-function reveal(ctx::SubVisualizer, TP::Type{UnicodePlotsType})
-    if ctx[:show] || ctx[:reveal]
-        display(ctx[:figure])
+    if layout == (1, 1)
+        display(subplots[1][:figure])
+    else
+        if !isdefined(Main, :Term)
+            @warn "A GridVisualizer with multiple UnicodePlots requires 'Term.jl' to be loaded: add Term.jl to your environment."
+        else
+            figures = [subplot[:figure] for subplot in subplots if haskey(subplot, :figure)]
+            grid_plot = UnicodePlots.gridplot(figures, layout = p.context[:layout], show_placeholder = true)
+            display(grid_plot)
+        end
     end
     return nothing
 end
 
 
-function region_legend!(canvas, title, x, y, colors)
-    # legend by annotate!
-    for (i, char) in enumerate(title)
-        UnicodePlots.char_point!(canvas, x + i - 1, y, char, UInt32(0), false)
+function reveal(ctx::SubVisualizer, TP::Type{UnicodePlotsType})
+    if ctx[:show] || ctx[:reveal]
+        return reveal(ctx[:GridVisualizer], TP)
     end
-    startx = x + length(title)
+    return nothing
+end
+
+
+function region_legend!(plt, title, y0, colors)
+    # legend by annotate!
+    UnicodePlots.label!(plt, :r, y0, title)
     for r in 1:length(colors)
         red, green, blue = UInt32.(colors[r])
         uint_color = (red << 16) | (green << 8) | blue
-        reg_string = "$r "
-        for char in reg_string
-            startx += 1
-            UnicodePlots.char_point!(canvas, startx, y, char, uint_color, false)
-        end
+        y0 += 1
+        UnicodePlots.label!(plt, :r, y0, "   " * string(r), uint_color)
     end
-    return
+    return y0
 end
+
+gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid) = @warn "3D gridplots are not implemented for the UnicodePlots backend"
 
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     UnicodePlots = ctx[:Plotter]
@@ -65,8 +76,9 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     end
 
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
-    resolution = ctx[:size] ./ 10
-    legend_space = 4
+    layout = ctx[:layout]
+    resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1])
+    legend_space = 0
     aspect = ctx[:aspect] * resolution[1] / (resolution[1] + legend_space)
 
     if (true) # auto scale feature, do we want this?
@@ -84,7 +96,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     resolution = @. Int(round(resolution))
 
     # create UnicodePlots.Canvas
-    padding = 0.1 * max(ex[2] - ex[1], ey[2] - ey[1])
+    padding = 0 #0.1 * max(ex[2] - ex[1], ey[2] - ey[1])
     ex = (ex[1] - 2 * padding, ex[2] + 0.5 * padding)
     ey = (ey[1] - padding, ey[2] + padding)
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
@@ -180,25 +192,33 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
         )
     end
 
-    region_legend!(canvas, "cell regions: ", 2, 1, colors)
-    region_legend!(canvas, "bface regions:", 2, 2, bcolors)
+
+    plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
+
+    y0 = region_legend!(plt, " cell", 1, [])
+    y0 = region_legend!(plt, "regions", 2, colors)
+    region_legend!(plt, " bface", y0 + 2, [])
+    region_legend!(plt, "regions", y0 + 3, bcolors)
 
     # corner coordinates
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
-    UnicodePlots.annotate!(canvas, ex[1], ey[1], "$(ex[1])", UInt32(0), false; valign = :top)
-    UnicodePlots.annotate!(canvas, ex[2], ey[1], "$(ex[2])", UInt32(0), false; valign = :top, halign = :right)
-    UnicodePlots.annotate!(canvas, ex[1] - 1.5 * padding, ey[1], "$(ey[1])", UInt32(0), false; halign = :left)
-    UnicodePlots.annotate!(canvas, ex[1] - 1.5 * padding, ey[2], "$(ey[2])", UInt32(0), false; halign = :left)
+    UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :b, "x")
+    UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, 1, string(Float16(ey[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, round(Int, (resolution[2] + 1) / 2), "y")
+    UnicodePlots.label!(plt, :l, resolution[2], string(Float16(ey[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
 
     # plot
-    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
+    ctx[:figure] = plt
     return reveal(ctx, TP)
 end
 
 
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     UnicodePlots = ctx[:Plotter]
+    text_color = UnicodePlots.ansi_color(:normal)
 
     # find bounding box
     coords = grid[Coordinates]
@@ -215,12 +235,15 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
         color = ctx[:color]
     end
 
-    # determine resolution (divided by 10, to reduce pixel count in the terminal)
-    resolution = (Int(round(ctx[:size][1] / 10)), 5)
+    # determine resolution (divided by 5, to reduce pixel count in the terminal)
+    ncellregions = num_cellregions(grid)
+    nbregions = num_bfaceregions(grid)
+    layout = ctx[:layout]
+    resolution = (Int(round(ctx[:size][1] / 6 / layout[2])), max(7, 5 + ncellregions + nbregions))
 
     # create UnicodePlots.Canvas
-    legend_space = 5
-    padding = 0.05 * (ex[2] - ex[1])
+    legend_space = 0 #5
+    padding = 0 #0.05 * (ex[2] - ex[1])
     ex = (ex[1] - padding, ex[2] + padding)
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
     canvas = CanvasType(
@@ -231,7 +254,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
 
     # plot all edges in the grid
     cellregions = grid[CellRegions]
-    ncellregions = num_cellregions(grid)
     cmap = region_cmap(max(2, ncellregions))
     ctx[:cmap] = cmap
     colors = [
@@ -251,18 +273,17 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
         for k in 1:size(cen, 2)
             UnicodePlots.lines!(
                 canvas,
-                coords[1, cellnodes[cen[1, k], j]], 0.3,
-                coords[1, cellnodes[cen[2, k], j]], 0.3;
+                coords[1, cellnodes[cen[1, k], j]], 0.5,
+                coords[1, cellnodes[cen[2, k], j]], 0.5;
                 color = colors[r]
             )
         end
     end
     for j in 1:nnodes
-        UnicodePlots.annotate!(canvas, coords[1, j], 0.4, "•", UInt32(0), false)
+        UnicodePlots.annotate!(canvas, coords[1, j], 0.5, "•", text_color, false)
     end
 
     # plot boundary nodes with bregion_cmap colors
-    nbregions = num_bfaceregions(grid)
     bcmap = bregion_cmap(nbregions)
     ctx[:bcmap] = bcmap
     bcolors = [
@@ -278,19 +299,25 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     for j in 1:nbfaces
         red, green, blue = UInt32.(bcolors[bfaceregions[j]])
         uint_color = (red << 16) | (green << 8) | blue
-        UnicodePlots.annotate!(canvas, coords[1, bfacenodes[1, j]], 0.4, "•", UInt32(uint_color), false)
+        UnicodePlots.annotate!(canvas, coords[1, bfacenodes[1, j]], 0.5, "•", UInt32(uint_color), false)
     end
 
-    region_legend!(canvas, "cell regions: ", 2, 1, colors)
-    region_legend!(canvas, "bface regions:", 2, 2, bcolors)
+    plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
+
+    y0 = region_legend!(plt, " cell", 1, [])
+    y0 = region_legend!(plt, "regions", 2, colors)
+    region_legend!(plt, " bface", y0 + 2, [])
+    region_legend!(plt, "regions", y0 + 3, bcolors)
 
 
+    # corner coordinates
     ex = extrema(view(coords, 1, :))
-    UnicodePlots.annotate!(canvas, 0, 0.1, "$(ex[1])", UInt32(0), false)
-    UnicodePlots.annotate!(canvas, ex[2], 0.1, "$(ex[2])", UInt32(0), false)
+    UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :b, "x")
+    UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
 
     # plot
-    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
+    ctx[:figure] = plt
 
     return reveal(ctx, TP)
 end
@@ -306,7 +333,8 @@ function scalarplot!(
     )
 
     nfuncs = length(funcs)
-    resolution = @. Int(round(ctx[:size] ./ 10)) # reduce pixel count in the terminal
+    layout = ctx[:layout]
+    resolution = @. Int(round(ctx[:size] ./ 6 ./ (layout[2], layout[1] * 2))) # reduce pixel count in the terminal (size is then compatible to other plots)
     ylim = ctx[:limits]
 
     if ylim[1] > ylim[2]
@@ -314,15 +342,60 @@ function scalarplot!(
         ylim = (minimum([minimum(func) for func in funcs]), maximum([maximum(func) for func in funcs]))
     end
 
-    plt = ctx[:clear] ? nothing : ctx[:figure]
+    if ctx[:clear] || !haskey(ctx, :figure)
+        plt = nothing
+    else
+        plt = ctx[:figure]
+    end
+
+    xlim = ctx[:xlimits]
+    if xlim[1] > xlim[2]
+        # invalid, try to find the optimal range
+        coord_min = min(ctx[:xlimits][1], minimum.([grid[Coordinates] for grid in grids])...)
+        coord_max = max(ctx[:xlimits][2], maximum.([grid[Coordinates] for grid in grids])...)
+        xlim = (coord_min, coord_max)
+    end
+
+    xscale = ctx[:xscale]
+    xscale == :log && (xscale = :log10)
+    xscale == :symlog && (xscale = x -> sign(x) * (log10(1 + abs(x))))
+
+    yscale = ctx[:yscale]
+    yscale == :log && (yscale = :log10)
+    yscale == :symlog && (yscale = x -> sign(x) * (log10(1 + abs(x))))
+
+    color = UnicodePlots.ansi_color(Symbol(ctx[:color]))
+
     for ifunc in 1:nfuncs
         func = funcs[ifunc]
         grid = grids[ifunc]
         coord = grid[Coordinates] * ctx[:gridscale]
-        if ifunc == 1
-            plt = UnicodePlots.lineplot(coord[1, :], func; ylim, xlabel = "x", name = ctx[:label], height = resolution[2], width = resolution[1])
+        name = name = isnothing(ctx[:label]) ? "" : ctx[:label]
+
+        if isnothing(plt)
+            plt = UnicodePlots.lineplot(
+                coord[1, :],
+                func;
+                xlim,
+                ylim,
+                xscale,
+                yscale,
+                xlabel = String(ctx[:xlabel]),
+                name,
+                height = resolution[2],
+                width = resolution[1],
+                title = ctx[:title],
+                border = ctx[:border],
+                color
+            )
         else
-            UnicodePlots.lineplot!(plt, coord[1, :], func; name = ctx[:label])
+            UnicodePlots.lineplot!(
+                plt,
+                coord[1, :],
+                func;
+                name,
+                color
+            )
         end
     end
     ctx[:figure] = plt
@@ -341,7 +414,8 @@ function scalarplot!(
     )
 
     func = funcs[1]
-    resolution = @. Int(round(ctx[:size] ./ 10)) # reduce pixel count in the terminal
+    layout = ctx[:layout]
+    resolution = ctx[:size] ./ 6 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
@@ -353,6 +427,20 @@ function scalarplot!(
     coords = grids[1][Coordinates]
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
+
+    if (true) # auto scale feature, do we want this?
+        wx = ex[2] - ex[1]
+        wy = ey[2] - ey[1]
+        rescale = wx / wy * (resolution[1] / (resolution[2]))
+        if rescale > 1
+            resolution = (resolution[1], resolution[2] / rescale)
+        else
+            resolution = (resolution[1] / rescale, resolution[2])
+        end
+    end
+
+    # we need an integer resolution
+    resolution = @. Int(round(resolution))
 
     X = LinRange(ex[1], ex[2], resolution[1])
     Y = LinRange(ey[1], ey[2], resolution[2])
@@ -372,9 +460,125 @@ function scalarplot!(
         yoffset = ey[1],
         title = ctx[:title],
         colormap = colormap,
+        height = resolution[2],
+        width = resolution[1],
+        xscale = ctx[:xscale],
+        yscale = ctx[:yscale],
+        border = ctx[:border]
     )
 
     return reveal(ctx, TP)
 end
+
+scalarplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grids, parentgrid, funcs) = @warn "3D scalarplot is not implemented for the UnicodePlots backend"
+
+function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
+
+    layout = ctx[:layout]
+    resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+
+    # find bounding box
+    coords = grid[Coordinates]
+    ex = extrema(view(coords, 1, :))
+    ey = extrema(view(coords, 2, :))
+
+    aspect = ctx[:aspect] * resolution[1] / resolution[1]
+
+    if (true) # auto scale feature, do we want this?
+        wx = ex[2] - ex[1]
+        wy = ey[2] - ey[1]
+        rescale = wx / wy * (resolution[1] / (2 * resolution[2]))
+        if rescale > 1
+            resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
+        else
+            resolution = (Int(ceil(resolution[1] * aspect / rescale)), resolution[2])
+        end
+    end
+
+    # we need an integer resolution
+    resolution = @. Int(round(resolution))
+
+    # query vector field raster points
+    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ((resolution[1] - 1) / 2, 2 * (resolution[2] - 1)), offset = ctx[:offset])
+    qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
+
+    # construct canvas
+    CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
+    canvas = CanvasType(
+        resolution[2], resolution[1],               # number of rows and columns (characters)
+        origin_y = ey[1], origin_x = ex[1],             # position in virtual space
+        height = (ey[2] - ey[1]), width = (ex[2] - ex[1]); blend = false
+    )
+
+    # plot arrows
+    scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
+    narrows = size(qv, 2)
+    vscale = ctx[:vscale] # vscale steers arrow thickness
+    if vscale <= 0.25
+        arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+    elseif vscale <= 0.5
+        arrows = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
+    elseif vscale <= 1
+        arrows = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
+    else
+        arrows = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
+    end
+    maxnorm = maximum(sqrt.(sum(qv .^ 2, dims = 1)))
+    colormap = colorschemes[ctx[:colormap]]
+    for a in 1:narrows
+        # calculate angle of arrow
+        angle = atan(qv[2, a], qv[1, a])
+        anorm = sqrt(qv[1, a]^2 + qv[2, a]^2)
+        scale = anorm / maxnorm
+        uint_color = UnicodePlots.ansi_color(colormap[scale])
+        if angle > -7 * π / 8 && angle <= -5 * π / 8
+            char = arrows[1]
+        elseif angle > -5 * π / 8 && angle <= -3 * π / 8
+            char = arrows[2]
+        elseif angle > -3 * π / 8 && angle <= -π / 8
+            char = arrows[3]
+        elseif angle > -π / 8 && angle <= π / 8
+            char = arrows[4]
+        elseif angle > π / 8 && angle <= 3 * π / 8
+            char = arrows[5]
+        elseif angle > 3 * π / 8 && angle <= 5 * π / 8
+            char = arrows[6]
+        elseif angle > 5 * π / 8 && angle <= 7 * π / 8
+            char = arrows[7]
+        else
+            char = arrows[8]
+        end
+        if scale < 1.0e-2
+            char = '•' # use a dot for very small vectors
+        end
+
+        UnicodePlots.annotate!(canvas, qc[1, a], qc[2, a], char, uint_color, false)
+    end
+
+    # generate plot
+    plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
+
+    # add colormap
+    plt.cmap.bar = ctx[:colorbar] == :none ? false : true
+    plt.cmap.lim = (0, Float16(maxnorm))
+    plt.cmap.callback = UnicodePlots.colormap_callback(ctx[:colormap])
+
+    # corner coordinates
+    ex = extrema(view(coords, 1, :))
+    ey = extrema(view(coords, 2, :))
+    UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :b, "x")
+    UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, 1, string(Float16(ey[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, round(Int, (resolution[2] + 1) / 2), "y")
+    UnicodePlots.label!(plt, :l, resolution[2], string(Float16(ey[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+
+    ctx[:figure] = plt
+
+    return reveal(ctx, TP)
+end
+
+streamplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func) = @warn "2D streamplot is not implemented for the UnicodePlots backend"
+
 
 end # module

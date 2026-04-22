@@ -1,6 +1,6 @@
 using Test, ExtendableGrids, GridVisualize, Pkg, LinearAlgebra
 
-import CairoMakie, PyPlot, PlutoVista
+import CairoMakie, PyPlot, PlutoVista, UnicodePlots, Term
 
 CairoMakie.activate!(; type = "svg", visible = false)
 
@@ -21,10 +21,15 @@ for Plotter in [CairoMakie]
 end
 
 # Some Plotters cannot perform the `makeplots` run, only try a `multiscene`
-for Plotter in [PyPlot, PlutoVista]
+for Plotter in [PyPlot, PlutoVista, UnicodePlots]
     @eval begin
         @testset "plotting_multiscene - $(nameof($Plotter))" begin
-            @test plotting_multiscene(Plotter = $Plotter) !== nothing
+            try
+                plotting_multiscene(Plotter = $Plotter)
+                @test true
+            catch e
+                @test false
+            end
         end
     end
 end

@@ -1,7 +1,7 @@
 name = "GridVisualize"
 uuid = "5eed8a63-0fb0-45eb-886d-8d5a387d12b8"
+version = "1.19.0"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>", "Patrick Jaap <patrick.jaap@wias-berlin.de>"]
-version = "1.18.2"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
@@ -64,6 +64,7 @@ Printf = "1.6"
 PyPlot = "2"
 PythonPlot = "1"
 StaticArrays = "1"
+Term = "2.0.8"
 Triangulate = "2, 3"
 UnicodePlots = "3"
 VTKView = "0.1,0.2"
@@ -75,8 +76,9 @@ ExtendableGrids = "cfc395e8-590f-11e8-1f13-43a2532b2fa8"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 PlutoVista = "646e1f28-b900-46d7-9d87-d554eb38a413"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
 
 [targets]
-test = ["CairoMakie", "ExtendableGrids", "Pkg", "PlutoVista", "PyPlot", "Test", "Triangulate"]
+test = ["CairoMakie", "ExtendableGrids", "Pkg", "PlutoVista", "PyPlot", "Term", "Test", "Triangulate", "UnicodePlots"]

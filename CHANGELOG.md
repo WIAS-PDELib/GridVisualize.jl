@@ -1,6 +1,7 @@
 # Changelog
 
-## [1.18.2] - 2026-04-21
+## [1.19.0] - 2026-XX-XX
+- `UnicodePlots` does support multiplots if the package `Term` is loaded.
 - Add colorbar for cell regions in 2D `gridplot!` with `Py[thon]Plot`
 
 ## [1.18.0] - 2026-04-15
