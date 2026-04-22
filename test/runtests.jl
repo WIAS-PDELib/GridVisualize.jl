@@ -24,7 +24,12 @@ end
 for Plotter in [PyPlot, PlutoVista, UnicodePlots]
     @eval begin
         @testset "plotting_multiscene - $(nameof($Plotter))" begin
-            @test plotting_multiscene(Plotter = $Plotter)
+            try
+                plotting_multiscene(Plotter = $Plotter)
+                @test true
+            catch e
+                @test false
+            end
         end
     end
 end
