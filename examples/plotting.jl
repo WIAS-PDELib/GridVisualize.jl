@@ -327,7 +327,8 @@ function plotting_multiscene!(p)
     )
     vectorplot!(p[1, 4], vec2d()...; title = "2D quiver")
     GridVisualize.streamplot!(p[2, 4], vec2d()...; title = "2D stream")
-    return reveal(p)
+    reveal(p)
+    return true
 end
 
 function plotting_multiscene(; Plotter = default_plotter(), resolution = (1000, 500))
