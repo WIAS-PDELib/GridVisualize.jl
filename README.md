@@ -135,18 +135,18 @@ and all plotting functions will do nothing.
 |                | PyPlot/PythonPlot  | Makie | PlutoVista | Plots | VTKView | UnicodePlots |
 |----------------|--------------------|-------|------------|-------|---------|--------------|
 | scalarplot, 1D | y                  | y     | y,i        | y     | y       | y            |
-| vectorplot, 1D | y                  | y     | y          | y     | y       |              |
+| vectorplot, 1D | y                  | y     | y          | y     | y       | n            |
 | gridplot, 1D   | y                  | y     | y          | y     |         | y            |
 | scalarplot, 2D | y                  | y     | y          | (y)   | y,i     | y            |
-| vectorplot, 2D | y                  | y     | y          | y     |         |
-| streamplot, 2D | y                  | y     | p          | n     |         |
+| vectorplot, 2D | y                  | y     | y          | y     |         | y
+| streamplot, 2D | y                  | y     | p          | n     |         | n
 | gridplot, 2D   | y                  | y,i   | y          | (y)   | y,i     | y            |
-| scalarplot, 3D | y                  | y,i   | y,i        | n     | y,i     |              |
-| gridplot, 3D   | y                  | y,i   | y,i        | n     | y,i     |              |
-| vectorplot, 3D | p                  | p     | p          | n     |         |              |
-| streamplot, 3D |                    | p     | p          | n     |         |              |
-| movie          | n                  | y     | n          | y     |         |              |
-| triangulateio  | y                  | y     | n          | n     | n       |              |
+| scalarplot, 3D | y                  | y,i   | y,i        | n     | y,i     | n            |
+| gridplot, 3D   | y                  | y,i   | y,i        | n     | y,i     | n            |
+| vectorplot, 3D | p                  | p     | p          | n     |         | n            |
+| streamplot, 3D |                    | p     | p          | n     |         | n            |
+| movie          | n                  | y     | n          | y     |         | n            |
+| triangulateio  | y                  | y     | n          | n     | n       | n            |
 
 ## Sample output
 
@@ -165,6 +165,10 @@ and all plotting functions will do nothing.
 
 ### [VTKView](https://github.com/j-fu/VTKView.jl) (experimental):
 ![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_vtkview.png?raw=true")
+
+### [UnicodePlots](https://github.com/JuliaPlots/UnicodePlots.jl) (experimental):
+![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_unicodeplots.png?raw=true")
+
 
 ## vscode
 Plotting  into the plot pane of Visual Studio Code is working. Here, you can use CairoMakie or WGLMakie as backend. This works only with the mutating functions, i.e. you should use something like
