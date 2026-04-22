@@ -331,6 +331,7 @@ function default_plot_kwargs()
         :azim => Pair(-60, "3D azimuth angle  (in degrees)"),
         :aspect => Pair(1.0, "XY Aspect ratio modification"),
         :backend => Pair(:default, "Backend for PlutoVista plot"),
+        :border => Pair(:solid, "border style (only for UnicodePlots), possible values: :corners, :solid, :bold, :dashed, :dotted, :ascii, :none"),
         :cellcoloring => Pair(
             :cellregions,
             "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"

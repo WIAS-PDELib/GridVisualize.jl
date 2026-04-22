@@ -102,7 +102,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     resolution = @. Int(round(resolution))
 
     # create UnicodePlots.Canvas
-    padding = 0.05 * max(ex[2] - ex[1], ey[2] - ey[1])
+    padding = 0.1 * max(ex[2] - ex[1], ey[2] - ey[1])
     ex = (ex[1] - 2 * padding, ex[2] + 0.5 * padding)
     ey = (ey[1] - padding, ey[2] + padding)
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
@@ -212,7 +212,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     UnicodePlots.annotate!(canvas, ex[1] - 1.5 * padding, ey[2], "$(Float16(ey[2]))", text_color, false; halign = :left)
 
     # plot
-    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
+    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
     return reveal(ctx, TP)
 end
 
@@ -313,7 +313,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     UnicodePlots.annotate!(canvas, ex[2], 0.1, "$(Float16(ex[2]))", text_color, false)
 
     # plot
-    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title])
+    ctx[:figure] = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
 
     return reveal(ctx, TP)
 end
@@ -381,6 +381,7 @@ function scalarplot!(
                 height = resolution[2],
                 width = resolution[1],
                 title = ctx[:title],
+                border = ctx[:border],
                 color
             )
         else
@@ -456,7 +457,10 @@ function scalarplot!(
         title = ctx[:title],
         colormap = colormap,
         height = resolution[2],
-        width = resolution[1]
+        width = resolution[1],
+        xscale = ctx[:xscale],
+        yscale = ctx[:yscale],
+        border = ctx[:border]
     )
 
     return reveal(ctx, TP)
@@ -548,7 +552,7 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     end
 
     # generate plot
-    plt = UnicodePlots.Plot(canvas; title = ctx[:title])
+    plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
 
     # add colormap
     plt.cmap.bar = ctx[:colorbar] == :none ? false : true
