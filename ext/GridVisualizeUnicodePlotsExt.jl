@@ -342,15 +342,57 @@ function scalarplot!(
         plt = ctx[:figure]
     end
 
+    xlim = ctx[:xlimits]
+    if xlim[1] > xlim[2]
+        # invalid, try to find the optimal range
+        coord_min = min(ctx[:xlimits][1], minimum.([grid[Coordinates] for grid in grids])...)
+        coord_max = max(ctx[:xlimits][2], maximum.([grid[Coordinates] for grid in grids])...)
+        xlim = (coord_min, coord_max)
+    end
+
+    # xscale::Symbol = :identity: x-axis scale (:identity, :ln, :log2, :log10), or scale function e.g. x -> log10(x).
+    # xscale: x axis scale: one of [:log, :identity, :symlog]. Default: :identity
+
+    xscale = ctx[:xscale]
+    xscale == :log && (xscale = :log10)
+    xscale == :symlog && (xscale = x -> sign(x) * (log10(1 + abs(x))))
+
+    yscale = ctx[:yscale]
+    yscale == :log && (yscale = :log10)
+    yscale == :symlog && (yscale = x -> sign(x) * (log10(1 + abs(x))))
+
+    color = UnicodePlots.ansi_color(Symbol(ctx[:color]))
+
     for ifunc in 1:nfuncs
         func = funcs[ifunc]
         grid = grids[ifunc]
         coord = grid[Coordinates] * ctx[:gridscale]
         name = name = isnothing(ctx[:label]) ? "" : ctx[:label]
+
         if isnothing(plt)
-            plt = UnicodePlots.lineplot(coord[1, :], func; ylim, xlabel = String(ctx[:xlabel]), name, height = resolution[2], width = resolution[1], title = ctx[:title])
+            @show Symbol(ctx[:color])
+            plt = UnicodePlots.lineplot(
+                coord[1, :],
+                func;
+                xlim,
+                ylim,
+                xscale,
+                yscale,
+                xlabel = String(ctx[:xlabel]),
+                name,
+                height = resolution[2],
+                width = resolution[1],
+                title = ctx[:title],
+                color
+            )
         else
-            UnicodePlots.lineplot!(plt, coord[1, :], func; name)
+            UnicodePlots.lineplot!(
+                plt,
+                coord[1, :],
+                func;
+                name,
+                color
+            )
         end
     end
     ctx[:figure] = plt
