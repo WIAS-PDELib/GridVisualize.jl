@@ -353,7 +353,18 @@ function scalarplot!(
     yscale == :log && (yscale = :log10)
     yscale == :symlog && (yscale = x -> sign(x) * (log10(1 + abs(x))))
 
-    color = UnicodePlots.ansi_color(Symbol(ctx[:color]))
+    if typeof(ctx[:color]) <: String || typeof(ctx[:color]) <: Symbol
+        color = UnicodePlots.ansi_color(Symbol(ctx[:color]))
+    elseif typeof(ctx[:color]) <: RGB
+        color = (
+            Int(round(ctx[:color].r * 255)),
+            Int(round(ctx[:color].g * 255)),
+            Int(round(ctx[:color].b * 255)),
+        )
+    else
+        color = ctx[:color]
+    end
+
 
     for ifunc in 1:nfuncs
         func = funcs[ifunc]
