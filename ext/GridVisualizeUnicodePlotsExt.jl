@@ -22,7 +22,7 @@ function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
     if layout == (1, 1)
         display(subplots[1][:figure])
     else
-        if !isdefined(Main, :Term)
+        if :Term ∉ Symbol.(Base.loaded_modules_array())
             @warn "A GridVisualizer with multiple UnicodePlots requires 'Term.jl' to be loaded: add Term.jl to your environment."
         else
             figures = [subplot[:figure] for subplot in subplots if haskey(subplot, :figure)]
