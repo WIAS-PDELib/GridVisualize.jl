@@ -98,34 +98,37 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
         height = (ey[2] - ey[1]) / (resolution[1] / (resolution[1] + legend_space)), width = ex[2] - ex[1]; blend = false
     )
 
-    ## plot all edges in the grid
-    plot_based = ctx[:cellwise] ? ON_CELLS : ON_FACES
-    if plot_based in [ON_FACES, ON_EDGES]
-        # plot all edges via FaceNodes
-        facenodes = grid[FaceNodes]
-        nfaces = size(facenodes, 2)
-        for j in 1:nfaces
-            UnicodePlots.lines!(
-                canvas,
-                coords[1, facenodes[1, j]], coords[2, facenodes[1, j]], # from
-                coords[1, facenodes[2, j]], coords[2, facenodes[2, j]]; # to
-                color = edge_color
-            )
-        end
-    elseif plot_based == ON_CELLS
-        # plot all edges via CellNodes and local_celledgenodes
-        cellnodes = grid[CellNodes]
-        cellgeoms = grid[CellGeometries]
-        ncells = num_cells(grid)
-        for j in 1:ncells
-            cen = local_celledgenodes(cellgeoms[j])
-            for k in 1:size(cen, 2)
+    linewidth = ctx[:linewidth]
+    if linewidth > 0
+        ## plot all edges in the grid
+        plot_based = ctx[:cellwise] ? ON_CELLS : ON_FACES
+        if plot_based in [ON_FACES, ON_EDGES]
+            # plot all edges via FaceNodes
+            facenodes = grid[FaceNodes]
+            nfaces = size(facenodes, 2)
+            for j in 1:nfaces
                 UnicodePlots.lines!(
                     canvas,
-                    coords[1, cellnodes[cen[1, k], j]], coords[2, cellnodes[cen[1, k], j]],
-                    coords[1, cellnodes[cen[2, k], j]], coords[2, cellnodes[cen[2, k], j]];
-                    color = color
+                    coords[1, facenodes[1, j]], coords[2, facenodes[1, j]], # from
+                    coords[1, facenodes[2, j]], coords[2, facenodes[2, j]]; # to
+                    color = edge_color
                 )
+            end
+        elseif plot_based == ON_CELLS
+            # plot all edges via CellNodes and local_celledgenodes
+            cellnodes = grid[CellNodes]
+            cellgeoms = grid[CellGeometries]
+            ncells = num_cells(grid)
+            for j in 1:ncells
+                cen = local_celledgenodes(cellgeoms[j])
+                for k in 1:size(cen, 2)
+                    UnicodePlots.lines!(
+                        canvas,
+                        coords[1, cellnodes[cen[1, k], j]], coords[2, cellnodes[cen[1, k], j]],
+                        coords[1, cellnodes[cen[2, k], j]], coords[2, cellnodes[cen[2, k], j]];
+                        color = color
+                    )
+                end
             end
         end
     end
@@ -146,6 +149,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     cellgeoms = grid[CellGeometries]
     ncells = num_cells(grid)
     midpoint = [0.0, 0.0]
+    markersize = ctx[:markersize]
     for j in 1:ncells
         fill!(midpoint, 0.0)
         nvertices = num_targets(cellnodes, j)
@@ -154,11 +158,31 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
         end
         midpoint ./= nvertices
         r = cellregions[j]
-        UnicodePlots.points!(
-            canvas,
-            midpoint[1], midpoint[2];
-            color = cell_colors[r]
-        )
+        if markersize > 0
+            if markersize < 4
+                UnicodePlots.points!(
+                    canvas,
+                    midpoint[1], midpoint[2];
+                    color = cell_colors[r]
+                )
+            else
+                if markersize < 6
+                    character = "•"
+                elseif markersize < 8
+                    character = "●"
+                else
+                    character = "⬤"
+                end
+                UnicodePlots.annotate!(
+                    canvas,
+                    midpoint[1], midpoint[2],
+                    character,
+                    UnicodePlots.ansi_color(cell_colors[r]),
+                    false
+                )
+            end
+        end
+
     end
 
     # plot boundary faces with bregion_cmap colors
@@ -187,8 +211,11 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
 
-    y0 = region_legend!(plt, " cell", 1, [])
-    y0 = region_legend!(plt, "regions", 2, cell_colors)
+    y0 = 0
+    if markersize > 0
+        y0 = region_legend!(plt, " cell", 1, [])
+        y0 = region_legend!(plt, "regions", 2, cell_colors)
+    end
     region_legend!(plt, " bface", y0 + 2, [])
     region_legend!(plt, "regions", y0 + 3, bcolors)
 
