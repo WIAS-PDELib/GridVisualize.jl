@@ -224,17 +224,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     coords = grid[Coordinates]
     ex = extrema(view(coords, 1, :))
 
-    # line color for interior edges
-    if typeof(ctx[:color]) <: RGB
-        color = (
-            Int(round(ctx[:color].r * 255)),
-            Int(round(ctx[:color].g * 255)),
-            Int(round(ctx[:color].b * 255)),
-        )
-    else
-        color = ctx[:color]
-    end
-
     # determine resolution (divided by 5, to reduce pixel count in the terminal)
     ncellregions = num_cellregions(grid)
     nbregions = num_bfaceregions(grid)
