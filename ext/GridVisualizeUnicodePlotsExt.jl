@@ -61,8 +61,18 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     # find bounding box
     coords = grid[Coordinates]
-    ex = extrema(view(coords, 1, :))
-    ey = extrema(view(coords, 2, :))
+    xlimits = ctx[:xlimits]
+    ylimits = ctx[:ylimits]
+    if xlimits[1] < xlimits[2]
+        ex = xlimits
+    else
+        ex = extrema(view(coords, 1, :))
+    end
+    if ylimits[1] < ylimits[2]
+        ey = ylimits
+    else
+        ey = extrema(view(coords, 2, :))
+    end
 
     # line color for interior edges
     edge_color = UnicodePlots.ansi_color(:normal)
@@ -70,8 +80,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
     layout = ctx[:layout]
     resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1])
-    legend_space = 0
-    aspect = ctx[:aspect] * resolution[1] / (resolution[1] + legend_space)
+    aspect = ctx[:aspect] * resolution[1] / (resolution[1])
 
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
@@ -88,14 +97,11 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     resolution = @. Int(round(resolution))
 
     # create UnicodePlots.Canvas
-    padding = 0 #0.1 * max(ex[2] - ex[1], ey[2] - ey[1])
-    ex = (ex[1] - 2 * padding, ex[2] + 0.5 * padding)
-    ey = (ey[1] - padding, ey[2] + padding)
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
     canvas = CanvasType(
-        resolution[2], resolution[1] + legend_space,            # number of rows and columns (characters)
+        resolution[2], resolution[1],            # number of rows and columns (characters)
         origin_y = ey[1], origin_x = ex[1],      # position in virtual space
-        height = (ey[2] - ey[1]) / (resolution[1] / (resolution[1] + legend_space)), width = ex[2] - ex[1]; blend = false
+        height = (ey[2] - ey[1]), width = ex[2] - ex[1]; blend = false
     )
 
     linewidth = ctx[:linewidth]
@@ -220,8 +226,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     region_legend!(plt, "regions", y0 + 3, bcolors)
 
     # corner coordinates
-    ex = extrema(view(coords, 1, :))
-    ey = extrema(view(coords, 2, :))
     UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
     UnicodePlots.label!(plt, :b, "x")
     UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
@@ -237,11 +241,15 @@ end
 
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     UnicodePlots = ctx[:Plotter]
-    text_color = UnicodePlots.ansi_color(:normal)
 
     # find bounding box
+    xlimits = ctx[:xlimits]
     coords = grid[Coordinates]
-    ex = extrema(view(coords, 1, :))
+    if xlimits[1] < xlimits[2]
+        ex = xlimits
+    else
+        ex = extrema(view(coords, 1, :))
+    end
 
     # determine resolution (divided by 5, to reduce pixel count in the terminal)
     ncellregions = num_cellregions(grid)
@@ -250,12 +258,9 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     resolution = (Int(round(ctx[:size][1] / 6 / layout[2])), max(7, 5 + ncellregions + nbregions))
 
     # create UnicodePlots.Canvas
-    legend_space = 0 #5
-    padding = 0 #0.05 * (ex[2] - ex[1])
-    ex = (ex[1] - padding, ex[2] + padding)
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
     canvas = CanvasType(
-        resolution[2], resolution[1] + legend_space,               # number of rows and columns (characters)
+        resolution[2], resolution[1],               # number of rows and columns (characters)
         origin_y = 0, origin_x = ex[1],             # position in virtual space
         height = 1, width = ex[2] - ex[1]; blend = false
     )
@@ -275,6 +280,12 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     cellgeoms = grid[CellGeometries]
     ncells = num_cells(grid)
     nnodes = num_nodes(grid)
+    text_color = UnicodePlots.ansi_color(:normal)
+    if nnodes < resolution[1] / 2
+        for j in 1:nnodes
+            UnicodePlots.annotate!(canvas, coords[1, j], 0.5, "•", text_color, false)
+        end
+    end
     for j in 1:ncells
         cen = local_celledgenodes(cellgeoms[j])
         r = cellregions[j]
@@ -286,9 +297,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
                 color = colors[r]
             )
         end
-    end
-    for j in 1:nnodes
-        UnicodePlots.annotate!(canvas, coords[1, j], 0.5, "•", text_color, false)
     end
 
     # plot boundary nodes with bregion_cmap colors
@@ -307,7 +315,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     for j in 1:nbfaces
         red, green, blue = UInt32.(bcolors[bfaceregions[j]])
         uint_color = (red << 16) | (green << 8) | blue
-        UnicodePlots.annotate!(canvas, coords[1, bfacenodes[1, j]], 0.5, "•", UInt32(uint_color), false)
+        UnicodePlots.annotate!(canvas, coords[1, bfacenodes[1, j]], 0.5, "•", uint_color, false)
     end
 
     plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
@@ -319,7 +327,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
 
 
     # corner coordinates
-    ex = extrema(view(coords, 1, :))
     UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
     UnicodePlots.label!(plt, :b, "x")
     UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
@@ -383,7 +390,6 @@ function scalarplot!(
     else
         color = ctx[:color]
     end
-
 
     for ifunc in 1:nfuncs
         func = funcs[ifunc]
