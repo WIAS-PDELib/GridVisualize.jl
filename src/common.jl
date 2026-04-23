@@ -257,7 +257,7 @@ function vectorsample(
     tol = reltol * extent
 
     # point spacing
-    spacing = [extent / rasterpoints[i] for i in 1:dim]
+    spacing = [(cminmax[i][2] - cminmax[i][1]) / rasterpoints[i] for i in 1:dim]
 
     # index range
     ijkmax = ones(Int, 3)

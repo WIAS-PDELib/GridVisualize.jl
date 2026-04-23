@@ -88,7 +88,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
     layout = ctx[:layout]
     resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1])
-    aspect = ctx[:aspect] * resolution[1] / (resolution[1])
+    aspect = ctx[:aspect]
 
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
@@ -103,6 +103,11 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
+
+    # ensure that legend fits
+    ncellregions = num_cellregions(grid)
+    nbregions = num_bfaceregions(grid)
+    resolution = (resolution[1], max(resolution[2], 5 + ncellregions + nbregions))
 
     # create UnicodePlots.Canvas
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
@@ -146,7 +151,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     # color cell midpoints with cell regions color
     cellregions = grid[CellRegions]
-    ncellregions = num_cellregions(grid)
     cmap = region_cmap(max(2, ncellregions))
     ctx[:cmap] = cmap
     colors = [
@@ -176,7 +180,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     end
 
     # plot boundary faces with bregion_cmap colors
-    nbregions = num_bfaceregions(grid)
     bcmap = bregion_cmap(nbregions)
     ctx[:bcmap] = bcmap
     bcolors = [
@@ -486,10 +489,19 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
 
     # find bounding box
     coords = grid[Coordinates]
-    ex = extrema(view(coords, 1, :))
-    ey = extrema(view(coords, 2, :))
-
-    aspect = ctx[:aspect] * resolution[1] / resolution[1]
+    xlimits = ctx[:xlimits]
+    ylimits = ctx[:ylimits]
+    if xlimits[1] < xlimits[2]
+        ex = xlimits
+    else
+        ex = extrema(view(coords, 1, :))
+    end
+    if ylimits[1] < ylimits[2]
+        ey = ylimits
+    else
+        ey = extrema(view(coords, 2, :))
+    end
+    aspect = ctx[:aspect]
 
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
@@ -504,9 +516,10 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
+    @info resolution
 
     # query vector field raster points
-    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ((resolution[1] - 1) / 2, 2 * (resolution[2] - 1)), offset = ctx[:offset])
+    rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ((resolution[1] - 1) / 2, resolution[2] - 1), offset = ctx[:offset], xlimits = ex, ylimits = ey)
     qc, qv = quiverdata(rc, rv; vscale = ctx[:vscale], vnormalize = ctx[:vnormalize], vconstant = ctx[:vconstant])
 
     # construct canvas
@@ -518,7 +531,6 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     )
 
     # plot arrows
-    scale = minimum(resolution) / maximum(ctx[:rasterpoints]) / 300
     narrows = size(qv, 2)
     vscale = ctx[:vscale] # vscale steers arrow thickness
     if vscale <= 0.25
