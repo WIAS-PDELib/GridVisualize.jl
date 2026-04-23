@@ -65,15 +65,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     ey = extrema(view(coords, 2, :))
 
     # line color for interior edges
-    if typeof(ctx[:color]) <: RGB
-        color = (
-            Int(round(ctx[:color].r * 255)),
-            Int(round(ctx[:color].g * 255)),
-            Int(round(ctx[:color].b * 255)),
-        )
-    else
-        color = ctx[:color]
-    end
+    edge_color = UnicodePlots.ansi_color(:normal)
 
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
     layout = ctx[:layout]
@@ -117,7 +109,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
                 canvas,
                 coords[1, facenodes[1, j]], coords[2, facenodes[1, j]], # from
                 coords[1, facenodes[2, j]], coords[2, facenodes[2, j]]; # to
-                color = color
+                color = edge_color
             )
         end
     elseif plot_based == ON_CELLS
@@ -143,7 +135,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     ncellregions = num_cellregions(grid)
     cmap = region_cmap(max(2, ncellregions))
     ctx[:cmap] = cmap
-    colors = [
+    cell_colors = [
         (
                 Int(round(cmap[i].r * 255)),
                 Int(round(cmap[i].g * 255)),
@@ -165,7 +157,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
         UnicodePlots.points!(
             canvas,
             midpoint[1], midpoint[2];
-            color = colors[r]
+            color = cell_colors[r]
         )
     end
 
@@ -196,7 +188,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
 
     y0 = region_legend!(plt, " cell", 1, [])
-    y0 = region_legend!(plt, "regions", 2, colors)
+    y0 = region_legend!(plt, "regions", 2, cell_colors)
     region_legend!(plt, " bface", y0 + 2, [])
     region_legend!(plt, "regions", y0 + 3, bcolors)
 
