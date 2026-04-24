@@ -500,10 +500,11 @@ end
 
 scalarplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grids, parentgrid, funcs) = @warn "3D scalarplot is not implemented for the UnicodePlots backend"
 
-arrows_thin = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
-arrows_medium = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
-arrows_thick = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
-arrows_max = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
+arrows_verythin = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+arrows_thin = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
+arrows_medium = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
+arrows_thick = ['🡿', '🡻', '🡾', '🡺', '🡽', '🡹', '🡼', '🡸']
+arrows_verythick = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
 
 function select_arrow(angle, norm, scale)
     if norm * scale < 1.0e-2
@@ -526,14 +527,16 @@ function select_arrow(angle, norm, scale)
     else
         a = 8
     end
-    if norm * scale <= 0.25
+    if norm * scale <= 0.2
+        return arrows_verythin[a]
+    elseif norm * scale <= 0.4
         return arrows_thin[a]
-    elseif norm * scale <= 0.5
+    elseif norm * scale <= 0.6
         return arrows_medium[a]
-    elseif norm * scale <= 0.75
+    elseif norm * scale <= 0.8
         return arrows_thick[a]
     else
-        return arrows_max[a]
+        return arrows_verythick[a]
     end
 end
 
