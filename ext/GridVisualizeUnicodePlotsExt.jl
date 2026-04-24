@@ -80,13 +80,13 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1])
+    resolution = ctx[:size] ./ 12 ./ (layout[2], 2 * layout[1])
     aspect = ctx[:aspect]
 
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
-        wy = ey[2] - ey[1]
-        rescale = wx / wy * (resolution[1] / (2 * resolution[2]))
+        wy = (ey[2] - ey[1]) * 2
+        rescale = wx / wy * (resolution[1] / resolution[2])
         if rescale > 1
             resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
         else
@@ -446,7 +446,7 @@ function scalarplot!(
 
     func = funcs[1]
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ (12, 6) ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
@@ -462,8 +462,8 @@ function scalarplot!(
     aspect = ctx[:aspect]
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
-        wy = ey[2] - ey[1]
-        rescale = wx / wy * (resolution[1] / (resolution[2]))
+        wy = (ey[2] - ey[1])
+        rescale = wx / wy * (resolution[1] / resolution[2])
         if rescale > 1
             resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
         else
@@ -576,7 +576,7 @@ end
 function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
 
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 12 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ 12 ./ (layout[2], 2 * layout[1]) # reduce pixel count in the terminal
 
     # find bounding box
     coords = grid[Coordinates]
@@ -596,8 +596,8 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
 
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
-        wy = ey[2] - ey[1]
-        rescale = wx / wy * (resolution[1] / (2 * resolution[2]))
+        wy = (ey[2] - ey[1]) * 2
+        rescale = wx / wy * (resolution[1] / resolution[2])
         if rescale > 1
             resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
         else
