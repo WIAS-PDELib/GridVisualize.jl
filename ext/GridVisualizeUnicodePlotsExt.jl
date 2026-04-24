@@ -6,7 +6,8 @@ Extension module for UnicodePlots.jl
 module GridVisualizeUnicodePlotsExt
 
 import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal, streamplot!
-using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata
+using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata, isolevels
+using GridVisualizeTools: marching_triangles
 using UnicodePlots: UnicodePlots
 using ExtendableGrids: Coordinates, simplexgrid, ON_CELLS, ON_FACES, ON_EDGES, CellNodes, FaceNodes, BFaceNodes, CellGeometries, CellRegions, BFaceRegions, num_cells, num_nodes, local_celledgenodes, num_bfaceregions, num_cellregions, num_targets, interpolate!
 using Colors: Colors, RGB, RGBA, red, green, blue
@@ -481,6 +482,9 @@ function scalarplot!(
     I = zeros(Float64, num_nodes(xgrid_plot))
     interpolate!(I, xgrid_plot, func, grids[1]; eps = 1.0e-14, not_in_domain_value = NaN, trybrute = true)
 
+    # adjust colormap to desired number of colorlevels
+    colormap = get(colorschemes[ctx[:colormap]], range(0.0, 1.0, length = max(2, 1 + ctx[:colorlevels])))
+
     plt = UnicodePlots.heatmap(
         reshape(I, (resolution[1], resolution[2]))',
         xlabel = ctx[:xlabel],
@@ -497,6 +501,26 @@ function scalarplot!(
         yscale = ctx[:yscale],
         border = ctx[:border]
     )
+
+    # isolines (only when given as an array)
+    if typeof(ctx[:levels]) <: AbstractArray
+        levels, ~, ~ = isolevels(ctx, funcs)
+        points = marching_triangles(grids[1], func, levels; gridscale = 1.0)
+        if typeof(ctx[:color]) <: String || typeof(ctx[:color]) <: Symbol
+            color = UnicodePlots.ansi_color(Symbol(ctx[:color]))
+        elseif typeof(ctx[:color]) <: RGB
+            color = (
+                Int(round(ctx[:color].r * 255)),
+                Int(round(ctx[:color].g * 255)),
+                Int(round(ctx[:color].b * 255)),
+            )
+        else
+            color = ctx[:color]
+        end
+        for j in 1:2:(length(points) - 1)
+            UnicodePlots.lineplot!(plt, [points[j][1], points[j + 1][1]], [points[j][2], points[j + 1][2]], color = color)
+        end
+    end
 
     ctx[:figure] = plt
 
