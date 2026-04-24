@@ -229,12 +229,12 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     region_legend!(plt, "regions", y0 + 3, bcolors)
 
     # corner coordinates
-    UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
-    UnicodePlots.label!(plt, :b, "x")
-    UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
-    UnicodePlots.label!(plt, :l, 1, string(Float16(ey[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
-    UnicodePlots.label!(plt, :l, round(Int, (resolution[2] + 1) / 2), "y")
-    UnicodePlots.label!(plt, :l, resolution[2], string(Float16(ey[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :b, ctx[:xlabel])
+    UnicodePlots.label!(plt, :bl, UnicodePlots.nice_repr(ex[1], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :br, UnicodePlots.nice_repr(ex[2], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, 1, UnicodePlots.nice_repr(ey[2], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, round(Int, (resolution[2] + 1) / 2), ctx[:ylabel])
+    UnicodePlots.label!(plt, :l, resolution[2], UnicodePlots.nice_repr(ey[1], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
 
     # plot
     ctx[:figure] = plt
@@ -331,7 +331,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
 
     # corner coordinates
     UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
-    UnicodePlots.label!(plt, :b, "x")
+    UnicodePlots.label!(plt, :b, ctx[:xlabel])
     UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
 
     # plot
@@ -352,9 +352,10 @@ function scalarplot!(
 
     nfuncs = length(funcs)
     layout = ctx[:layout]
-    resolution = @. Int(round(ctx[:size] ./ 6 ./ (layout[2], layout[1] * 2))) # reduce pixel count in the terminal (size is then compatible to other plots)
-    ylim = ctx[:limits]
+    resolution = @. Int(round(ctx[:size] ./ (12, 6) ./ (layout[2], 4 * layout[1]))) # reduce pixel count in the terminal (size is then compatible to other plots)
+    @info resolution
 
+    ylim = ctx[:limits]
     if ylim[1] > ylim[2]
         # try to find limits automatically
         ylim = (minimum([minimum(func) for func in funcs]), maximum([maximum(func) for func in funcs]))
@@ -409,6 +410,7 @@ function scalarplot!(
                 xscale,
                 yscale,
                 xlabel = String(ctx[:xlabel]),
+                ylabel = ctx[:ylabel],
                 name,
                 height = resolution[2],
                 width = resolution[1],
@@ -426,6 +428,7 @@ function scalarplot!(
             )
         end
     end
+
     ctx[:figure] = plt
 
     return reveal(ctx, TP)
@@ -443,7 +446,7 @@ function scalarplot!(
 
     func = funcs[1]
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 6 ./ (layout[2], layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ (12, 6) ./ (layout[2], layout[1]) # reduce pixel count in the terminal
     ylim = ctx[:limits]
     colormap = ctx[:colormap]
 
@@ -456,14 +459,15 @@ function scalarplot!(
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
 
+    aspect = ctx[:aspect]
     if (true) # auto scale feature, do we want this?
         wx = ex[2] - ex[1]
         wy = ey[2] - ey[1]
         rescale = wx / wy * (resolution[1] / (resolution[2]))
         if rescale > 1
-            resolution = (resolution[1], resolution[2] / rescale)
+            resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
         else
-            resolution = (resolution[1] / rescale, resolution[2])
+            resolution = (Int(ceil(resolution[1] * aspect / rescale)), resolution[2])
         end
     end
 
@@ -478,10 +482,10 @@ function scalarplot!(
     I = zeros(Float64, num_nodes(xgrid_plot))
     interpolate!(I, xgrid_plot, func, grids[1]; eps = 1.0e-14, not_in_domain_value = NaN, trybrute = true)
 
-    ctx[:figure] = UnicodePlots.heatmap(
+    plt = UnicodePlots.heatmap(
         reshape(I, (resolution[1], resolution[2]))',
-        xlabel = "x",
-        ylabel = "y",
+        xlabel = ctx[:xlabel],
+        ylabel = ctx[:ylabel],
         xfact = (ex[2] - ex[1]) / (resolution[1] - 1),
         yfact = (ey[2] - ey[1]) / (resolution[2] - 1),
         xoffset = ex[1],
@@ -495,17 +499,22 @@ function scalarplot!(
         border = ctx[:border]
     )
 
+    ctx[:figure] = plt
+
     return reveal(ctx, TP)
 end
 
 scalarplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grids, parentgrid, funcs) = @warn "3D scalarplot is not implemented for the UnicodePlots backend"
 
+
+# unicode arrows for vector plot
 arrows_verythin = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
 arrows_thin = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
 arrows_medium = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
 arrows_thick = ['🡿', '🡻', '🡾', '🡺', '🡽', '🡹', '🡼', '🡸']
 arrows_verythick = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
 
+# helper function that selects the right arrow for a given vector direction and norm
 function select_arrow(angle, norm, scale)
     if norm * scale < 1.0e-2
         return '•' # use a dot for very small vectors
@@ -605,7 +614,17 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     end
 
     # generate plot
-    plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
+    plt = UnicodePlots.Plot(
+        canvas; title = ctx[:title], border = ctx[:border],
+        xfact = (ex[2] - ex[1]) / (resolution[1] - 1),
+        yfact = (ey[2] - ey[1]) / (resolution[2] - 1),
+        xlabel = ctx[:xlabel],
+        ylabel = ctx[:ylabel],
+        xoffset = ex[1],
+        yoffset = ey[1],
+        compact_labels = false,
+        labels = true
+    )
 
     # add colormap
     plt.cmap.bar = ctx[:colorbar] == :none ? false : true
@@ -615,12 +634,10 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     # corner coordinates
     ex = extrema(view(coords, 1, :))
     ey = extrema(view(coords, 2, :))
-    UnicodePlots.label!(plt, :bl, string(Float16(ex[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
-    UnicodePlots.label!(plt, :b, "x")
-    UnicodePlots.label!(plt, :br, string(Float16(ex[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
-    UnicodePlots.label!(plt, :l, 1, string(Float16(ey[2])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
-    UnicodePlots.label!(plt, :l, round(Int, (resolution[2] + 1) / 2), "y")
-    UnicodePlots.label!(plt, :l, resolution[2], string(Float16(ey[1])), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :bl, UnicodePlots.nice_repr(ex[1], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :br, UnicodePlots.nice_repr(ex[2], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, 1, UnicodePlots.nice_repr(ey[2], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
+    UnicodePlots.label!(plt, :l, resolution[2], UnicodePlots.nice_repr(ey[1], plt), UnicodePlots.ansi_color(UnicodePlots.BORDER_COLOR[]))
 
     ctx[:figure] = plt
 
