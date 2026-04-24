@@ -352,8 +352,7 @@ function scalarplot!(
 
     nfuncs = length(funcs)
     layout = ctx[:layout]
-    resolution = @. Int(round(ctx[:size] ./ (12, 6) ./ (layout[2], 4 * layout[1]))) # reduce pixel count in the terminal (size is then compatible to other plots)
-    @info resolution
+    resolution = @. Int(round(ctx[:size] ./ 6 ./ (layout[2], 2 * layout[1]))) # reduce pixel count in the terminal (size is then compatible to other plots)
 
     ylim = ctx[:limits]
     if ylim[1] > ylim[2]
