@@ -80,19 +80,14 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     # determine resolution (divided by 10, to reduce pixel count in the terminal)
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 12 ./ (layout[2], 2 * layout[1])
+    resolution = ctx[:size] ./ (48, 24) ./ (layout[2], layout[1])
     aspect = ctx[:aspect]
 
-    if (true) # auto scale feature, do we want this?
-        wx = ex[2] - ex[1]
-        wy = (ey[2] - ey[1]) * 2
-        rescale = wx / wy * (resolution[1] / resolution[2])
-        if rescale > 1
-            resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
-        else
-            resolution = (Int(ceil(resolution[1] * aspect / rescale)), resolution[2])
-        end
-    end
+    # rescale resolution
+    wx = ex[2] - ex[1]
+    wy = ey[2] - ey[1]
+    rescale = 2 * wx / wy * (resolution[2] / (resolution[1])) / aspect
+    resolution = (resolution[1] * rescale, resolution[2])
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
@@ -259,7 +254,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     ncellregions = num_cellregions(grid)
     nbregions = num_bfaceregions(grid)
     layout = ctx[:layout]
-    resolution = (Int(round(ctx[:size][1] / 6 / layout[2])), max(7, 5 + ncellregions + nbregions))
+    resolution = (Int(round(ctx[:size][1] / 12 / layout[2])), max(7, 5 + ncellregions + nbregions))
 
     # create UnicodePlots.Canvas
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
@@ -460,16 +455,12 @@ function scalarplot!(
     ey = extrema(view(coords, 2, :))
 
     aspect = ctx[:aspect]
-    if (true) # auto scale feature, do we want this?
-        wx = ex[2] - ex[1]
-        wy = (ey[2] - ey[1])
-        rescale = wx / wy * (resolution[1] / resolution[2])
-        if rescale > 1
-            resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
-        else
-            resolution = (Int(ceil(resolution[1] * aspect / rescale)), resolution[2])
-        end
-    end
+
+    # rescale resolution
+    wx = ex[2] - ex[1]
+    wy = ey[2] - ey[1]
+    rescale = wx / wy * (resolution[2] / (resolution[1])) / aspect
+    resolution = (resolution[1] * rescale, resolution[2])
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
@@ -576,7 +567,7 @@ end
 function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
 
     layout = ctx[:layout]
-    resolution = ctx[:size] ./ 12 ./ (layout[2], 2 * layout[1]) # reduce pixel count in the terminal
+    resolution = ctx[:size] ./ (48, 24) ./ (layout[2], layout[1])
 
     # find bounding box
     coords = grid[Coordinates]
@@ -592,18 +583,14 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     else
         ey = extrema(view(coords, 2, :))
     end
+
     aspect = ctx[:aspect]
 
-    if (true) # auto scale feature, do we want this?
-        wx = ex[2] - ex[1]
-        wy = (ey[2] - ey[1]) * 2
-        rescale = wx / wy * (resolution[1] / resolution[2])
-        if rescale > 1
-            resolution = (resolution[1] * aspect, Int(ceil(resolution[2] / rescale)))
-        else
-            resolution = (Int(ceil(resolution[1] * aspect / rescale)), resolution[2])
-        end
-    end
+    # rescale resolution
+    wx = ex[2] - ex[1]
+    wy = ey[2] - ey[1]
+    rescale = 2 * wx / wy * (resolution[2] / (resolution[1])) / aspect
+    resolution = (resolution[1] * rescale, resolution[2])
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
