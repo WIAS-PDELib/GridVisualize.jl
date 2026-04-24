@@ -500,6 +500,44 @@ end
 
 scalarplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grids, parentgrid, funcs) = @warn "3D scalarplot is not implemented for the UnicodePlots backend"
 
+arrows_thin = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
+arrows_medium = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
+arrows_thick = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
+arrows_max = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
+
+function select_arrow(angle, norm, scale)
+    if norm * scale < 1.0e-2
+        return '•' # use a dot for very small vectors
+    end
+    if angle > -7 * π / 8 && angle <= -5 * π / 8
+        a = 1
+    elseif angle > -5 * π / 8 && angle <= -3 * π / 8
+        a = 2
+    elseif angle > -3 * π / 8 && angle <= -π / 8
+        a = 3
+    elseif angle > -π / 8 && angle <= π / 8
+        a = 4
+    elseif angle > π / 8 && angle <= 3 * π / 8
+        a = 5
+    elseif angle > 3 * π / 8 && angle <= 5 * π / 8
+        a = 6
+    elseif angle > 5 * π / 8 && angle <= 7 * π / 8
+        a = 7
+    else
+        a = 8
+    end
+    if norm * scale <= 0.25
+        return arrows_thin[a]
+    elseif norm * scale <= 0.5
+        return arrows_medium[a]
+    elseif norm * scale <= 0.75
+        return arrows_thick[a]
+    else
+        return arrows_max[a]
+    end
+end
+
+
 function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func)
 
     layout = ctx[:layout]
@@ -534,7 +572,6 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
-    @info resolution
 
     # query vector field raster points
     rc, rv = vectorsample(grid, func; gridscale = ctx[:gridscale], rasterpoints = ((resolution[1] - 1) / 2, resolution[2] - 1), offset = ctx[:offset], xlimits = ex, ylimits = ey)
@@ -551,15 +588,6 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     # plot arrows
     narrows = size(qv, 2)
     vscale = ctx[:vscale] # vscale steers arrow thickness
-    if vscale <= 0.25
-        arrows = ['↙', '↓', '↘', '→', '↗', '↑', '↖', '←']
-    elseif vscale <= 0.5
-        arrows = ['🡯', '🡫', '🡮', '🡪', '🡭', '🡩', '🡬', '🡨']
-    elseif vscale <= 1
-        arrows = ['🡷', '🡳', '🡶', '🡲', '🡵', '🡱', '🡴', '🡰']
-    else
-        arrows = ['🢇', '🢃', '🢆', '🢂', '🢅', '🢁', '🢄', '🢀']
-    end
     maxnorm = maximum(sqrt.(sum(qv .^ 2, dims = 1)))
     colormap = colorschemes[ctx[:colormap]]
     for a in 1:narrows
@@ -568,26 +596,7 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
         anorm = sqrt(qv[1, a]^2 + qv[2, a]^2)
         scale = anorm / maxnorm
         uint_color = UnicodePlots.ansi_color(colormap[scale])
-        if angle > -7 * π / 8 && angle <= -5 * π / 8
-            char = arrows[1]
-        elseif angle > -5 * π / 8 && angle <= -3 * π / 8
-            char = arrows[2]
-        elseif angle > -3 * π / 8 && angle <= -π / 8
-            char = arrows[3]
-        elseif angle > -π / 8 && angle <= π / 8
-            char = arrows[4]
-        elseif angle > π / 8 && angle <= 3 * π / 8
-            char = arrows[5]
-        elseif angle > 3 * π / 8 && angle <= 5 * π / 8
-            char = arrows[6]
-        elseif angle > 5 * π / 8 && angle <= 7 * π / 8
-            char = arrows[7]
-        else
-            char = arrows[8]
-        end
-        if scale < 1.0e-2
-            char = '•' # use a dot for very small vectors
-        end
+        char = select_arrow(angle, anorm / maxnorm, vscale)
 
         UnicodePlots.annotate!(canvas, qc[1, a], qc[2, a], char, uint_color, false)
     end
