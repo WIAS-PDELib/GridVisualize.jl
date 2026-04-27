@@ -1,6 +1,6 @@
 name = "GridVisualize"
 uuid = "5eed8a63-0fb0-45eb-886d-8d5a387d12b8"
-version = "1.19.1"
+version = "1.19.2"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>", "Patrick Jaap <patrick.jaap@wias-berlin.de>"]
 
 [deps]
@@ -50,7 +50,7 @@ ElasticArrays = "1"
 ExtendableGrids = "1.17"
 GeometryBasics = "0.4.1, 0.5"
 GridVisualizeTools = "3"
-HypertextLiteral = "0.9"
+HypertextLiteral = "0.9, 1"
 Interpolations = "0.14, 0.15, 0.16"
 IntervalSets = "0.7"
 LinearAlgebra = "1.6"
