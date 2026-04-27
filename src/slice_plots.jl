@@ -214,9 +214,6 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
     # get new data from marching_tetrahedra
     new_coords, new_triangles, new_values = GridVisualize.marching_tetrahedra(grid, values, [plane], [])
 
-    # construct new 2D grid
-    grid_2d = ExtendableGrid{Float64, Int32}()
-
     a::Float64, b::Float64, c::Float64, _ = plane
 
     # transformation matrix
@@ -242,23 +239,25 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
         rotation_matrix = compute_3d_z_rotation_matrix([a, b, c])
     end
 
-    grid_2d[Coordinates] = Matrix{Float64}(undef, 2, length(new_coords))
+    coords = Matrix{Float64}(undef, 2, length(new_coords))
     for (ip, p) in enumerate(new_coords)
         # to obtain the projected coordinates, we can simply use the transpose of the rotation matrix
-        @views grid_2d[Coordinates][:, ip] .= (rotation_matrix'p)[1:2]
+        @views coords[:, ip] .= (rotation_matrix'p)[1:2]
     end
 
     if (a, b, c) ∉ [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)]
         # adjust the coordinates s.t. the minimal coordinate is zero
-        @views grid_2d[Coordinates][1, :] .-= minimum(grid_2d[Coordinates][1, :])
-        @views grid_2d[Coordinates][2, :] .-= minimum(grid_2d[Coordinates][2, :])
+        @views coords[1, :] .-= minimum(coords[1, :])
+        @views coords[2, :] .-= minimum(coords[2, :])
     end
 
-    grid_2d[CellNodes] = Matrix{Int32}(undef, 3, length(new_triangles))
+    cellnodes = Matrix{Int32}(undef, 3, length(new_triangles))
     for (it, t) in enumerate(new_triangles)
-        @views grid_2d[CellNodes][:, it] .= t
+        @views cellnodes[:, it] .= t
     end
 
+    # construct new 2D grid
+    grid_2d = simplexgrid(coords, cellnodes)
     return scalarplot!(ctx, grid_2d, new_values)
 end
 

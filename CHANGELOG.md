@@ -1,6 +1,10 @@
 # Changelog
 
-## [1.19.0] - 2026-XX-XX
+## [1.19.1] - 2026-04-23
+- several small fixes in `UnicodePlots` extension.
+- fix in slice plotting: use `simplexgrid` constructor for the resulting grid to ensure a consistent grid.
+
+## [1.19.0] - 2026-04-23
 - `UnicodePlots` does support multiplots if the package `Term` is loaded.
 - Add colorbar for cell regions in 2D `gridplot!` with `Py[thon]Plot`
 
