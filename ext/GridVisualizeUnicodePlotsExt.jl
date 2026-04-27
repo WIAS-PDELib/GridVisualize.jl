@@ -16,7 +16,7 @@ using ColorSchemes: colorschemes, color
 initialize!(p, ::Type{UnicodePlotsType}) = nothing
 
 
-function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
+function reveal(p::GridVisualizer, TP::Type{UnicodePlotsType})
     layout = p.context[:layout]
     subplots = @views permutedims(p.subplots)[:]
 
@@ -26,8 +26,14 @@ function reveal(p::GridVisualizer, ::Type{UnicodePlotsType})
         if :Term ∉ Symbol.(Base.loaded_modules_array())
             @warn "A GridVisualizer with multiple UnicodePlots requires 'Term.jl' to be loaded: add Term.jl to your environment."
         else
-            figures = [subplot[:figure] for subplot in subplots if haskey(subplot, :figure)]
-            grid_plot = UnicodePlots.gridplot(figures, layout = p.context[:layout], show_placeholder = true)
+            # set missing figures
+            for subplot in subplots
+                if !haskey(subplot, :figure)
+                    missing_figure!(subplot, TP)
+                end
+            end
+
+            grid_plot = UnicodePlots.gridplot([subplot[:figure] for subplot in subplots], layout = p.context[:layout], show_placeholder = true)
             display(grid_plot)
         end
     end
@@ -55,7 +61,7 @@ function region_legend!(plt, title, y0, colors)
     return y0
 end
 
-gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid) = @warn "3D gridplots are not implemented for the UnicodePlots backend"
+gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid) = missing_figure!(ctx, TP, "gridplot! (3D)", not_implemented = true)
 
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     UnicodePlots = ctx[:Plotter]
@@ -518,7 +524,7 @@ function scalarplot!(
     return reveal(ctx, TP)
 end
 
-scalarplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grids, parentgrid, funcs) = @warn "3D scalarplot is not implemented for the UnicodePlots backend"
+scalarplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grids, parentgrid, funcs) = missing_figure!(ctx, TP, "scalarplot! (3D)", not_implemented = true)
 
 
 # unicode arrows for vector plot
@@ -654,7 +660,50 @@ function vectorplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func
     return reveal(ctx, TP)
 end
 
-streamplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func) = @warn "2D streamplot is not implemented for the UnicodePlots backend"
+streamplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid, func) = missing_figure!(ctx, TP, "streamplot! (2D)", not_implemented = true)
 
+# placeholder for missing/not implemented
+function missing_figure!(ctx, TP::Type{UnicodePlotsType}, caller_text = ""; not_implemented = false)
+
+    UnicodePlots = ctx[:Plotter]
+
+    layout = ctx[:layout]
+    resolution = ctx[:size] ./ (12, 24) ./ (layout[2], layout[1])
+
+    # we need an integer resolution
+    resolution = @. Int(round(resolution))
+
+    # create UnicodePlots.Canvas
+    CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
+    canvas = CanvasType(
+        resolution[2], resolution[1]            # number of rows and columns (characters)
+    )
+
+    if not_implemented
+        @warn "$caller_text is not implemented for the UnicodePlots backend"
+        UnicodePlots.annotate!(
+            canvas,
+            0.5, 0.4,
+            "[not implemented]",
+            UnicodePlots.ansi_color(:normal),
+            false
+        )
+    end
+
+    UnicodePlots.annotate!(
+        canvas,
+        0.5,
+        not_implemented ? 0.6 : 0.5,
+        caller_text,
+        UnicodePlots.ansi_color(:normal),
+        false
+    )
+
+    plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = :dotted)
+
+    # plot
+    ctx[:figure] = plt
+    return reveal(ctx, TP)
+end
 
 end # module
