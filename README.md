@@ -152,22 +152,22 @@ and all plotting functions will do nothing.
 
 
 ### [PyPlot](https://github.com/JuliaPy/PyPlot.jl),  [PythonPlot](https://github.com/JuliaPy/PythonPlot.jl):
-![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_pyplot.png?raw=true)
+<img src="https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_pyplot.png?raw=true" width="600">
 
 
 ### [GLMakie](https://github.com/JuliaPlots/GLMakie.jl):
-![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_glmakie.png?raw=true)
+<img src="https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_glmakie.png?raw=true" width="600">
 
 
 ### [Plots/gr](https://github.com/JuliaPlots/Plots.jl):
-![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_plots.png?raw=true")
+<img src="https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_plots.png?raw=true" width="600">
 
 
 ### [VTKView](https://github.com/j-fu/VTKView.jl) (experimental):
-![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_vtkview.png?raw=true")
+<img src="https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_vtkview.png?raw=true" width="600">
 
 ### [UnicodePlots](https://github.com/JuliaPlots/UnicodePlots.jl) (experimental):
-![](https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_unicodeplots.png?raw=true")
+<img src="https://github.com/WIAS-PDELib/GridVisualize.jl/blob/main/docs/src/assets/multiscene_unicodeplots.png?raw=true" width="600">
 
 
 ## vscode
