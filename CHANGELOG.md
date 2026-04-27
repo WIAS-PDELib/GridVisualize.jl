@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.19.1] - 2026-04-23
+## [1.19.1] - 2026-04-27
 - several small fixes in `UnicodePlots` extension.
 - fix in slice plotting: use `simplexgrid` constructor for the resulting grid to ensure a consistent grid.
 
