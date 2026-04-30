@@ -1,6 +1,6 @@
 """
     module GridVisualizeUnicodePlotsExt
-    
+
 Extension module for UnicodePlots.jl
 """
 module GridVisualizeUnicodePlotsExt
@@ -24,7 +24,12 @@ function reveal(p::GridVisualizer, TP::Type{UnicodePlotsType})
         display(subplots[1][:figure])
     else
         if :Term ∉ Symbol.(Base.loaded_modules_array())
-            @warn "A GridVisualizer with multiple UnicodePlots requires 'Term.jl' to be loaded: add Term.jl to your environment."
+            @warn "A GridVisualizer with multiple UnicodePlots can only respect the desired layout if 'Term.jl' is loaded: add Term.jl to your environment and use it."
+
+            # plot figures one by one
+            for subplot in subplots
+                haskey(subplot, :figure) && display(subplot[:figure])
+            end
         else
             # set missing figures
             for subplot in subplots
