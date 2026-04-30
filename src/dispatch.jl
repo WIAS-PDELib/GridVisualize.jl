@@ -314,7 +314,7 @@ $(SIGNATURES)
 
 Return a SubVisualizer
 """
-Base.getindex(p::GridVisualizer, i, j) = p.subplots[i, j]
+Base.getindex(p::GridVisualizer, i...) = p.subplots[i...]
 
 """
 $(SIGNATURES)
