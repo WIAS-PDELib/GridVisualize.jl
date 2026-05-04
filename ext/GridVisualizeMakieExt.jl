@@ -653,7 +653,7 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid)
             end
         end
         # Draw cells with region mark
-        cmap = region_cmap(nregions)
+        cmap = ctx[:cellregioncolormap](nregions)
         ctx[:cmap] = cmap
         for i in 1:nregions
             XMakie.poly!(
@@ -666,7 +666,7 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{2}}, grid)
         end
 
         # Draw boundary lines
-        bcmap = bregion_cmap(nbregions)
+        bcmap = ctx[:bregioncolormap](nbregions)
         ctx[:bcmap] = bcmap
         for i in 1:nbregions
             lp = XMakie.linesegments!(
@@ -1124,9 +1124,9 @@ function gridplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grid)
         )
 
         ctx[:scene] = makeaxis3d(ctx)
-        cmap = region_cmap(nregions)
+        cmap = ctx[:cellregioncolormap](nregions)
         ctx[:cmap] = cmap
-        bcmap = bregion_cmap(nbregions)
+        bcmap = ctx[:bregioncolormap](nbregions)
         ctx[:bcmap] = bcmap
 
         ############# Interior cuts
@@ -1375,7 +1375,7 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
                 d -> [make_mesh(d[1][i], d[2][i]) for i in 1:nbregions],
                 ctx[:outlinedata]
             )
-            bcmap = bregion_cmap(nbregions)
+            bcmap = ctx[:bregioncolormap](nbregions)
             for i in 1:nbregions
                 XMakie.mesh!(
                     ctx[:scene],

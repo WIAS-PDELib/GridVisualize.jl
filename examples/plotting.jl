@@ -38,9 +38,23 @@ function grid2d(; n = 20)
     return g = simplexgrid(X, X)
 end
 
-function plotting_grid2d(; Plotter = default_plotter(), kwargs...)
-    return gridplot(grid2d(); Plotter = Plotter, kwargs...)
+# We can also set custom colors for the cellregions and
+# boundary regions by providing a function that returns
+# a list of `nregions` colors via the `cellregioncolormap`
+# or `bregioncolormap` keywords.
+
+function custom_cellcolors(ncellregions)
+    return [:firebrick]
 end
+
+function custom_bregioncolors(nbregions)
+    return [:teal, :darkgreen, :darkmagenta, :navy]
+end
+
+function plotting_grid2d(; Plotter = default_plotter(), kwargs...)
+    return gridplot(grid2d(); Plotter = Plotter, cellregioncolormap = custom_cellcolors, bregioncolormap = custom_bregioncolors, kwargs...)
+end
+
 # ![](plotting_grid2d.png)
 
 # ### 3D grids
