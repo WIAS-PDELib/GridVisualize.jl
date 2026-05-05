@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.20.1] -
+## [1.20.1] - 2026-05-05
 - `UnicodePlots`: fixed a grid rescaling issue
 
 ## [1.20.0] - 2026-04-30
