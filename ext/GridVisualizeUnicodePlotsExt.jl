@@ -94,6 +94,11 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     resolution = ctx[:size] ./ (48, 24) ./ (layout[2], layout[1])
     aspect = ctx[:aspect]
 
+    # ensure that legend fits
+    ncellregions = num_cellregions(grid)
+    nbregions = num_bfaceregions(grid)
+    resolution = (resolution[1], max(resolution[2], 5 + ncellregions + nbregions))
+
     # rescale resolution
     wx = ex[2] - ex[1]
     wy = ey[2] - ey[1]
@@ -102,11 +107,6 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
 
     # we need an integer resolution
     resolution = @. Int(round(resolution))
-
-    # ensure that legend fits
-    ncellregions = num_cellregions(grid)
-    nbregions = num_bfaceregions(grid)
-    resolution = (resolution[1], max(resolution[2], 5 + ncellregions + nbregions))
 
     # create UnicodePlots.Canvas
     CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
