@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.20.1] -
+- `UnicodePlots`: fixed a grid rescaling issue
+
 ## [1.20.0] - 2026-04-30
 - a `GridVisualizer` can now be indexed with a single index
 - `UnicodePlots`: multiple plots are now displayed even without `Term` loaded, but only one by one
