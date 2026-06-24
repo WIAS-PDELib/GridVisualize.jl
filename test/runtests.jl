@@ -1,5 +1,10 @@
 using Test, ExtendableGrids, GridVisualize, Pkg, LinearAlgebra
 
+using Conda
+Conda.add("matplotlib")
+ENV["MPLBACKEND"] = "agg"
+
+
 import CairoMakie, PyPlot, PlutoVista, UnicodePlots, Term
 
 CairoMakie.activate!(; type = "svg", visible = false)
