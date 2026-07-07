@@ -1,6 +1,6 @@
 using Test, ExtendableGrids, GridVisualize, Pkg, LinearAlgebra
 
-import CairoMakie, PyPlot, PlutoVista, UnicodePlots, Term
+import PyPlot, CairoMakie, PlutoVista, UnicodePlots, Term
 
 CairoMakie.activate!(; type = "svg", visible = false)
 
