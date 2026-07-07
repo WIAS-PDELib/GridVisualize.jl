@@ -1,4 +1,4 @@
-function initialize!(p, ::Type{T}) where {T <: AbstractPythonPlotterType}
+function initialize!(p, ::Type{T}) where {T <: UnionPythonPlotterType}
     PyPlotter = p.context[:Plotter]
     PyPlotter.rc("font"; size = p.context[:fontsize])
     if !haskey(p.context, :figure)
@@ -24,15 +24,15 @@ function initialize!(p, ::Type{T}) where {T <: AbstractPythonPlotterType}
     return nothing
 end
 
-function save(fname, p, ::Type{T}) where {T <: AbstractPythonPlotterType}
+function save(fname, p, ::Type{T}) where {T <: UnionPythonPlotterType}
     return p.context[:figure].savefig(fname)
 end
 
-function save(fname, scene, PyPlotter, ::Type{T}) where {T <: AbstractPythonPlotterType}
+function save(fname, scene, PyPlotter, ::Type{T}) where {T <: UnionPythonPlotterType}
     return isnothing(scene) ? nothing : scene.savefig(fname)
 end
 
-function reveal(p::GridVisualizer, ::Type{T}) where {T <: AbstractPythonPlotterType}
+function reveal(p::GridVisualizer, ::Type{T}) where {T <: UnionPythonPlotterType}
     p.context[:revealed] = true
     p.Plotter.tight_layout()
     if !(isdefined(Main, :PlutoRunner)) && isinteractive()
@@ -46,7 +46,7 @@ function reveal(p::GridVisualizer, ::Type{T}) where {T <: AbstractPythonPlotterT
     return current_figure
 end
 
-function reveal(ctx::SubVisualizer, TP::Type{T}) where {T <: AbstractPythonPlotterType}
+function reveal(ctx::SubVisualizer, TP::Type{T}) where {T <: UnionPythonPlotterType}
     yield()
     if ctx[:show] || ctx[:reveal]
         reveal(ctx[:GridVisualizer], TP)
@@ -123,7 +123,7 @@ end
 plaincolormap(ctx) = colorschemes[ctx[:colormap]].colors
 
 ### 1D grid
-function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: AbstractPythonPlotterType}
+function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
 
     if !haskey(ctx, :ax)
@@ -200,7 +200,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grid) where {T <: AbstractP
 end
 
 ### 2D grid
-function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractPythonPlotterType}
+function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -316,7 +316,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid) where {T <: AbstractP
 end
 
 ### 3D Grid
-function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: AbstractPythonPlotterType}
+function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: UnionPythonPlotterType}
     # See https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html
 
     PyPlotter = ctx[:Plotter]
@@ -416,7 +416,7 @@ function gridplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grid) where {T <: AbstractP
 end
 
 ### 1D Function
-function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs) where {T <: AbstractPythonPlotterType}
+function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     nfuncs = length(funcs)
 
@@ -544,7 +544,7 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{1}}, grids, parentgrid, funcs)
 end
 
 ### 2D Function
-function scalarplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grids, parentgrid, funcs) where {T <: AbstractPythonPlotterType}
+function scalarplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grids, parentgrid, funcs) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -629,7 +629,7 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grids, parentgrid, funcs)
     return reveal(ctx, TP)
 end
 
-function scalarplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grids, parentgrid, funcs) where {T <: AbstractPythonPlotterType}
+function scalarplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grids, parentgrid, funcs) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot]; projection = "3d")
@@ -717,7 +717,7 @@ function scalarplot!(ctx, TP::Type{T}, ::Type{Val{3}}, grids, parentgrid, funcs)
 end
 
 ### 2D Vector
-function vectorplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: AbstractPythonPlotterType}
+function vectorplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -761,7 +761,7 @@ function vectorplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: A
 end
 
 ### 2D stream
-function streamplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: AbstractPythonPlotterType}
+function streamplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -800,7 +800,7 @@ function streamplot!(ctx, TP::Type{T}, ::Type{Val{2}}, grid, func) where {T <: A
     return reveal(ctx, TP)
 end
 
-function customplot!(ctx, TP::Type{T}, func) where {T <: AbstractPythonPlotterType}
+function customplot!(ctx, TP::Type{T}, func) where {T <: UnionPythonPlotterType}
     PyPlotter = ctx[:Plotter]
     if !haskey(ctx, :ax)
         ctx[:ax] = ctx[:figure].add_subplot(ctx[:layout]..., ctx[:iplot])
@@ -823,7 +823,7 @@ function plot_triangulateio!(
         voronoi = nothing,
         circumcircles = false,
         kwargs...
-    ) where {T <: AbstractPythonPlotterType}
+    ) where {T <: UnionPythonPlotterType}
 
     function frgb(Plotter, i, max; pastel = false)
         x = Float64(i - 1) / Float64(max)

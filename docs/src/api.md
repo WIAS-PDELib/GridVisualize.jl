@@ -14,15 +14,22 @@ save
 default_plotter
 default_plotter!
 plottertype
+PlotterType
 PythonPlotType
 PyPlotType
-MakieType
+UnionPythonPlotterType
+UnionMakieType
 PlotsType
 PlutoVistaType
 VTKViewType
 MeshCatType
+UnicodePlotsType
 ```
 
+### Deprecated Plottertypes
+```@docs
+MakieType
+```
 
 
 ## Plotting grids

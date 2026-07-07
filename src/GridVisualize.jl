@@ -22,6 +22,7 @@ include("dispatch.jl")
 include("common.jl")
 include("pycommon.jl")
 include("slice_plots.jl")
+include("deprecated.jl")
 
 export scalarplot, scalarplot!
 export gridplot, gridplot!
@@ -31,11 +32,11 @@ export customplot, customplot!
 export quiverdata, vectorsample
 export plot_triangulateio, plot_triangulateio!
 export save, reveal
-export isplots, isvtkview, ispyplot, ispythonplot, ismakie, isplutovista
 export GridVisualizer, SubVisualizer
 export plottertype, available_kwargs
 export default_plotter!, default_plotter
-export PyPlotType, PythonPlotType, MakieType, PlotsType, VTKViewType, PlutoVistaType, MeshCatType
+export PlotterType, PyPlotType, PythonPlotType, UnionPythonPlotterType, UnionMakieType, PlotsType, VTKViewType, PlutoVistaType, MeshCatType, UnicodePlotsType
+export isvtkview, ispyplot, ispythonplot, isplots, ismakie, ismeshcat, isplutovista, isunicodeplots
 export movie
 
 end

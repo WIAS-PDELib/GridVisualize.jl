@@ -199,7 +199,7 @@ end
 # ### Animation of function on 1D grid
 function anim_func1d(; Plotter = default_plotter(), kwargs...)
     step = 0.01
-    if ismakie(Plotter)
+    if plottertype(Plotter) <: UnionMakieType
         step = 0.0001
     end
     g = grid1d(; n = 50)
@@ -214,7 +214,7 @@ end
 # ### Animation of function on 2D grid
 function anim_func2d(; Plotter = default_plotter(), kwargs...)
     step = 0.05
-    if ismakie(Plotter)
+    if plottertype(Plotter) <: UnionMakieType
         step = 0.005
     end
     g = grid2d(; n = 30)
@@ -229,7 +229,7 @@ end
 # ### Animation of function on 3D grid
 function anim_func3d(; Plotter = default_plotter(), kwargs...)
     step = 0.05
-    if ismakie(Plotter)
+    if plottertype(Plotter) <: UnionMakieType
         step = 0.005
     end
     g = grid3d(; n = 15)
@@ -447,9 +447,9 @@ function plotting_custom(; Plotter = default_plotter(), kwargs...)
     grid = grid2d()
     gridplot!(vis, grid)
     customplot!(vis) do ax
-        ismakie(Plotter) && Plotter.scatter!(ax, rand(10), rand(10), fill(0.1, 10); color = :blue, markersize = 20)
-        ispyplot(Plotter) && ax.scatter(rand(10), rand(10); s = 500)
-        isplots(Plotter) && Plotter.scatter!(ax, rand(10), rand(10); color = :blue, markersize = 10, label = nothing)
+        plottertype(Plotter) <: UnionMakieType && Plotter.scatter!(ax, rand(10), rand(10), fill(0.1, 10); color = :blue, markersize = 20)
+        plottertype(Plotter) <: PyPlotType && ax.scatter(rand(10), rand(10); s = 500)
+        plottertype(Plotter) <: PlotsType && Plotter.scatter!(ax, rand(10), rand(10); color = :blue, markersize = 10, label = nothing)
     end
     return reveal(vis)
 end
