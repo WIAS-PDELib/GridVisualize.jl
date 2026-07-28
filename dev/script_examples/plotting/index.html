@@ -89,7 +89,7 @@ end</code></pre><p><img src="../plotting_vec2d.png" alt/></p><h3 id="2D-stream">
     return GridVisualize.streamplot(g, f; Plotter = Plotter, rasterpoints = 20, kwargs...)
 end</code></pre><p><img src="../plotting_stream2d.png" alt/></p><h2 id="Animation"><a class="docs-heading-anchor" href="#Animation">Animation</a><a id="Animation-1"></a><a class="docs-heading-anchor-permalink" href="#Animation" title="Permalink"></a></h2><p>Animation examples work in the REPL. They are useful for in-situ visualization of evolving calculation data. For the creation of videos/movies, see the <a href="#Movie">Movie</a> example.</p><h3 id="Animation-of-function-on-1D-grid"><a class="docs-heading-anchor" href="#Animation-of-function-on-1D-grid">Animation of function on 1D grid</a><a id="Animation-of-function-on-1D-grid-1"></a><a class="docs-heading-anchor-permalink" href="#Animation-of-function-on-1D-grid" title="Permalink"></a></h3><pre><code class="language-julia hljs">function anim_func1d(; Plotter = default_plotter(), kwargs...)
     step = 0.01
-    if ismakie(Plotter)
+    if plottertype(Plotter) &lt;: UnionMakieType
         step = 0.0001
     end
     g = grid1d(; n = 50)
@@ -101,7 +101,7 @@ end</code></pre><p><img src="../plotting_stream2d.png" alt/></p><h2 id="Animatio
     return nothing
 end</code></pre><h3 id="Animation-of-function-on-2D-grid"><a class="docs-heading-anchor" href="#Animation-of-function-on-2D-grid">Animation of function on 2D grid</a><a id="Animation-of-function-on-2D-grid-1"></a><a class="docs-heading-anchor-permalink" href="#Animation-of-function-on-2D-grid" title="Permalink"></a></h3><pre><code class="language-julia hljs">function anim_func2d(; Plotter = default_plotter(), kwargs...)
     step = 0.05
-    if ismakie(Plotter)
+    if plottertype(Plotter) &lt;: UnionMakieType
         step = 0.005
     end
     g = grid2d(; n = 30)
@@ -113,7 +113,7 @@ end</code></pre><h3 id="Animation-of-function-on-2D-grid"><a class="docs-heading
     return nothing
 end</code></pre><h3 id="Animation-of-function-on-3D-grid"><a class="docs-heading-anchor" href="#Animation-of-function-on-3D-grid">Animation of function on 3D grid</a><a id="Animation-of-function-on-3D-grid-1"></a><a class="docs-heading-anchor-permalink" href="#Animation-of-function-on-3D-grid" title="Permalink"></a></h3><pre><code class="language-julia hljs">function anim_func3d(; Plotter = default_plotter(), kwargs...)
     step = 0.05
-    if ismakie(Plotter)
+    if plottertype(Plotter) &lt;: UnionMakieType
         step = 0.005
     end
     g = grid3d(; n = 15)
@@ -282,9 +282,9 @@ end</code></pre><p><img src="../plotting_jfunc3d.png" alt/></p><h2 id="Custom-pl
     grid = grid2d()
     gridplot!(vis, grid)
     customplot!(vis) do ax
-        ismakie(Plotter) &amp;&amp; Plotter.scatter!(ax, rand(10), rand(10), fill(0.1, 10); color = :blue, markersize = 20)
-        ispyplot(Plotter) &amp;&amp; ax.scatter(rand(10), rand(10); s = 500)
-        isplots(Plotter) &amp;&amp; Plotter.scatter!(ax, rand(10), rand(10); color = :blue, markersize = 10, label = nothing)
+        plottertype(Plotter) &lt;: UnionMakieType &amp;&amp; Plotter.scatter!(ax, rand(10), rand(10), fill(0.1, 10); color = :blue, markersize = 20)
+        plottertype(Plotter) &lt;: PyPlotType &amp;&amp; ax.scatter(rand(10), rand(10); s = 500)
+        plottertype(Plotter) &lt;: PlotsType &amp;&amp; Plotter.scatter!(ax, rand(10), rand(10); color = :blue, markersize = 10, label = nothing)
     end
     return reveal(vis)
 end</code></pre><p><img src="../plotting_custom.png" alt/></p><h2 id="TriangulateIO"><a class="docs-heading-anchor" href="#TriangulateIO">TriangulateIO</a><a id="TriangulateIO-1"></a><a class="docs-heading-anchor-permalink" href="#TriangulateIO" title="Permalink"></a></h2><p>GridVisualize comes with <a href="../../api/#GridVisualize.plot_triangulateio"><code>GridVisualize.plot_triangulateio</code></a>, a method to plot the input/output struct of the Triangle mesh generator, provided by the <a href="https://github.com/JuliaGeometry/Triangulate.jl">Triangulate.jl</a> wrapper. Supported are PyPlot and Makie backends.</p><pre><code class="language-julia hljs">function plotting_triangulateio(; Plotter = default_plotter(), maxarea = 0.05, resolution = (600, 300))
@@ -356,4 +356,4 @@ function generateplots(picdir; Plotter = nothing)
         end
     end
     return filepaths
-end</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../api/">« Public API</a><a class="docs-footer-nextpage" href="../../pluto_examples/plutovista/">plutovista »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 8 June 2026 11:47">Monday 8 June 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../api/">« Public API</a><a class="docs-footer-nextpage" href="../../pluto_examples/plutovista/">plutovista »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Tuesday 28 July 2026 08:12">Tuesday 28 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
