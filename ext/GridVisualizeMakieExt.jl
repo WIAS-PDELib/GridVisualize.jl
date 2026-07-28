@@ -214,7 +214,16 @@ scenekwargs(ctx) = Dict(
     :titlesize => ctx[:fontsize]
 )
 
-#scenekwargs(ctx)=()
+scenekwargs_3(ctx) = Dict(
+    :xticklabelsize => 0.3 * ctx[:fontsize],
+    :yticklabelsize => 0.3 * ctx[:fontsize],
+    :zticklabelsize => 0.3 * ctx[:fontsize],
+    :xlabelsize => 0.5 * ctx[:fontsize],
+    :ylabelsize => 0.5 * ctx[:fontsize],
+    :zlabelsize => 0.5 * ctx[:fontsize],
+    :titlesize => ctx[:fontsize]
+)
+
 
 ############################################################################################################
 #1D grid
@@ -563,14 +572,14 @@ end
 
 #######################################################################################
 # 2D grid
-
+# makescene_grid() used for 2D and 3D grids
 function makescene_grid(ctx)
     XMakie = ctx[:Plotter]
     GL = XMakie.GridLayout(ctx[:figure])
     GL[1, 1] = ctx[:scene]
     ncol = length(ctx[:cmap])
     nbcol = length(ctx[:bcmap])
-    # fontsize=0.5*ctx[:fontsize],ticklabelsize=0.5*ctx[:fontsize]
+
     if ctx[:show_colorbar]
         if ctx[:colorbar] == :vertical
             GL[1, 2] = XMakie.Colorbar(
@@ -580,6 +589,8 @@ function makescene_grid(ctx)
                 ticks = 1:ncol,
                 width = 15,
                 label = "cell regions",
+                labelsize = 0.5 * ctx[:fontsize],
+                ticklabelsize = 0.5 * ctx[:fontsize],
             )
             GL[1, 3] = XMakie.Colorbar(
                 ctx[:figure];
@@ -588,6 +599,8 @@ function makescene_grid(ctx)
                 ticks = 1:nbcol,
                 width = 15,
                 label = "boundary regions",
+                labelsize = 0.5 * ctx[:fontsize],
+                ticklabelsize = 0.5 * ctx[:fontsize],
             )
         elseif ctx[:colorbar] == :horizontal
             GL[2, 1] = XMakie.Colorbar(
@@ -597,6 +610,8 @@ function makescene_grid(ctx)
                 height = 15,
                 vertical = false,
                 label = "cell regions",
+                labelsize = 0.5 * ctx[:fontsize],
+                ticklabelsize = 0.5 * ctx[:fontsize],
             )
             GL[3, 1] = XMakie.Colorbar(
                 ctx[:figure];
@@ -605,6 +620,8 @@ function makescene_grid(ctx)
                 height = 15,
                 vertical = false,
                 label = "boundary regions",
+                labelsize = 0.5 * ctx[:fontsize],
+                ticklabelsize = 0.5 * ctx[:fontsize],
             )
         end
     end
@@ -1006,7 +1023,10 @@ function makeaxis3d(ctx)
             azimuth = ctx[:azim] * π / 180,
             perspectiveness = ctx[:perspectiveness],
             title = map(data -> data.t, ctx[:data]),
-            scenekwargs(ctx)...,
+            xlabel = ctx[:xlabel],
+            ylabel = ctx[:ylabel],
+            zlabel = ctx[:zlabel],
+            scenekwargs_3(ctx)...,
         )
     end
 end
@@ -1031,28 +1051,47 @@ function makescene3d(ctx)
         )
     end
     GL[1, 1] = ctx[:scene]
-    # Horizontal or vertical colorbar
+    # Add colorbar
     if ctx[:show_colorbar]
         if haskey(ctx, :crange)
+
+            # Configure range and ticks for linear or logarithmic scaling
+            islog = ctx[:colorscale] == :log
+            tickvalues = ctx[:colorbarticks]
+            colorbar_range = islog ? log10.(ctx[:crange]) : ctx[:crange]
+            colorbar_ticks = if islog
+                (
+                    log10.(tickvalues),
+                    ["10^$(round(Int, log10(t)))" for t in tickvalues],
+                )
+            else
+                map(d -> d.c, ctx[:data])
+            end
+            colorbar_tickformat = islog ? XMakie.Makie.automatic : "{:.2e}"
+
             if ctx[:colorbar] == :vertical
                 GL[1, 2] = XMakie.Colorbar(
                     ctx[:figure];
                     colormap = ctx[:colormap],
-                    colorrange = ctx[:crange],
-                    ticks = map(d -> d.c, ctx[:data]),
-                    tickformat = "{:.2e}",
+                    colorrange = colorbar_range,
+                    ticks = colorbar_ticks,
+                    tickformat = colorbar_tickformat,
                     width = 15,
                     ticklabelsize = 0.5 * ctx[:fontsize],
+                    labelsize = 0.5 * ctx[:fontsize],
+                    label = get(ctx, :colorbarlabel, ""),
                 )
             elseif ctx[:colorbar] == :horizontal
                 GL[2, 1] = XMakie.Colorbar(
                     ctx[:figure];
                     colormap = ctx[:colormap],
-                    colorrange = ctx[:crange],
-                    ticks = map(d -> d.c, ctx[:data]),
-                    tickformat = "{:.2e}",
+                    colorrange = colorbar_range,
+                    ticks = colorbar_ticks,
+                    tickformat = colorbar_tickformat,
                     height = 15,
                     ticklabelsize = 0.5 * ctx[:fontsize],
+                    labelsize = 0.5 * ctx[:fontsize],
+                    label = get(ctx, :colorbarlabel, ""),
                     vertical = false,
                 )
             end
@@ -1283,7 +1322,14 @@ function scalarplot!(ctx, TP::Type{MakieType}, ::Type{Val{3}}, grids, parentgrid
 
     function make_mesh(pts, fcs, vals, alpha)
         if length(fcs) > 0
-            colors = XMakie.Makie.interpolated_getindex.((cmap,), vals, (crange,))
+            # Map values to colors using linear or logarithmic scaling
+            if ctx[:colorscale] == :log
+                vals_log = log10.(clamp.(vals, crange[1], crange[2]))
+                crange_log = log10.(crange)
+                colors = XMakie.Makie.interpolated_getindex.((cmap,), vals_log, (crange_log,))
+            else
+                colors = XMakie.Makie.interpolated_getindex.((cmap,), vals, (crange,))
+            end
             if alpha < 1
                 colors = [
                     RGBA(colors[i].r, colors[i].g, colors[i].b, Float32(alpha)) for
