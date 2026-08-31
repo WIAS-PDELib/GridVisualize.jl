@@ -148,7 +148,7 @@ function gridplot!(ctx, TP::Type{PlutoVistaType}, ::Type{Val{1}}, grid)
     #    ax.set_aspect(ctx[:aspect])
     #    ax.get_yaxis().set_ticks([])
     #    ax.set_ylim(-5*h,xmax-xmin)
-    cmap = region_cmap(ncellregions)
+    cmap = ctx[:cellregioncolormap](ncellregions)
 
     for icell in 1:num_cells(grid)
         ireg = cellregions[icell]
@@ -185,7 +185,7 @@ function gridplot!(ctx, TP::Type{PlutoVistaType}, ::Type{Val{1}}, grid)
         )
     end
 
-    cmap = bregion_cmap(nbfaceregions)
+    cmap = ctx[:bregioncolormap](nbfaceregions)
     for ibface in 1:num_bfaces(grid)
         ireg = bfaceregions[ibface]
         if ireg > 0
@@ -280,8 +280,8 @@ end
 function gridplot!(ctx, TP::Type{PlutoVistaType}, ::Type{Val{2}}, grid)
     nregions = num_cellcolors(grid, ctx[:cellcoloring])
     nbregions = num_bfaceregions(grid)
-    cmap = region_cmap(nregions)
-    bcmap = bregion_cmap(nbregions)
+    cmap = ctx[:cellregioncolormap](nregions)
+    bcmap = ctx[:bregioncolormap](nbregions)
     PlutoVista = ctx[:Plotter]
     pts = grid[Coordinates]
     tris = grid[CellNodes]
@@ -387,8 +387,8 @@ function streamplot!(ctx, TP::Type{PlutoVistaType}, ::Type{Val{2}}, grid, func) 
 function gridplot!(ctx, TP::Type{PlutoVistaType}, ::Type{Val{3}}, grid)
     nbregions = num_bfaceregions(grid)
     nregions = num_cellcolors(grid, ctx[:cellcoloring])
-    cmap = region_cmap(nregions)
-    bcmap = bregion_cmap(nbregions)
+    cmap = ctx[:cellregioncolormap](nregions)
+    bcmap = ctx[:bregioncolormap](nbregions)
 
     PlutoVista = ctx[:Plotter]
     pts = grid[Coordinates]
@@ -440,7 +440,7 @@ function scalarplot!(
     )
     PlutoVista = ctx[:Plotter]
     nbregions = num_bfaceregions(parentgrid)
-    bcmap = bregion_cmap(nbregions)
+    bcmap = ctx[:bregioncolormap](nbregions)
 
     faces = parentgrid[BFaceNodes]
     facemarkers = parentgrid[BFaceRegions]

@@ -116,7 +116,7 @@ function gridplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grid)
     xmax = maximum(coord) * gridscale
     h = (xmax - xmin) / 20.0
 
-    cmap = region_cmap(ncellregions)
+    cmap = ctx[:cellregioncolormap](ncellregions)
     for icell in 1:num_cells(grid)
         x1 = coord[1, cellnodes[1, icell]] * gridscale
         x2 = coord[1, cellnodes[2, icell]] * gridscale
@@ -132,7 +132,7 @@ function gridplot!(ctx, TP::Type{PlotsType}, ::Type{Val{1}}, grid)
         )
     end
 
-    cmap = bregion_cmap(nbfaceregions)
+    cmap = ctx[:bregioncolormap](nbfaceregions)
     for ibface in 1:num_bfaces(grid)
         if bfaceregions[ibface] > 0
             x1 = coord[1, bfacenodes[1, ibface]] * gridscale
@@ -163,7 +163,7 @@ function gridplot!(ctx, TP::Type{PlotsType}, ::Type{Val{2}}, grid)
     bfaceregions = grid[BFaceRegions]
     nbfaceregions = grid[NumBFaceRegions]
 
-    cmap = region_cmap(ncellregions)
+    cmap = ctx[:cellregioncolormap](ncellregions)
     for icell in 1:num_cells(grid)
         inode1 = cellnodes[1, icell]
         inode2 = cellnodes[2, icell]
@@ -205,7 +205,7 @@ function gridplot!(ctx, TP::Type{PlotsType}, ::Type{Val{2}}, grid)
         )
     end
 
-    cmap = bregion_cmap(nbfaceregions)
+    cmap = ctx[:bregioncolormap](nbfaceregions)
     for ibface in 1:num_bfaces(grid)
         inode1 = bfacenodes[1, ibface]
         inode2 = bfacenodes[2, ibface]
