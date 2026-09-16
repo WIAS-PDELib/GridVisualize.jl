@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.21.0] - 2026-09-16
+- Replace plottertypes by Singleton
+
 ## [1.20.1] - 2026-05-05
 - `UnicodePlots`: fixed a grid rescaling issue
 
