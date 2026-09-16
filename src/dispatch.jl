@@ -85,11 +85,11 @@ Parent type for dispatch on Python plotters.
 const UnionPythonPlotterType = Union{PyPlotType, PythonPlotType}
 
 """
-    const UnionMakieType = Union{PlotterType{:CairoMakie},PlotterType{:WGLMakie},PlotterType{:RPRMakie}}
+    const UnionMakieType = Union{PlotterType{:CairoMakie},PlotterType{:WGLMakie},PlotterType{:GLMakie},PlotterType{:RPRMakie}}
 
 Parent type for dispatch on Makie plotters.
 """
-const UnionMakieType = Union{PlotterType{:CairoMakie}, PlotterType{:WGLMakie}, PlotterType{:RPRMakie}}
+const UnionMakieType = Union{PlotterType{:CairoMakie}, PlotterType{:GLMakie}, PlotterType{:WGLMakie}, PlotterType{:RPRMakie}}
 
 """
 $(TYPEDEF)
