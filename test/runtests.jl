@@ -21,13 +21,14 @@ for Plotter in [CairoMakie]
 end
 
 # Some Plotters cannot perform the `makeplots` run, only try a `multiscene`
-for Plotter in [PyPlot, PlutoVista, UnicodePlots]
+for Plotter in [nothing, PyPlot, PlutoVista, UnicodePlots]
     @eval begin
-        @testset "plotting_multiscene - $(nameof($Plotter))" begin
+        @testset "plotting_multiscene - $(plottertype($Plotter))" begin
             try
                 plotting_multiscene(Plotter = $Plotter)
                 @test true
             catch e
+                print(e)
                 @test false
             end
         end

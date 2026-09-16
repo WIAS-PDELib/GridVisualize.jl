@@ -14,3 +14,4 @@ Manifest*.toml
 .repl_history.jl
 quarry
 cliff.toml
+.CondaPkg
