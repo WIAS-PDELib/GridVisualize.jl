@@ -294,13 +294,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     # plot boundary nodes with bregion_cmap colors
     bcmap = bregion_cmap(nbregions)
     ctx[:bcmap] = bcmap
-    bcolors = [
-        (
-                Int(round(bcmap[i].r * 255)),
-                Int(round(bcmap[i].g * 255)),
-                Int(round(bcmap[i].b * 255)),
-            ) for i in 1:nbregions
-    ]
+    bcolors = [(Int(round(bcmap[i].r * 255)), Int(round(bcmap[i].g * 255)), Int(round(bcmap[i].b * 255))) for i in 1:nbregions]
     bfacenodes = grid[BFaceNodes]
     bfaceregions = grid[BFaceRegions]
     nbfaces = size(bfacenodes, 2)
