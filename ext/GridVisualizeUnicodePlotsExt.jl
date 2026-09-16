@@ -155,13 +155,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     cellregions = grid[CellRegions]
     cmap = region_cmap(max(2, ncellregions))
     ctx[:cmap] = cmap
-    cell_colors = [
-        (
-                Int(round(cmap[i].r * 255)),
-                Int(round(cmap[i].g * 255)),
-                Int(round(cmap[i].b * 255)),
-            ) for i in 1:ncellregions
-    ]
+    cell_colors = [(Int(round(cmap[i].r * 255)), Int(round(cmap[i].g * 255)), Int(round(cmap[i].b * 255))) for i in 1:ncellregions]
     cellnodes = grid[CellNodes]
     cellgeoms = grid[CellGeometries]
     ncells = num_cells(grid)
@@ -205,13 +199,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     # plot boundary faces with bregion_cmap colors
     bcmap = bregion_cmap(nbregions)
     ctx[:bcmap] = bcmap
-    bcolors = [
-        (
-                Int(round(bcmap[i].r * 255)),
-                Int(round(bcmap[i].g * 255)),
-                Int(round(bcmap[i].b * 255)),
-            ) for i in 1:nbregions
-    ]
+    bcolors = [(Int(round(bcmap[i].r * 255)), Int(round(bcmap[i].g * 255)), Int(round(bcmap[i].b * 255))) for i in 1:nbregions]
     bfacenodes = grid[BFaceNodes]
     bfaceregions = grid[BFaceRegions]
     nbfaces = size(bfacenodes, 2)
@@ -279,13 +267,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{1}}, grid)
     cellregions = grid[CellRegions]
     cmap = region_cmap(max(2, ncellregions))
     ctx[:cmap] = cmap
-    colors = [
-        (
-                Int(round(cmap[i].r * 255)),
-                Int(round(cmap[i].g * 255)),
-                Int(round(cmap[i].b * 255)),
-            ) for i in 1:ncellregions
-    ]
+    colors = [(Int(round(cmap[i].r * 255)), Int(round(cmap[i].g * 255)), Int(round(cmap[i].b * 255))) for i in 1:ncellregions]
     cellnodes = grid[CellNodes]
     cellgeoms = grid[CellGeometries]
     ncells = num_cells(grid)
