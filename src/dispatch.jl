@@ -104,7 +104,7 @@ $(SIGNATURES)
 Obtain Singleton type of given Plotter.
 """
 plottertype(Plotter::Module) = PlotterType{nameof(Plotter)}
-plottertype(::Nothing) = Type{Nothing}
+plottertype(::Nothing) = Nothing
 
 """
 $(SIGNATURES)
@@ -979,6 +979,8 @@ end
 function reveal(p, ::Type{T}) where {T <: AbstractPlotterType}
     error("Missing implementation of reveal!(p,::Type{$(T)})")
 end
+
+reveal(p, ::Nothing) = nothing
 
 """
 $(TYPEDSIGNATURES)
