@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.21.1] - 2026-09-30
+- Fix corner case in 3D slice plotting
+- Use special rotation for `x`-`y` rotations in 3D: keep `z` original, map it to `y`
+
 ## [1.21.0] - 2026-09-16
 - Replace plottertypes by Singleton
 

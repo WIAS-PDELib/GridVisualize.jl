@@ -62,6 +62,11 @@ end
     @test abs(η ⋅ t) < 1.0e-15
     @test abs(ξ ⋅ t) < 1.0e-15
 
+    # tricky case
+    t = [-1.0, 1.0, 0.0] / sqrt(2)
+    R = GridVisualize.compute_3d_z_rotation_matrix(t)
+    @test R[:, 3] ≈ t
+
     # corner case I: only one axis rotation necessary
     t = [1, 0, 0]
     @test GridVisualize.compute_3d_z_rotation_matrix(t) ≈ [0 0 1; 0 1 0; -1 0 0]
@@ -69,7 +74,6 @@ end
     # corner case II: only one axis rotation necessary
     t = [0, 1, 0]
     @test GridVisualize.compute_3d_z_rotation_matrix(t) ≈ [1 0 0; 0 0 1; 0 -1 0]
-
 end
 
 

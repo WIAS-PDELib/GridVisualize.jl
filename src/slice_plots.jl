@@ -149,6 +149,11 @@ function compute_3d_z_rotation_matrix(target_vector)
         β = acos(t[3] / cos(α))
     end
 
+    # check t[1]:
+    if cos(α) * sin(β) ≉ t[1]
+        β = -β
+    end
+
     return R_y(β) * R_x(α)
 end
 
@@ -216,8 +221,8 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
 
     a::Float64, b::Float64, c::Float64, _ = plane
 
-    # transformation matrix
-    if (a, b, c) == (1.0, 0.0, 0.0)
+
+    if (a, b, c) == (1.0, 0.0, 0.0) # simple axis directions
         rotation_matrix = @SArray [
             0.0 0.0 1.0
             1.0 0.0 0.0
@@ -234,6 +239,13 @@ function slice_plot!(ctx, ::Type{Val{3}}, grid, values)
             1.0 0.0 0.0
             0.0 1.0 0.0
             0.0 0.0 1.0
+        ]
+    elseif c == 0 # special case for c = 0: keep z-axis original
+        M = compute_2d_rotation_matrix([a, b])
+        rotation_matrix = @SArray [
+            M[1, 1] 0.0 M[1, 2]
+            M[2, 1] 0.0 M[2, 2]
+            0.0     1.0 0.0
         ]
     else
         rotation_matrix = compute_3d_z_rotation_matrix([a, b, c])
