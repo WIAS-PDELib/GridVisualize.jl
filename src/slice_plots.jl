@@ -149,6 +149,11 @@ function compute_3d_z_rotation_matrix(target_vector)
         β = acos(t[3] / cos(α))
     end
 
+    # check t[1]:
+    if cos(α) * sin(β) ≉ t[1]
+        β = -β
+    end
+
     return R_y(β) * R_x(α)
 end
 
