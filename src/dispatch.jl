@@ -359,6 +359,7 @@ function default_plot_kwargs()
             :viridis,
             "2D/3D contour plot color map (any from [ColorSchemes.jl](https://juliagraphics.github.io/ColorSchemes.jl/stable/basics/#Pre-defined-schemes))"
         ),
+        :colorscale => Pair(:linear, "Color scale for scalar plots (:linear or :log; :log requires positive color limits and ticks)"),
         :dim => Pair(1, "Data dimension for PlutoVista plot"),
         :elev => Pair(30, "3D elevation angle  (in degrees)"),
         :elevation => Pair(0.0, "2D plot height factor for elevation"),
