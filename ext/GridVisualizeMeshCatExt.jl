@@ -56,8 +56,8 @@ function gridplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{2}}, grid)
     nregions = num_cellregions(grid)
     nbregions = num_bfaceregions(grid)
 
-    cmap = region_cmap(nregions)
-    bcmap = bregion_cmap(nbregions)
+    cmap = ctx[:cellregioncolormap](nregions)
+    bcmap = ctx[:bregioncolormap](nbregions)
     for i in 1:nregions
         mesh = regionmesh(grid, 1.0, i; cellcoloring = ctx[:cellcoloring])
         MeshCat.setobject!(
@@ -92,8 +92,8 @@ function gridplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{3}}, grid)
 
     nregions = num_cellregions(grid)
     nbregions = num_bfaceregions(grid)
-    cmap = region_cmap(nregions)
-    bcmap = bregion_cmap(nbregions)
+    cmap = ctx[:cellregioncolormap](nregions)
+    bcmap = ctx[:bregioncolormap](nbregions)
 
     xyzmin = zeros(3)
     xyzmax = ones(3)
@@ -173,7 +173,7 @@ function scalarplot!(ctx, TP::Type{MeshCatType}, ::Type{Val{3}}, grids, parentgr
 
     nregions = num_cellregions(grid)
     nbregions = num_bfaceregions(grid)
-    bcmap = bregion_cmap(nbregions)
+    bcmap = ctx[:bregioncolormap](nbregions)
     xyzmin = zeros(3)
     xyzmax = ones(3)
     coord = grid[Coordinates]
