@@ -102,7 +102,7 @@ end # module ImplEvalSlice
 
     Examples:
       -  :(x-3) => [ 1, 0, 0, -3 ]
-      -  :(2x - z + 3)  => [2, 0, 1, 3]
+      -  :(2x - z + 3)  => [2, 0, -1, 3]
 """
 eval_slice_expr!(vec, expr::Union{Symbol, Expr}) = ImplEvalSlice._eval_slice_expr!(vec, expr, 1.0)
 
