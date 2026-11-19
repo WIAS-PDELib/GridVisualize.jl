@@ -343,6 +343,10 @@ function default_plot_kwargs()
             :cellregions,
             "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"
         ),
+        :cellmarkers => Pair(
+            false,
+            "3D gridplot: mark cell regions by numbers at cell midpoints"
+        ),
         :cellwise => Pair(false, "1D plots cellwise; unmaintained and can be slow)"),
         :clear => Pair(true, "Clear plot before adding new content"),
         :color => Pair(RGB(0.0, 0.0, 0.0), "1D plot line color"),
@@ -418,6 +422,7 @@ function default_plot_kwargs()
         :vnormalize => Pair(true, "Normalize vector field before scaling"),
         :vscale => Pair(1.0, "Vector field scale for quiver grid"),
         :viewmode => Pair(:fit, "Axis3d viewmode for Makie plots. Possible values :fit or :free"),
+        :wireframe => Pair(true, "3D gridplot: draw interior cell edges. Set false to plot boundary edges only"),
         :xlimits => Pair((1, -1), "x axis limits"),
         :xplanes => Pair([prevfloat(Inf)], "3D x plane positions or number thereof"),
         :xlabel => Pair("x", "x axis label"),

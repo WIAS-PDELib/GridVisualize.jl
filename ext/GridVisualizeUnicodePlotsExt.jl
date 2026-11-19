@@ -5,7 +5,7 @@ Extension module for UnicodePlots.jl
 """
 module GridVisualizeUnicodePlotsExt
 
-import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal, streamplot!
+import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal, streamplot!, compute_3d_z_rotation_matrix
 using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata, isolevels
 using GridVisualizeTools: marching_triangles
 using UnicodePlots: UnicodePlots
@@ -66,7 +66,302 @@ function region_legend!(plt, title, y0, colors)
     return y0
 end
 
-gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid) = missing_figure!(ctx, TP, "gridplot! (3D)", not_implemented = true)
+# unit vector from origin towards the camera for given azimuth/elevation angles (degrees)
+function camera_direction(azim::Real, elev::Real)
+    az = Float64(azim) * π / 180
+    el = Float64(elev) * π / 180
+    return [cos(el) * cos(az), cos(el) * sin(az), sin(el)]
+end
+
+# cyclic polygon edges of face j (as node index pairs)
+function face_edges(facenodes, j)
+    n = num_targets(facenodes, j)
+    return [(facenodes[k, j], facenodes[k % n + 1, j]) for k in 1:n]
+end
+
+function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
+    UnicodePlots = ctx[:Plotter]
+
+    # set up camera from azimuth / elevation:
+    # R rotates the z axis into the view direction (pointing towards the camera),
+    # so in rotated coordinates q = R'p the first two components are screen
+    # coordinates and the third one is the depth (larger = closer to camera).
+    # Coordinates are centered w.r.t. the bounding box center.
+    R = compute_3d_z_rotation_matrix(camera_direction(ctx[:azim], ctx[:elev]))
+    coords = grid[Coordinates]
+    c3 = vec((minimum(coords, dims = 2) .+ maximum(coords, dims = 2)) / 2)
+    kappa = Float64(ctx[:perspectiveness])
+
+    q = R' * (coords .- c3)
+    d0, d1 = extrema(q[3, :])
+    ddp = max(d1 - d0, 1.0e-14)
+
+    # perspective: distant points shrink towards the view center
+    if kappa > 0
+        sc = reshape(1 ./ (1 .+ kappa .* clamp.((d1 .- q[3:3, :]) ./ ddp, 0.0, 1.0)), 1, :)
+        pc = [q[1:1, :] .* sc; q[2:2, :] .* sc; q[3:3, :]]
+    else
+        pc = q
+    end
+    eu = extrema(view(pc, 1, :))
+    ev = extrema(view(pc, 2, :))
+
+    # project an arbitrary 3D point (same transform, including perspective)
+    function project3(p)
+        r = R' * (p .- c3)
+        if kappa > 0
+            s = 1 / (1 + kappa * clamp((d1 - r[3]) / ddp, 0.0, 1.0))
+            return [r[1] * s, r[2] * s, r[3]]
+        end
+        return r
+    end
+
+    # determine resolution (divided by 10, to reduce pixel count in the terminal)
+    layout = ctx[:layout]
+    resolution = ctx[:size] ./ (48, 24) ./ (layout[2], layout[1])
+    aspect = ctx[:aspect]
+
+    # ensure that legend fits
+    ncellregions = num_cellregions(grid)
+    nbregions = num_bfaceregions(grid)
+    resolution = (resolution[1], max(resolution[2], 5 + ncellregions + nbregions))
+
+    # rescale resolution
+    wu = eu[2] - eu[1]
+    wv = ev[2] - ev[1]
+    rescale = 2 * wu / wv * (resolution[2] / (resolution[1])) / aspect
+    resolution = (resolution[1] * rescale, resolution[2])
+
+    # we need an integer resolution
+    resolution = @. Int(round(resolution))
+
+    # reserve an empty band below the mesh s.t. the axis triad sits outside the geometry
+    # (UnicodePlots cannot paint outside of the plot frame, so an empty band is used)
+    nb = max(3, Int(round(0.2 * resolution[2]))) # triad band rows
+    vunit = wv / resolution[2]                    # virtual units per row (mesh scale)
+    band_h = nb * vunit                           # band height in virtual units
+    ev_canvas = (ev[1] - band_h, ev[2])           # extended vertical range
+    canvas_rows = resolution[2] + nb
+
+    # create UnicodePlots.Canvas
+    CanvasType = UnicodePlots.BrailleCanvas # should this be a changeable parameter ?
+    canvas = CanvasType(
+        canvas_rows, resolution[1],                   # number of rows and columns (characters)
+        origin_y = ev_canvas[1], origin_x = eu[1],    # position in virtual space (incl. band)
+        height = (ev_canvas[2] - ev_canvas[1]), width = eu[2] - eu[1]; blend = false
+    )
+
+    # region colors
+    cmap = region_cmap(max(2, ncellregions))
+    ctx[:cmap] = cmap
+    cell_colors = [(Int(round(cmap[i].r * 255)), Int(round(cmap[i].g * 255)), Int(round(cmap[i].b * 255))) for i in 1:ncellregions]
+    bcmap = bregion_cmap(nbregions)
+    ctx[:bcmap] = bcmap
+    bcolors = [(Int(round(bcmap[i].r * 255)), Int(round(bcmap[i].g * 255)), Int(round(bcmap[i].b * 255))) for i in 1:nbregions]
+
+    linewidth = ctx[:linewidth]
+    if linewidth > 0
+        # interior edges (from cells, colored by cell region): painter's algorithm
+        # (far edges first), brightness fades with depth
+        if ctx[:interior] && ctx[:wireframe]
+            cellnodes = grid[CellNodes]
+            cellregions = grid[CellRegions]
+            cellgeoms = grid[CellGeometries]
+            ncells = num_cells(grid)
+            ed1 = Int[]
+            ed2 = Int[]
+            edd = Float64[]
+            edr = Int[]
+            for j in 1:ncells
+                cen = local_celledgenodes(cellgeoms[j])
+                for k in 1:size(cen, 2)
+                    i1 = cellnodes[cen[1, k], j]
+                    i2 = cellnodes[cen[2, k], j]
+                    push!(ed1, i1)
+                    push!(ed2, i2)
+                    push!(edd, 0.5 * (pc[3, i1] + pc[3, i2]))
+                    push!(edr, cellregions[j])
+                end
+            end
+            if !isempty(edd)
+                dmin, dmax = extrema(edd)
+                dd = dmax - dmin
+                dd == 0 && (dd = 1.0)
+                for k in sortperm(edd)
+                    # brightness encodes depth: closer edges are brighter
+                    s = 0.35 + 0.65 * (edd[k] - dmin) / dd
+                    c0 = cell_colors[edr[k]]
+                    edge_color = (Int(round(c0[1] * s)), Int(round(c0[2] * s)), Int(round(c0[3] * s)))
+                    UnicodePlots.lines!(
+                        canvas,
+                        pc[1, ed1[k]], pc[2, ed1[k]], # from
+                        pc[1, ed2[k]], pc[2, ed2[k]]; # to
+                        color = edge_color
+                    )
+                end
+            end
+        end
+
+        # boundary faces on top, colored by bregion, with depth fog
+        bfacenodes = grid[BFaceNodes]
+        bfaceregions = grid[BFaceRegions]
+        nbfaces = size(bfacenodes, 2)
+        bdepth = [sum(pc[3, bfacenodes[1:num_targets(bfacenodes, j), j]]) / num_targets(bfacenodes, j) for j in 1:nbfaces]
+        bd0, bd1 = extrema(bdepth)
+        bdd = max(bd1 - bd0, 1.0e-14)
+        for j in sortperm(bdepth)
+            s = 0.45 + 0.55 * (bdepth[j] - bd0) / bdd
+            c0 = bcolors[bfaceregions[j]]
+            edge_color = (Int(round(c0[1] * s)), Int(round(c0[2] * s)), Int(round(c0[3] * s)))
+            for (i1, i2) in face_edges(bfacenodes, j)
+                UnicodePlots.lines!(
+                    canvas,
+                    pc[1, i1], pc[2, i1], # from
+                    pc[1, i2], pc[2, i2]; # to
+                    color = edge_color
+                )
+            end
+        end
+    end
+
+    # mark cell midpoints with their region number in region color (opt-in via cellmarkers)
+    markersize = ctx[:markersize]
+    if ctx[:interior] && ctx[:wireframe] && ctx[:cellmarkers]
+        cellregions = grid[CellRegions]
+        cellnodes = grid[CellNodes]
+        ncells = num_cells(grid)
+        cells = Tuple{Float64, Float64, Float64, Int}[] # (depth, u, v, region)
+        midpoint = zeros(3)
+        p2 = zeros(3)
+        for j in 1:ncells
+            fill!(midpoint, 0.0)
+            nvertices = num_targets(cellnodes, j)
+            for k in 1:nvertices
+                midpoint .+= coords[:, cellnodes[k, j]]
+            end
+            midpoint ./= nvertices
+            p2 .= project3(midpoint)
+            push!(cells, (p2[3], p2[1], p2[2], cellregions[j]))
+        end
+        # painter's algorithm: far cells first, closer numbers overwrite them
+        sort!(cells; by = c -> c[1])
+        for c in cells
+            r = c[4]
+            if markersize < 4
+                UnicodePlots.points!(
+                    canvas,
+                    c[2], c[3];
+                    color = cell_colors[r]
+                )
+            else
+                UnicodePlots.annotate!(
+                    canvas,
+                    c[2], c[3],
+                    string(r),
+                    UnicodePlots.ansi_color(cell_colors[r]),
+                    false
+                )
+            end
+        end
+    end
+
+    plt = UnicodePlots.Plot(canvas; title = ctx[:title], border = ctx[:border])
+
+    # coordinate hints for the projected view:
+    # (a) world coordinates at the bounding box corner regions, snapped to the closest
+    # mesh node s.t. labels and markers sit on actual geometry (near labels win)
+    lo = vec(minimum(coords, dims = 2))
+    hi = vec(maximum(coords, dims = 2))
+    corners = [[x, y, z] for x in (lo[1], hi[1]) for y in (lo[2], hi[2]) for z in (lo[3], hi[3])]
+    fmt(x) = isinteger(x) ? string(Int(x)) : string(round(x, sigdigits = 3))
+    dcam = R[:, 3] # view direction (pointing towards the camera)
+    nnodes = num_nodes(grid)
+    hints = Tuple{Float64, Float64, Float64, Int}[] # (depth, u, v, node)
+    seen_nodes = Int[]
+    for c in corners
+        # consider only corner regions which are really visible, i.e. at least one of
+        # the three adjacent bounding box faces points towards the camera
+        any((c[i] == hi[i] ? 1 : -1) * dcam[i] > 0 for i in 1:3) || continue
+        # snap to the closest mesh node, skip corners sharing the same node
+        jnode = 1
+        dmin = Inf
+        for i in 1:nnodes
+            d = (coords[1, i] - c[1])^2 + (coords[2, i] - c[2])^2 + (coords[3, i] - c[3])^2
+            d < dmin && (dmin = d; jnode = i)
+        end
+        jnode in seen_nodes && continue
+        push!(seen_nodes, jnode)
+        pp = project3(view(coords, :, jnode))
+        push!(hints, (pp[3], pp[1], pp[2], jnode))
+    end
+    placed = Tuple{Float64, Float64}[]
+    for h in sort(hints; by = h -> h[1]) # far nodes first, near labels overwrite them
+        (u, v, jnode) = (h[2], h[3], h[4])
+        pn = view(coords, :, jnode)
+        # skip labels colliding with an already placed one (approximately 9 chars wide)
+        if !any(abs(u - p0[1]) < 9 * wu / resolution[1] && abs(v - p0[2]) < 2 * wv / resolution[2] for p0 in placed)
+            push!(placed, (u, v))
+            text = "($(fmt(pn[1])), $(fmt(pn[2])), $(fmt(pn[3])))"
+            # shift towards the canvas center s.t. labels do not get clipped at the border
+            half = (length(text) / 2 + 1) * wu / resolution[1]
+            du = u > (eu[1] + eu[2]) / 2 ? -half : half
+            dv = v > (ev[1] + ev[2]) / 2 ? -1.5 * wv / resolution[2] : 0.5 * wv / resolution[2]
+            # bullet marker at the annotated node itself, slightly shifted inwards
+            UnicodePlots.annotate!(
+                canvas,
+                u + (du > 0 ? 0.7 : -0.7) * wu / resolution[1],
+                v + (dv > 0 ? 0.7 : -0.7) * wv / resolution[2],
+                "●",
+                UnicodePlots.ansi_color((230, 230, 230)),
+                false
+            )
+            UnicodePlots.annotate!(
+                canvas, u + du, v + dv,
+                text,
+                UnicodePlots.ansi_color((200, 200, 200)),
+                false
+            )
+        end
+    end
+
+    # (b) projected axis triad, neutral gray (to not be confused with region colors),
+    # placed in the empty band reserved below the mesh, drawn last
+    L = min(0.42 * band_h, 0.4 * wu)
+    tips = [(R' * (L * [Float64(k) for k in (i, j, l)]))[1:2] for (i, j, l) in ((1, 0, 0), (0, 1, 0), (0, 0, 1))]
+    # anchor the triad in the bottom-left of the reserved band, all arrows inside
+    lo_v = min(0.0, minimum(t[2] for t in tips))
+    hi_v = max(0.0, maximum(t[2] for t in tips))
+    tx = eu[1] + 0.06 * wu - min(0.0, minimum(t[1] for t in tips))
+    ty = ev_canvas[1] + (band_h - (hi_v - lo_v)) / 2 - lo_v
+    triad_color = (180, 180, 180)
+    for (t2, axis_label) in zip(tips, "xyz")
+        UnicodePlots.lines!(canvas, tx, ty, tx + t2[1], ty + t2[2]; color = triad_color)
+        # place letter at the arrow tip, slightly offset to the right s.t. it is not clipped
+        UnicodePlots.annotate!(
+            canvas,
+            tx + t2[1] + 0.8 * wu / resolution[1], ty + t2[2] + 0.5 * wv / resolution[2],
+            string(axis_label),
+            UnicodePlots.ansi_color(triad_color),
+            false
+        )
+    end
+
+    y0 = 0
+    if ctx[:interior] && ctx[:wireframe] && ctx[:cellmarkers]
+        y0 = region_legend!(plt, " cell", 1, [])
+        y0 = region_legend!(plt, "regions", 2, cell_colors)
+    end
+    region_legend!(plt, " bface", y0 + 2, [])
+    region_legend!(plt, "regions", y0 + 3, bcolors)
+
+    # camera info (view space u/v extents would be meaningless to the user,
+    # world coordinates are annotated at the corner nodes instead)
+    UnicodePlots.label!(plt, :b, "azim = $(ctx[:azim])°, elev = $(ctx[:elev])°")
+
+    # plot
+    ctx[:figure] = plt
+    return reveal(ctx, TP)
+end
 
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{2}}, grid)
     UnicodePlots = ctx[:Plotter]
@@ -459,6 +754,8 @@ function scalarplot!(
     # interpolate data onto plot_grid
     I = zeros(Float64, num_nodes(xgrid_plot))
     interpolate!(I, xgrid_plot, func, grids[1]; eps = 1.0e-14, not_in_domain_value = NaN, trybrute = true)
+
+    @info extrema(func) size (func)
 
     # adjust colormap to desired number of colorlevels
     colormap = get(colorschemes[ctx[:colormap]], range(0.0, 1.0, length = max(2, 1 + ctx[:colorlevels])))
