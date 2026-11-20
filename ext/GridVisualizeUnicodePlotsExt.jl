@@ -149,7 +149,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
 
     # reserve an empty band below the mesh s.t. the axis triad sits outside the geometry
     # (UnicodePlots cannot paint outside of the plot frame, so an empty band is used)
-    nb = max(3, Int(round(0.2 * resolution[2]))) # triad band rows
+    nb = ctx[:axistriad] ? max(3, Int(round(0.2 * resolution[2]))) : 0 # triad band rows
     vunit = wv / resolution[2]                    # virtual units per row (mesh scale)
     band_h = nb * vunit                           # band height in virtual units
     ev_canvas = (ev[1] - band_h, ev[2])           # extended vertical range
@@ -343,24 +343,26 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
 
     # (b) projected axis triad, neutral gray (to not be confused with region colors),
     # placed in the empty band reserved below the mesh, drawn last
-    L = min(0.42 * band_h, 0.4 * wu)
-    tips = [(R' * (L * [Float64(k) for k in (i, j, l)]))[1:2] for (i, j, l) in ((1, 0, 0), (0, 1, 0), (0, 0, 1))]
-    # anchor the triad in the bottom-left of the reserved band, all arrows inside
-    lo_v = min(0.0, minimum(t[2] for t in tips))
-    hi_v = max(0.0, maximum(t[2] for t in tips))
-    tx = eu[1] + 0.06 * wu - min(0.0, minimum(t[1] for t in tips))
-    ty = ev_canvas[1] + (band_h - (hi_v - lo_v)) / 2 - lo_v
-    triad_color = (180, 180, 180)
-    for (t2, axis_label) in zip(tips, "xyz")
-        UnicodePlots.lines!(canvas, tx, ty, tx + t2[1], ty + t2[2]; color = triad_color)
-        # place letter at the arrow tip, slightly offset to the right s.t. it is not clipped
-        UnicodePlots.annotate!(
-            canvas,
-            uc(tx + t2[1] + 0.8 * wu / resolution[1]), vc(ty + t2[2] + 0.5 * wv / resolution[2]),
-            string(axis_label),
-            UnicodePlots.ansi_color(triad_color),
-            false
-        )
+    if ctx[:axistriad]
+        L = min(0.42 * band_h, 0.4 * wu)
+        tips = [(R' * (L * [Float64(k) for k in (i, j, l)]))[1:2] for (i, j, l) in ((1, 0, 0), (0, 1, 0), (0, 0, 1))]
+        # anchor the triad in the bottom-left of the reserved band, all arrows inside
+        lo_v = min(0.0, minimum(t[2] for t in tips))
+        hi_v = max(0.0, maximum(t[2] for t in tips))
+        tx = eu[1] + 0.06 * wu - min(0.0, minimum(t[1] for t in tips))
+        ty = ev_canvas[1] + (band_h - (hi_v - lo_v)) / 2 - lo_v
+        triad_color = (180, 180, 180)
+        for (t2, axis_label) in zip(tips, "xyz")
+            UnicodePlots.lines!(canvas, tx, ty, tx + t2[1], ty + t2[2]; color = triad_color)
+            # place letter at the arrow tip, slightly offset to the right s.t. it is not clipped
+            UnicodePlots.annotate!(
+                canvas,
+                uc(tx + t2[1] + 0.8 * wu / resolution[1]), vc(ty + t2[2] + 0.5 * wv / resolution[2]),
+                string(axis_label),
+                UnicodePlots.ansi_color(triad_color),
+                false
+            )
+        end
     end
 
     y0 = 0
