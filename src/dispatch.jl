@@ -337,11 +337,16 @@ function default_plot_kwargs()
     return OrderedDict{Symbol, Pair{Any, String}}(
         :azim => Pair(-60, "3D azimuth angle  (in degrees)"),
         :aspect => Pair(1.0, "XY Aspect ratio modification"),
+        :axistriad => Pair(false, "3D gridplot: draw projected x/y/z axis triad in a band below the mesh"),
         :backend => Pair(:default, "Backend for PlutoVista plot"),
         :border => Pair(:solid, "border style (only for UnicodePlots), possible values: :corners, :solid, :bold, :dashed, :dotted, :ascii, :none"),
         :cellcoloring => Pair(
             :cellregions,
             "Coloring of cells: one of [:cellregions, :pcolors, :partitions]"
+        ),
+        :cellmarkers => Pair(
+            false,
+            "3D gridplot: mark cell regions by numbers at cell midpoints"
         ),
         :cellwise => Pair(false, "1D plots cellwise; unmaintained and can be slow)"),
         :clear => Pair(true, "Clear plot before adding new content"),

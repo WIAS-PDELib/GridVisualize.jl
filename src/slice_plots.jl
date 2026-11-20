@@ -141,12 +141,12 @@ function compute_3d_z_rotation_matrix(target_vector)
     t = target_vector ./= norm(target_vector)
 
     # solve non-linear system
-    α = asin(-t[2])
+    α = asin(clamp(-t[2], -1, 1))
 
     if abs(α) ≈ π / 2 # cos(α) = 0: z → ±y, no y-rotation
         β = 0
     else
-        β = acos(t[3] / cos(α))
+        β = acos(clamp(t[3] / cos(α), -1, 1))
     end
 
     # check t[1]:
