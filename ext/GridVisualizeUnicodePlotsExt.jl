@@ -5,10 +5,11 @@ Extension module for UnicodePlots.jl
 """
 module GridVisualizeUnicodePlotsExt
 
-import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal, streamplot!, compute_3d_z_rotation_matrix
+import GridVisualize: initialize!, gridplot!, scalarplot!, vectorplot!, bregion_cmap, region_cmap, reveal, streamplot!
 using GridVisualize: UnicodePlotsType, GridVisualizer, SubVisualizer, vectorsample, quiverdata, isolevels
 using GridVisualizeTools: marching_triangles
 using UnicodePlots: UnicodePlots
+using LinearAlgebra: normalize, cross
 using ExtendableGrids: Coordinates, simplexgrid, ON_CELLS, ON_FACES, ON_EDGES, CellNodes, FaceNodes, BFaceNodes, CellGeometries, CellRegions, BFaceRegions, num_cells, num_nodes, local_celledgenodes, num_bfaceregions, num_cellregions, num_targets, interpolate!
 using Colors: Colors, RGB, RGBA, red, green, blue
 using ColorSchemes: colorschemes, color
@@ -68,10 +69,23 @@ function region_legend!(plt, title, y0, colors)
 end
 
 # unit vector from origin towards the camera for given azimuth/elevation angles (degrees)
+# (elevation clamped to Makie's stage camera limits of ±89.9° s.t. the screen up
+# direction (world z axis) never degenerates)
 function camera_direction(azim::Real, elev::Real)
     az = Float64(azim) * π / 180
-    el = Float64(elev) * π / 180
+    el = clamp(Float64(elev), -89.9, 89.9) * π / 180
     return [cos(el) * cos(az), cos(el) * sin(az), sin(el)]
+end
+
+# camera basis with z_cam pointing towards the camera and screen up along the world
+# z axis, matching the eyelookat convention (up = (0, 0, 1)) of the Makie / PyPlot
+# backends: in view coordinates q = R'p the first two components are screen
+# coordinates and the third one is the depth (larger = closer to camera)
+function camera_basis(azim::Real, elev::Real)
+    z_cam = camera_direction(azim, elev)
+    x_cam = normalize(cross([0.0, 0.0, 1.0], z_cam))
+    y_cam = cross(z_cam, x_cam)
+    return hcat(x_cam, y_cam, z_cam)
 end
 
 # cyclic polygon edges of face j (as node index pairs)
@@ -83,12 +97,9 @@ end
 function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
     UnicodePlots = ctx[:Plotter]
 
-    # set up camera from azimuth / elevation:
-    # R rotates the z axis into the view direction (pointing towards the camera),
-    # so in rotated coordinates q = R'p the first two components are screen
-    # coordinates and the third one is the depth (larger = closer to camera).
-    # Coordinates are centered w.r.t. the bounding box center.
-    R = compute_3d_z_rotation_matrix(camera_direction(ctx[:azim], ctx[:elev]))
+    # set up camera from azimuth / elevation (screen up = world z, as in the other
+    # 3D backends). Coordinates are centered w.r.t. the bounding box center.
+    R = camera_basis(ctx[:azim], ctx[:elev])
     coords = grid[Coordinates]
     c3 = vec((minimum(coords, dims = 2) .+ maximum(coords, dims = 2)) / 2)
     kappa = Float64(ctx[:perspectiveness])
