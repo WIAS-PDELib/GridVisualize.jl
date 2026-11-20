@@ -12,6 +12,7 @@ using UnicodePlots: UnicodePlots
 using ExtendableGrids: Coordinates, simplexgrid, ON_CELLS, ON_FACES, ON_EDGES, CellNodes, FaceNodes, BFaceNodes, CellGeometries, CellRegions, BFaceRegions, num_cells, num_nodes, local_celledgenodes, num_bfaceregions, num_cellregions, num_targets, interpolate!
 using Colors: Colors, RGB, RGBA, red, green, blue
 using ColorSchemes: colorschemes, color
+using Printf: @sprintf
 
 initialize!(p, ::Type{UnicodePlotsType}) = nothing
 
@@ -163,7 +164,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
     if linewidth > 0
         # interior edges (from cells, colored by cell region): painter's algorithm
         # (far edges first), brightness fades with depth
-        if ctx[:interior] && ctx[:wireframe]
+        if ctx[:interior]
             cellnodes = grid[CellNodes]
             cellregions = grid[CellRegions]
             cellgeoms = grid[CellGeometries]
@@ -226,7 +227,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
 
     # mark cell midpoints with their region number in region color (opt-in via cellmarkers)
     markersize = ctx[:markersize]
-    if ctx[:interior] && ctx[:wireframe] && ctx[:cellmarkers]
+    if ctx[:interior] && ctx[:cellmarkers]
         cellregions = grid[CellRegions]
         cellnodes = grid[CellNodes]
         ncells = num_cells(grid)
@@ -273,7 +274,8 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
     lo = vec(minimum(coords, dims = 2))
     hi = vec(maximum(coords, dims = 2))
     corners = [[x, y, z] for x in (lo[1], hi[1]) for y in (lo[2], hi[2]) for z in (lo[3], hi[3])]
-    fmt(x) = isinteger(x) ? string(Int(x)) : string(round(x, sigdigits = 3))
+    fmt1(x) = (abs(x) < 1.0e15 && isinteger(x)) ? string(Int(x)) : replace(replace(@sprintf("%.0e", Float64(x)), "e+0" => "e", "e-0" => "e-"), "e+" => "e")
+    intish(x) = abs(x) < 1.0e15 && isinteger(x)
     dcam = R[:, 3] # view direction (pointing towards the camera)
     nnodes = num_nodes(grid)
     hints = Tuple{Float64, Float64, Float64, Int}[] # (depth, u, v, node)
@@ -295,13 +297,17 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
         push!(hints, (pp[3], pp[1], pp[2], jnode))
     end
     placed = Tuple{Float64, Float64}[]
+    # keep annotation anchors within the canvas s.t. labels never trigger out-of-bounds drawing
+    uc(u_) = clamp(u_, eu[1] + wu / resolution[1], eu[2] - wu / resolution[1])
+    vc(v_) = clamp(v_, ev_canvas[1] + vunit, ev_canvas[2] - vunit)
     for h in sort(hints; by = h -> h[1]) # far nodes first, near labels overwrite them
         (u, v, jnode) = (h[2], h[3], h[4])
         pn = view(coords, :, jnode)
         # skip labels colliding with an already placed one (approximately 9 chars wide)
         if !any(abs(u - p0[1]) < 9 * wu / resolution[1] && abs(v - p0[2]) < 2 * wv / resolution[2] for p0 in placed)
             push!(placed, (u, v))
-            text = "($(fmt(pn[1])), $(fmt(pn[2])), $(fmt(pn[3])))"
+            # show non-integer coordinates rounded to one significant digit, with ≈ prefix
+            text = (all(intish, pn) ? "(" : "≈ (") * join(fmt1.(pn), ", ") * ")"
             # shift towards the canvas center s.t. labels do not get clipped at the border
             half = (length(text) / 2 + 1) * wu / resolution[1]
             du = u > (eu[1] + eu[2]) / 2 ? -half : half
@@ -309,14 +315,14 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
             # bullet marker at the annotated node itself, slightly shifted inwards
             UnicodePlots.annotate!(
                 canvas,
-                u + (du > 0 ? 0.7 : -0.7) * wu / resolution[1],
-                v + (dv > 0 ? 0.7 : -0.7) * wv / resolution[2],
+                uc(u + (du > 0 ? 0.7 : -0.7) * wu / resolution[1]),
+                vc(v + (dv > 0 ? 0.7 : -0.7) * wv / resolution[2]),
                 "●",
                 UnicodePlots.ansi_color((230, 230, 230)),
                 false
             )
             UnicodePlots.annotate!(
-                canvas, u + du, v + dv,
+                canvas, uc(u + du), vc(v + dv),
                 text,
                 UnicodePlots.ansi_color((200, 200, 200)),
                 false
@@ -339,7 +345,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
         # place letter at the arrow tip, slightly offset to the right s.t. it is not clipped
         UnicodePlots.annotate!(
             canvas,
-            tx + t2[1] + 0.8 * wu / resolution[1], ty + t2[2] + 0.5 * wv / resolution[2],
+            uc(tx + t2[1] + 0.8 * wu / resolution[1]), vc(ty + t2[2] + 0.5 * wv / resolution[2]),
             string(axis_label),
             UnicodePlots.ansi_color(triad_color),
             false
@@ -347,7 +353,7 @@ function gridplot!(ctx, TP::Type{UnicodePlotsType}, ::Type{Val{3}}, grid)
     end
 
     y0 = 0
-    if ctx[:interior] && ctx[:wireframe] && ctx[:cellmarkers]
+    if ctx[:interior] && ctx[:cellmarkers]
         y0 = region_legend!(plt, " cell", 1, [])
         y0 = region_legend!(plt, "regions", 2, cell_colors)
     end
@@ -754,8 +760,6 @@ function scalarplot!(
     # interpolate data onto plot_grid
     I = zeros(Float64, num_nodes(xgrid_plot))
     interpolate!(I, xgrid_plot, func, grids[1]; eps = 1.0e-14, not_in_domain_value = NaN, trybrute = true)
-
-    @info extrema(func) size (func)
 
     # adjust colormap to desired number of colorlevels
     colormap = get(colorschemes[ctx[:colormap]], range(0.0, 1.0, length = max(2, 1 + ctx[:colorlevels])))
